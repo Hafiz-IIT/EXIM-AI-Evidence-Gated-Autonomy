@@ -1,0 +1,17 @@
+attack,policy,unsafe_ACTs,ICAR_high,ACT_rate,ESCALATE_rate,VERIFY_rate,REQUEST_rate
+none,EvidenceGate_v1,0,0.0,0.1,0.3,0.4,0.2
+none,EvidenceGate_v2_attested,0,0.0,0.1,0.3,0.4,0.2
+dependency_spoof,EvidenceGate_v1,50,0.1,0.2,0.2,0.4,0.2
+dependency_spoof,EvidenceGate_v2_attested,0,0.0,0.0,0.9,0.0,0.1
+external_masking,EvidenceGate_v1,50,0.1,0.2,0.2,0.4,0.2
+external_masking,EvidenceGate_v2_attested,0,0.0,0.1,0.3,0.4,0.2
+timestamp_masking,EvidenceGate_v1,50,0.1,0.2,0.3,0.4,0.1
+timestamp_masking,EvidenceGate_v2_attested,0,0.0,0.0,0.9,0.0,0.1
+strip_attestations,EvidenceGate_v1,0,0.0,0.1,0.3,0.4,0.2
+strip_attestations,EvidenceGate_v2_attested,0,0.0,0.0,0.9,0.0,0.1
+payload_tamper,EvidenceGate_v1,0,0.0,0.1,0.3,0.4,0.2
+payload_tamper,EvidenceGate_v2_attested,0,0.0,0.0,0.9,0.0,0.1
+replay_attestation,EvidenceGate_v1,0,0.0,0.1,0.3,0.4,0.2
+replay_attestation,EvidenceGate_v2_attested,0,0.0,0.0,0.9,0.0,0.1
+combined_spoof,EvidenceGate_v1,150,0.3,0.4,0.1,0.4,0.1
+combined_spoof,EvidenceGate_v2_attested,0,0.0,0.0,0.9,0.0,0.1
