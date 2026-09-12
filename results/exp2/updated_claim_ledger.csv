@@ -1,0 +1,5 @@
+id,claim,status,evidence,boundary
+H10,Cryptographically bound provenance reduces silent metadata-spoof acceptance,SUPPORTED IN SYNTHETIC BENCHMARK,v1 10% ICAR on dependency/external/timestamp single-spoof families and 30% combined; v2 0% direct unsafe ACTs under those unsigned attacks.,Does not cover forged valid attestations or real PKI deployment.
+H11,Valid signatures do not establish evidence truth,SUPPORTED BY TRUST-ROOT ATTACK,"Compromising a trusted verifier, sensor, or authorization signer reintroduced 10% ICAR; all relevant roots 30%.",Benchmark compromise model is synthetic.
+H12,Separating verifier output authority from lineage authority raises compromise threshold,SUPPORTED IN SYNTHETIC BENCHMARK,"v3 remained at 0% deterministic ICAR under verifier-only, single-lineage, and verifier+single-lineage compromise; both lineage authorities compromised restored 10%.",Depends on independence and security of lineage authorities.
+H13,Cryptographic tamper detection removes downstream review risk,REJECTED,"With 90%-accurate simulated human escalation, v2 still showed ~7.1% ICAR under several detected-tamper conditions.",Actual human review remains untested.
