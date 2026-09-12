@@ -1,0 +1,21 @@
+{
+  "benchmark_version": "0.3",
+  "seed": 42,
+  "n_records": 1000,
+  "n_unique_case_ids": 1000,
+  "n_unique_underlying": 500,
+  "n_unique_fingerprints": 500,
+  "pair_integrity_failures": 0,
+  "family_counts": {
+    "C0_clean": 100,
+    "C1_extraction_error": 100,
+    "C2_cross_document_conflict": 100,
+    "C3_missing_critical_evidence": 100,
+    "C4_consistent_but_wrong": 100,
+    "C5_stale_evidence": 100,
+    "C6_verifier_false_accept": 100,
+    "C7_verifier_false_reject": 100,
+    "C8_correlated_verifier_failure": 100,
+    "C9_cascading_error": 100
+  }
+}
