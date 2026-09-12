@@ -1,0 +1,9 @@
+policy,ICAR_high,ICAR_95CI_low,ICAR_95CI_high,IncorrectHighActions,FAR_among_acts,FalseBlockingRate_safe,FinalActRate,MeanCost,InitialVerifyRate,InitialEscalateRate,InitialRequestRate
+B8_EvidenceGate,0.0,0.0,0.007625,0,0.0,0.0,0.7,1.85,0.2,0.15,0.1
+B7_RiskGate,0.1,0.076677,0.129423,50,0.178571,0.616667,0.28,0.5,0.5,0.0,0.0
+B4_AlwaysVerify,0.1,0.076677,0.129423,50,0.25,0.75,0.2,1.0,1.0,0.0,0.0
+B6_WeakStrong,0.204,0.170998,0.241516,102,0.386364,0.73,0.264,0.408,0.408,0.0,0.0
+B2_Confidence,0.288,0.250043,0.32919,144,0.4,0.64,0.36,0.0,0.0,0.0,0.0
+B5_Selective,0.288,0.250043,0.32919,144,0.444444,0.7,0.324,0.0,0.0,0.0,0.0
+B3_DocAgreement,0.65,0.607192,0.690521,325,0.382353,0.125,0.85,0.0,0.0,0.0,0.0
+B1_AlwaysAct,0.8,0.76271,0.832715,400,0.4,0.0,1.0,0.0,0.0,0.0,0.0
