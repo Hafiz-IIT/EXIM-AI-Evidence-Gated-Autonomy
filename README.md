@@ -26,6 +26,27 @@ The gate reasons about evidence completeness, consistency, freshness, provenance
 - Dual-lineage separation-of-duties experiment.
 - Preregistered protocols for the two studies not yet run: real model outputs and actual human reviewers.
 
+## Evidence map
+
+### Experiment results
+- [`results/exp1/summary.csv`](results/exp1/summary.csv) — deterministic Experiment 1A policy comparison.
+- [`results/exp1/exp1b_stochastic_summary.csv`](results/exp1/exp1b_stochastic_summary.csv) — optimistic/moderate/harsh imperfect-review simulations.
+- [`results/exp1/exp1c_stress_human90.csv`](results/exp1/exp1c_stress_human90.csv) — adversarial evidence/provenance stress at the predefined 90% reviewer-accuracy condition.
+- [`results/exp1/exp1d_ood_summary.csv`](results/exp1/exp1d_ood_summary.csv) — in-distribution, nuisance, confidence, provenance-dropout, and compound shifts.
+- [`results/exp2/deterministic_attack_comparison.csv`](results/exp2/deterministic_attack_comparison.csv) — Evidence Gate v1 vs attestation-aware v2 under provenance attacks.
+- [`results/exp2/EXP2_RESULTS.md`](results/exp2/EXP2_RESULTS.md) — Experiments 2A–2E interpretation and claim boundaries.
+- [`results/exp2/updated_claim_ledger.csv`](results/exp2/updated_claim_ledger.csv) — supported, rejected, and bounded provenance hypotheses.
+
+### Research audit / manuscript
+- [`paper/RESULTS_AND_DISCUSSION.md`](paper/RESULTS_AND_DISCUSSION.md) — current manuscript results/discussion section.
+- [`docs/FINAL_RESEARCH_AUDIT.md`](docs/FINAL_RESEARCH_AUDIT.md) — concise Experiments 1A–1D audit.
+- [`docs/THREATS_TO_VALIDITY.md`](docs/THREATS_TO_VALIDITY.md) — limitations and validity threats.
+- [`docs/PRIOR_ART_NOTES.md`](docs/PRIOR_ART_NOTES.md) — explicit boundary between established attestation techniques and the research question tested here.
+
+### Studies not yet run
+- [`docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md`](docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md) — frozen protocol for replacing simulated errors with actual model outputs.
+- [`docs/HUMAN_OVERSIGHT_PREREGISTRATION.md`](docs/HUMAN_OVERSIGHT_PREREGISTRATION.md) — preregistered human-review study; no human-subject result is claimed.
+
 ## Selected results
 
 ### Experiment 1A
@@ -58,9 +79,12 @@ A dual-lineage design separated verifier output authority from dependency-lineag
 - Human evidence-packet effectiveness has **not** been tested with real participants.
 - No external frontier-model batch experiment has been run.
 
-## Reproduce integrity checks
+## Reproduce the benchmark and checks
+
+The large raw JSONL benchmark is intentionally not stored in the repository. It is deterministically regenerated from code so the public repo stays compact and inspectable.
 
 ```bash
+python scripts/generate_benchmark.py
 python scripts/verify_benchmark.py
 python scripts/reproduce_tables.py
 ```
@@ -82,4 +106,4 @@ The strongest open problem emerging from the experiments is not merely verificat
 
 > **How should an action-gating system establish trustworthy provenance and independence for the evidence on which its authorization decision depends, while remaining robust to compromised trust roots and imperfect human escalation?**
 
-See `paper/RESULTS_AND_DISCUSSION.md` and `docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md`.
+The next empirical stages are the frozen real-model protocol and the preregistered human-oversight study linked above.
