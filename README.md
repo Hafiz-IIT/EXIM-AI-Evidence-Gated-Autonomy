@@ -25,6 +25,9 @@ The gate reasons about evidence completeness, consistency, freshness, provenance
 - Trust-root compromise tests.
 - Dual-lineage separation-of-duties experiment.
 - Preregistered protocols for the two studies not yet run: real model outputs and actual human reviewers.
+- A provider-neutral Experiment 3 scaffold for blinded real-model evaluation.
+- A claims/evidence ledger and reproducibility checklist that explicitly separate demonstrated results from hypotheses.
+- A manuscript draft grounded only in currently completed experiments.
 
 ## Evidence map
 
@@ -38,13 +41,17 @@ The gate reasons about evidence completeness, consistency, freshness, provenance
 - [`results/exp2/updated_claim_ledger.csv`](results/exp2/updated_claim_ledger.csv) — supported, rejected, and bounded provenance hypotheses.
 
 ### Research audit / manuscript
-- [`paper/RESULTS_AND_DISCUSSION.md`](paper/RESULTS_AND_DISCUSSION.md) — current manuscript results/discussion section.
+- [`paper/RESULTS_AND_DISCUSSION.md`](paper/RESULTS_AND_DISCUSSION.md) — current results/discussion section.
+- [`paper/DRAFT_MANUSCRIPT.md`](paper/DRAFT_MANUSCRIPT.md) — evidence-bounded full manuscript scaffold.
 - [`docs/FINAL_RESEARCH_AUDIT.md`](docs/FINAL_RESEARCH_AUDIT.md) — concise Experiments 1A–1D audit.
+- [`docs/CLAIMS_AND_EVIDENCE.md`](docs/CLAIMS_AND_EVIDENCE.md) — supported claims, negative findings, untested hypotheses, and publication-language boundaries.
+- [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) — deterministic regeneration, run-record requirements, and Experiment 3 reproducibility rules.
 - [`docs/THREATS_TO_VALIDITY.md`](docs/THREATS_TO_VALIDITY.md) — limitations and validity threats.
 - [`docs/PRIOR_ART_NOTES.md`](docs/PRIOR_ART_NOTES.md) — explicit boundary between established attestation techniques and the research question tested here.
 
 ### Studies not yet run
 - [`docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md`](docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md) — frozen protocol for replacing simulated errors with actual model outputs.
+- [`experiments/exp3_real_models/`](experiments/exp3_real_models/) — blinded-case builder, provider-neutral output schema, executable evaluator, and freeze record.
 - [`docs/HUMAN_OVERSIGHT_PREREGISTRATION.md`](docs/HUMAN_OVERSIGHT_PREREGISTRATION.md) — preregistered human-review study; no human-subject result is claimed.
 
 ## Selected results
@@ -89,6 +96,35 @@ python scripts/verify_benchmark.py
 python scripts/reproduce_tables.py
 ```
 
+For the blinded Experiment 3 dataset:
+
+```bash
+python experiments/exp3_real_models/build_blinded_cases.py
+```
+
+After real model outputs have been collected under the frozen protocol:
+
+```bash
+python experiments/exp3_real_models/evaluate_outputs.py \
+  --outputs path/to/model_outputs.jsonl
+```
+
+See [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) before running any final holdout.
+
+## Experiment 3 integrity boundary
+
+Experiment 3 is **not yet a completed empirical result**.
+
+The current branch makes the next study executable while preserving the distinction between protocol and evidence:
+
+- model-facing tasks strip `ground_truth`, `fault`, and `safe_to_act`;
+- raw model responses must be retained, not only parsed fields;
+- same-family verifier outputs are not relabeled as independent;
+- prompts, parsers, controller thresholds, and model choices must be frozen before final holdout inspection;
+- any post-hoc change requires a new experiment version / fresh holdout.
+
+A current implementation gap is also documented: `src/` exposes Evidence Gate v1 directly, while the later provenance-aware v2/v3 variants are represented in Experiment 2 artifacts rather than as reusable controller functions. Real-model v2/v3 claims must wait until those variants are reconstructed and regression-tested against Experiment 2.
+
 ## Repository boundaries
 
 This repository intentionally excludes:
@@ -100,10 +136,27 @@ This repository intentionally excludes:
 
 All benchmark records are synthetic.
 
+## Claim discipline
+
+The repository distinguishes:
+
+- **supported benchmark findings**;
+- **supported negative findings**;
+- **untested hypotheses**;
+- **work not completed**.
+
+See [`docs/CLAIMS_AND_EVIDENCE.md`](docs/CLAIMS_AND_EVIDENCE.md).
+
+Zero observed failures are not interpreted as proof of safety. Cryptographic integrity is not treated as semantic truth. Human escalation is not assumed to be reliable until tested with participants.
+
+## Citation metadata
+
+Repository-level citation metadata is provided in [`CITATION.cff`](CITATION.cff).
+
 ## Current research direction
 
 The strongest open problem emerging from the experiments is not merely verification. It is:
 
 > **How should an action-gating system establish trustworthy provenance and independence for the evidence on which its authorization decision depends, while remaining robust to compromised trust roots and imperfect human escalation?**
 
-The next empirical stages are the frozen real-model protocol and the preregistered human-oversight study linked above.
+The next empirical stage is the frozen real-model protocol. The human-oversight study remains separately preregistered and unrun.
