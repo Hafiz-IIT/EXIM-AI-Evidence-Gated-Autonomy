@@ -1,0 +1,89 @@
+{
+  "experiment_version": "exp3-v1",
+  "benchmark_version": "0.3",
+  "benchmark_seed": 42,
+  "benchmark_commit_sha": "FILL_BEFORE_RUN",
+  "blinded_cases_sha256": "FILL_BEFORE_RUN",
+  "parser_version": "exp3-parser-v1",
+  "conditions": [
+    {
+      "condition_id": "same_family_A",
+      "description": "Extractor and both verifiers use the same model family.",
+      "extractor": {
+        "provider": "FILL",
+        "model_family": "FAMILY_A",
+        "model_id": "FILL_EXACT_VERSION",
+        "prompt_version": "extract-v1",
+        "prompt_hash": "FILL",
+        "temperature": 0,
+        "seed": null,
+        "max_retries": 1
+      },
+      "verifiers": [
+        {
+          "slot": 1,
+          "provider": "FILL",
+          "model_family": "FAMILY_A",
+          "model_id": "FILL_EXACT_VERSION",
+          "prompt_version": "verify-v1",
+          "prompt_hash": "FILL",
+          "temperature": 0,
+          "seed": null,
+          "max_retries": 1
+        },
+        {
+          "slot": 2,
+          "provider": "FILL",
+          "model_family": "FAMILY_A",
+          "model_id": "FILL_EXACT_VERSION",
+          "prompt_version": "verify-v1",
+          "prompt_hash": "FILL",
+          "temperature": 0,
+          "seed": null,
+          "max_retries": 1
+        }
+      ]
+    },
+    {
+      "condition_id": "cross_family_A_B_C",
+      "description": "Extractor family A; verifiers from families B and C.",
+      "extractor": {
+        "provider": "FILL",
+        "model_family": "FAMILY_A",
+        "model_id": "FILL_EXACT_VERSION",
+        "prompt_version": "extract-v1",
+        "prompt_hash": "FILL",
+        "temperature": 0,
+        "seed": null,
+        "max_retries": 1
+      },
+      "verifiers": [
+        {
+          "slot": 1,
+          "provider": "FILL",
+          "model_family": "FAMILY_B",
+          "model_id": "FILL_EXACT_VERSION",
+          "prompt_version": "verify-v1",
+          "prompt_hash": "FILL",
+          "temperature": 0,
+          "seed": null,
+          "max_retries": 1
+        },
+        {
+          "slot": 2,
+          "provider": "FILL",
+          "model_family": "FAMILY_C",
+          "model_id": "FILL_EXACT_VERSION",
+          "prompt_version": "verify-v1",
+          "prompt_hash": "FILL",
+          "temperature": 0,
+          "seed": null,
+          "max_retries": 1
+        }
+      ]
+    }
+  ],
+  "run_start_utc": "FILL_BEFORE_RUN",
+  "run_end_utc": "FILL_AFTER_RUN",
+  "notes": "Different model families are treated as diversity labels, not proof of statistical or epistemic independence."
+}

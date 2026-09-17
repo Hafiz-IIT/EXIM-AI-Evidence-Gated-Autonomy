@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Evidence-Gated Autonomy Experiment 3 model-call record",
+  "type": "object",
+  "required": [
+    "condition_id",
+    "case_id",
+    "role",
+    "provider",
+    "model_family",
+    "model_id",
+    "prompt_version",
+    "prompt_hash",
+    "raw_response",
+    "parsed",
+    "timestamp_utc"
+  ],
+  "properties": {
+    "condition_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Frozen experimental condition, e.g. same_family, cross_family_A_B, holdout_family_C, or format_ood_v1."
+    },
+    "case_id": {"type": "string"},
+    "role": {"enum": ["extractor", "verifier"]},
+    "verifier_slot": {"type": ["integer", "null"], "minimum": 1},
+    "provider": {"type": "string"},
+    "model_family": {"type": "string"},
+    "model_id": {"type": "string"},
+    "prompt_version": {"type": "string"},
+    "prompt_hash": {"type": "string"},
+    "raw_response": {"type": "string"},
+    "parsed": {
+      "type": "object",
+      "properties": {
+        "quantity": {"type": ["integer", "null"]},
+        "gross_weight": {"type": ["number", "null"]},
+        "hs": {"type": ["string", "null"]},
+        "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "accept": {"type": ["boolean", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "temperature": {"type": ["number", "null"]},
+    "seed": {"type": ["integer", "null"]},
+    "retry_count": {"type": ["integer", "null"], "minimum": 0},
+    "latency_ms": {"type": ["number", "null"], "minimum": 0},
+    "cost_usd": {"type": ["number", "null"], "minimum": 0},
+    "timestamp_utc": {"type": "string"}
+  },
+  "additionalProperties": true
+}

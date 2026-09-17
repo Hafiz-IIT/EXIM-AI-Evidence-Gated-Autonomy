@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this research repository, please cite the software/research artifact."
+title: "Evidence-Gated Autonomy"
+type: software
+authors:
+  - family-names: "Ali"
+    given-names: "Syed Hafiz"
+repository-code: "https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy"
+license: "MIT"
+version: "0.3-research"
+date-released: 2026-09-17
+abstract: >-
+  A reproducible research testbed for action authorization under uncertain,
+  dependent, stale, conflicting, and potentially compromised evidence, with
+  synthetic controller evaluation, provenance stress tests, and a frozen
+  real-model follow-up protocol.
+keywords:
+  - AI safety
+  - agent governance
+  - evidence gating
+  - verification
+  - provenance
+  - autonomous agents
