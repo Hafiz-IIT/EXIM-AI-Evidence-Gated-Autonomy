@@ -3,6 +3,7 @@
   "title": "Evidence-Gated Autonomy Experiment 3 model-call record",
   "type": "object",
   "required": [
+    "condition_id",
     "case_id",
     "role",
     "provider",
@@ -15,6 +16,11 @@
     "timestamp_utc"
   ],
   "properties": {
+    "condition_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Frozen experimental condition, e.g. same_family, cross_family_A_B, holdout_family_C, or format_ood_v1."
+    },
     "case_id": {"type": "string"},
     "role": {"enum": ["extractor", "verifier"]},
     "verifier_slot": {"type": ["integer", "null"], "minimum": 1},
