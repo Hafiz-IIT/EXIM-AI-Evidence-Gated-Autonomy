@@ -1,0 +1,58 @@
+name: Research Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - research-hardening-exp3
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Regenerate benchmark
+        run: python scripts/generate_benchmark.py
+
+      - name: Verify benchmark
+        run: python scripts/verify_benchmark.py
+
+      - name: Reproduce published tables
+        run: python scripts/reproduce_tables.py
+
+      - name: Build blinded Experiment 3 cases
+        run: python experiments/exp3_real_models/build_blinded_cases.py
+
+      - name: Check blinded cases for forbidden hidden-truth fields
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          forbidden = {"ground_truth", "fault", "safe_to_act"}
+          path = Path("data/exp3/blinded_cases.jsonl")
+          count = 0
+          for line in path.read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              row = json.loads(line)
+              leaked = forbidden.intersection(row)
+              assert not leaked, f"Hidden truth leaked into model-facing case: {leaked}"
+              count += 1
+          assert count == 1000, f"Expected 1000 blinded cases, found {count}"
+          print(f"Verified {count} blinded cases with no forbidden top-level truth fields")
+          PY
