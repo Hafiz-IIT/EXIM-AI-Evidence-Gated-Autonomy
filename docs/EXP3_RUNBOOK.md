@@ -99,10 +99,13 @@ The scorer reports:
 - HIGH-risk incorrect-action count/rate;
 - 95% Wilson interval;
 - false authorization;
-- false blocking;
-- coverage;
+- safe cases sent to terminal `DEFER`;
+- safe cases routed to `VERIFY`, `REQUEST_EVIDENCE`, or `ESCALATE` for additional review;
+- autonomous action coverage;
 - verification/request/defer/escalation rates;
 - paired exact McNemar comparisons on the primary HIGH-risk error outcome.
+
+`VERIFY`, `REQUEST_EVIDENCE`, and `ESCALATE` are **not** counted as false blocks because they are intermediate routing decisions rather than terminal rejection. If a later end-to-end pipeline resolves those routes, final false-block/utility metrics should be computed on the resolved outcome.
 
 ## Phase G — required diagnostic analyses
 
