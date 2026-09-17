@@ -1,0 +1,57 @@
+{
+  "experiment": "exp3",
+  "status": "REGISTRATION_REQUIRED_BEFORE_HELDOUT",
+  "registered_at": null,
+  "registered_by": "Syed Hafiz Ali",
+  "code_commit_sha": null,
+  "prompt_contract": "configs/exp3/prompts.json",
+  "max_retries": 2,
+  "timeout_seconds": 120,
+  "max_total_cost_usd": null,
+  "roles": {
+    "extractor": {
+      "provider": null,
+      "model": null,
+      "model_family": null,
+      "model_revision": null,
+      "temperature": 0.0,
+      "top_p": 1.0
+    },
+    "same_model_verifier": {
+      "provider": null,
+      "model": null,
+      "model_family": null,
+      "model_revision": null,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "must_match_extractor_family": true,
+      "fresh_context": true
+    },
+    "cross_family_verifier_b": {
+      "provider": null,
+      "model": null,
+      "model_family": null,
+      "model_revision": null,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "must_differ_from_extractor_family": true
+    },
+    "cross_family_verifier_c": {
+      "provider": null,
+      "model": null,
+      "model_family": null,
+      "model_revision": null,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "optional": true,
+      "must_differ_from_extractor_and_b_when_used": true
+    }
+  },
+  "registration_rules": [
+    "Fill exact provider and model identifiers exposed at run time.",
+    "Do not call two endpoints from the same underlying model family independent families.",
+    "Commit this completed file before the first held-out test call.",
+    "Any later model substitution creates a new experiment version or a separately reported condition.",
+    "Provider aliases that can silently change underlying model versions must be avoided where version-pinned identifiers are available."
+  ]
+}
