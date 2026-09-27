@@ -47,6 +47,21 @@ The gate reasons about evidence completeness, consistency, freshness, provenance
 - [`docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md`](docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md) — frozen protocol for replacing simulated errors with actual model outputs.
 - [`docs/HUMAN_OVERSIGHT_PREREGISTRATION.md`](docs/HUMAN_OVERSIGHT_PREREGISTRATION.md) — preregistered human-review study; no human-subject result is claimed.
 
+
+## Preprint manuscript
+
+A complete preprint draft is now included in this repository:
+
+- [Full manuscript (Markdown)](paper/MANUSCRIPT.md)
+- [arXiv-ready LaTeX source](paper/main.tex)
+- [Bibliography](paper/references.bib)
+- [arXiv / preprint release checklist](paper/ARXIV_SUBMISSION_CHECKLIST.md)
+- [Citation metadata](CITATION.cff)
+
+**Working title:** *Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence*
+
+The v1 manuscript covers Experiments 1A–2E only. The real-model experiment and human-oversight study remain preregistered future work and are not claimed as completed results.
+
 ## Selected results
 
 ### Experiment 1A
