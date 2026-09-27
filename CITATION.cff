@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence"
+type: software
+authors:
+  - family-names: "Ali"
+    given-names: "Syed Hafiz"
+repository-code: "https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy"
+url: "https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy"
+version: "0.1.0"
+date-released: "2026-09-27"
