@@ -1,0 +1,109 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+\title{Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence}
+\author{Syed Hafiz Ali\\Independent Researcher; BS in Data Science and Applications, IIT Madras\\\texttt{syedhafizali4@gmail.com}}
+\date{2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+As AI systems are given greater autonomy, a central deployment question is not only whether a model can produce a plausible answer, but whether the available evidence is sufficient to authorize a consequential action. This work introduces Evidence-Gated Autonomy (EGA), a synthetic benchmark and action-authorization framework that maps observable evidence states to ACT, VERIFY, REQUEST EVIDENCE, DEFER, or ESCALATE. The benchmark contains 500 underlying evidence situations paired across low- and high-consequence actions, producing 1,000 cases across ten controlled failure families. In an idealized deterministic testbed, EGA produced 0/500 unsafe high-consequence ACT decisions, compared with 50/500 for tested Risk-Gate and Always-Verify baselines. Under stochastic verification, retrieval, and escalation, high-risk incorrect-action rate increased from 1.86\% in an optimistic regime to 6.10\% in a moderate regime and 13.09\% in a harsh regime. Adversarial tests showed that spoofed dependency metadata and masked external evidence could defeat the original gate. Ed25519 provenance attestations prevented direct unsafe ACTs under several unsigned metadata attacks, but valid signatures over false claims remained dangerous under trust-root compromise. A dual-lineage separation-of-duties design raised the compromise threshold for fabricated evidence independence. All current results are synthetic or simulated and do not establish production safety.
+\end{abstract}
+
+\section{Introduction}
+Increasingly capable AI systems are being integrated into workflows where model outputs can trigger external actions. The central question studied here is: what evidence should an AI system require before it is allowed to take the next action?
+
+Evidence-Gated Autonomy treats action authorization as a structured evidence problem. The controller considers evidence completeness, cross-document consistency, freshness, external grounding, verifier disagreement, source dependence, action consequence, and later, cryptographically bound provenance.
+
+The contribution is a reproducible synthetic benchmark, comparative policy evaluation, adversarial falsification tests, and provenance/trust-root experiments. The work does not claim to solve autonomous-agent safety.
+
+\section{Benchmark}
+The benchmark is generated deterministically with seed 42 and contains 500 unique underlying evidence situations across ten controlled failure families. Each underlying state is paired with a LOW- and HIGH-consequence action, producing 1,000 total cases.
+
+The ten families are clean, extraction error, cross-document conflict, missing critical evidence, consistent-but-wrong evidence, stale evidence, verifier false accept, verifier false reject, correlated verifier failure, and cascading upstream error.
+
+Observable information includes document fields, authorization presence and freshness, externally measured weight, extraction outputs and confidence, verifier decisions, verifier dependency groups, and action consequence. Ground-truth and injected-fault labels are used only for evaluation.
+
+\section{Action Policies}
+The primary controller outputs ACT, VERIFY, REQUEST EVIDENCE, DEFER, or ESCALATE. For high-consequence actions it checks critical evidence presence, authorization freshness, cross-document agreement, external conflicts, extraction agreement, verifier rejection, and verifier dependency diversity.
+
+Seven comparison policies are evaluated: Always Act, Confidence Gate, Document Agreement, Always Verify, Selective Abstention, Weak/Strong, and Risk Gate.
+
+\section{Metric}
+The primary metric is high-risk incorrect consequential action rate (ICAR), the proportion of HIGH-risk cases that ultimately result in an incorrect consequential action. Additional metrics include false authorization, false blocking, action rate, intervention rates, and normalized intervention cost.
+
+\section{Experiment 1A: Deterministic Comparison}
+Evidence Gate produced 0/500 incorrect HIGH-risk actions. Risk Gate and Always Verify each produced 50/500.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Policy & Incorrect HIGH & ICAR & Final ACT rate\\
+\midrule
+Evidence Gate & 0/500 & 0.000 & 0.700\\
+Risk Gate & 50/500 & 0.100 & 0.280\\
+Always Verify & 50/500 & 0.100 & 0.200\\
+Weak/Strong & 102/500 & 0.204 & 0.264\\
+Confidence & 144/500 & 0.288 & 0.360\\
+Document Agreement & 325/500 & 0.650 & 0.850\\
+Always Act & 400/500 & 0.800 & 1.000\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This result is treated only as an idealized proof-of-concept.
+
+\section{Experiment 1B: Imperfect Verification and Escalation}
+Across 30 Monte Carlo seeds per regime, Evidence Gate mean HIGH-risk ICAR was $0.0186 \pm 0.0052$ under optimistic assumptions, $0.0610 \pm 0.0115$ under moderate assumptions, and $0.1309 \pm 0.0131$ under harsh assumptions. Under the moderate regime, Risk Gate ICAR was approximately 0.1655.
+
+\section{Ablations and Negative Results}
+External grounding, source/dependency independence, and freshness provided measurable protection. Explicit verifier-status handling did not independently reduce deterministic ICAR after other checks were present. Risk conditioning primarily changed coverage and cost, while REQUEST EVIDENCE improved resolution and coverage without establishing intrinsic safety benefit.
+
+\section{Experiment 1C: Provenance Stress}
+At simulated 90\% human-review accuracy, Evidence Gate ICAR was approximately 6.4\% without attack, 15.36\% under dependency spoofing, 15.70\% under external-evidence masking, and 24.06\% under combined metadata spoofing. These tests invalidated the assumption that self-asserted provenance and dependency metadata was a sufficient trust foundation.
+
+\section{Experiment 1D: Distribution Shift}
+Under compound shift, Evidence Gate ICAR was 0.1195, Risk Gate 0.1851, and Confidence-only 0.7660. Provenance dropout increased Evidence Gate ICAR from approximately 0.0619 in-distribution to 0.0895.
+
+\section{Experiment 2: Attested Provenance}
+Experiment 2 generated 3,675 synthetic Ed25519 attestations binding provenance claims to current evidence objects. Under individual dependency, external-evidence, and timestamp spoofing attacks, Evidence Gate v1 reached 10\% deterministic ICAR while attestation-aware v2 produced 0\% direct unsafe ACT. Under combined spoofing, v1 reached 30\% and v2 0\% direct unsafe ACT, largely by escalating detected inconsistencies.
+
+With simulated 90\%-accurate escalation, v2 still produced roughly 6--7\% ICAR under several detected-tamper conditions.
+
+\section{Trust-Root Compromise}
+Compromising a trusted verifier, external-sensor signer, or authorization signer reintroduced a 10\% deterministic failure family; compromising all relevant roots produced 30\%. A valid signature therefore establishes authenticity and integrity of a claim, not its truth.
+
+\section{Separation of Duties}
+A third design separates verifier-output authority from dependency-lineage authority. The verifier signs its output while two independent lineage authorities attest dependency lineage. Deterministic ICAR remained at 0\% under verifier-only, either single-lineage, or verifier plus one-lineage compromise. Compromising both lineage authorities restored 10\% ICAR. With imperfect escalation, single-authority compromise still produced approximately 7\% error and both-lineage compromise approximately 15\%.
+
+\section{Discussion}
+The experiments shift the central question from evidence quantity to evidence structure and trust. Multiple agreeing model outputs need not provide multiple independent reasons for action. External grounding can expose mutually consistent but incorrect evidence, yet its benefit collapses if that evidence can be hidden. Signed provenance can prevent undetected modification but cannot guarantee truth when trusted signers are compromised. Escalation quality is part of the safety system rather than an external assumption.
+
+\section{Governance Relevance}
+For regulators, auditors, standards bodies, and independent evaluators, the results motivate questions about what evidence supports a safety claim, whether checks are actually independent, who controls trust roots, how negative results are disclosed, and whether escalation effectiveness has been empirically measured.
+
+The paper does not prescribe a regulatory regime. It motivates treating provenance, independence, and correlated failure as first-class properties of assurance claims for consequential AI deployments.
+
+\section{Limitations}
+All current performance results are synthetic or Monte Carlo simulations. There is no external frontier-model batch evaluation, real customs dataset, production deployment, real cryptographic infrastructure, or human-subject result. Cost units are normalized utilities. Trust-root compromise scenarios are stylized. The benchmark can establish controlled counterexamples and comparative proof-of-concept behavior, not deployment safety.
+
+\section{Future Work}
+A frozen real-model protocol will replace simulated extraction and verifier error with actual model outputs from independently developed model families. A preregistered human-oversight study will compare raw escalation output against structured evidence packets. Neither study has been run.
+
+\section{Reproducibility}
+Code, benchmark generation, results, claim ledgers, and preregistered protocols are available at:
+\url{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy}
+
+\section{Conclusion}
+The strongest defensible conclusion is narrow: action authorization should reason not only about model outputs, but about the provenance, independence, freshness, external grounding, and failure structure of the evidence supporting those outputs. Whether such mechanisms improve real-world AI safety remains an empirical question.
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
