@@ -1,0 +1,39 @@
+name: research-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  reproducibility:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Compile Python sources
+        run: python -m compileall -q src scripts tests
+
+      - name: Generate deterministic benchmark
+        run: python scripts/generate_benchmark.py
+
+      - name: Verify benchmark integrity
+        run: python scripts/verify_benchmark.py
+
+      - name: Reproduce published synthetic tables
+        run: python scripts/reproduce_tables.py
+
+      - name: Prepare frozen Experiment 3 split
+        run: python scripts/exp3_prepare.py
+
+      - name: Run harness tests
+        run: python -m unittest discover -s tests -v
