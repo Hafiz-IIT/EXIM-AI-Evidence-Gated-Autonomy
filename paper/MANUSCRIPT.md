@@ -49,15 +49,13 @@ The experiments address five questions.
 
 ## 3. Related Work and Scope
 
-This work sits near research on AI control, oversight, red teaming, and provenance.
+This work is adjacent to AI control, scalable oversight, and provenance research. AI control studies protocols intended to prevent harmful outcomes even when an untrusted model may intentionally subvert the safety mechanism; Greenblatt et al. evaluate such protocols empirically [1]. Scalable-oversight work studies whether weaker judges can supervise stronger agents through debate and consultancy [4]. Recent work on collaborative disagreement resolution and strategic communication further highlights that oversight quality depends on how evidence is elicited and presented, not only on whether a final verdict is correct [5,6].
 
-AI-control research studies how systems can be deployed safely even when powerful models may be untrusted or strategically subversive. Greenblatt et al. evaluate control protocols combining untrusted models, monitoring, and limited trusted labor, emphasizing that safety techniques must be tested against active attempts to circumvent them [1]. EGA addresses a different but adjacent layer: whether the **evidence structure supplied to an action-authorizing controller is itself trustworthy**.
+EGA addresses a narrower complementary question: **before an external action is authorized, what properties of the evidence chain should be required, and what happens when those properties are themselves compromised?** Source dependence, provenance, freshness, external grounding and escalation are therefore explicit experimental variables.
 
-The provenance experiments draw on established software-supply-chain patterns rather than claiming cryptographic attestation as novel. The in-toto framework binds artifacts to signed statements about their supply-chain history [2], while SLSA provenance similarly emphasizes verifiable metadata about how artifacts were produced [3]. EGA uses analogous ideas to test whether signed evidence and dependency claims can repair failures discovered in the synthetic benchmark.
+The provenance experiments draw on established assurance systems. in-toto provides signed statements about software supply-chain history [2], while SLSA defines verifiable provenance describing where and how artifacts were produced [3]. These systems motivate the integrity experiments here, but EGA explicitly tests the distinction between authenticated provenance and truthful claims.
 
-The distinction between integrity and truth is central. A valid signature can establish that a trusted signer made a claim and that the signed bytes were not modified; it cannot by itself establish that the claim is correct. The trust-root experiments explicitly test this boundary.
-
-This project does **not** evaluate deceptive frontier models, real customs operations, production security, or actual human reviewers. It is a synthetic proof-of-concept designed to expose controlled failure modes and generate testable hypotheses for later real-model and human-subject studies.
+This project does not replace AI control, scalable oversight, provenance systems, or human review. Its contribution is a controlled benchmark for studying how evidence-chain failures propagate into consequential action authorization.
 
 ## 4. Benchmark
 
