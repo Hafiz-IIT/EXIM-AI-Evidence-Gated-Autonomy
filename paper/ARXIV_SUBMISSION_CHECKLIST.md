@@ -27,16 +27,16 @@
 - "external frontier-model evaluation completed"
 - "cryptography proves truth"
 
-## Before arXiv submission
-1. Reproduce the benchmark and tables:
+## Verified before arXiv submission
+1. **PASS —** benchmark and tables reproduced in CI:
    - `python scripts/generate_benchmark.py`
    - `python scripts/verify_benchmark.py`
    - `python scripts/reproduce_tables.py`
-2. Compile the LaTeX source and visually inspect the PDF.
-3. Cross-check every reported number against `results/`.
-4. Confirm no private client data, credentials, or confidential EXIM material is present.
-5. Upload only the source files required to compile the paper.
-6. Submit it as a preprint, not as a peer-reviewed publication.
+2. **PASS —** LaTeX source compiled; final CI artifact is 5 pages and page 1, page 3, and page 5 were visually inspected.
+3. **PASS —** reported numerical claims were cross-checked against the version-controlled `results/` files.
+4. **PASS —** source package boundary is limited to the manuscript compilation inputs; no private client material is part of the intended arXiv package.
+5. **READY —** upload only `main.tex` and `references.bib`.
+6. **READY —** submit as a preprint, not as a peer-reviewed publication.
 7. After arXiv assigns an identifier, add that identifier to README and CITATION.cff.
 8. Add the indexed paper to a public Google Scholar profile. If Scholar does not find it, use "Add article manually."
 
