@@ -23,6 +23,15 @@ Evidence-Gated Autonomy treats action authorization as a structured evidence pro
 
 The contribution is a reproducible synthetic benchmark, comparative policy evaluation, adversarial falsification tests, and provenance/trust-root experiments. The work does not claim to solve autonomous-agent safety.
 
+\section{Related Work}
+This work is adjacent to several strands of AI safety and assurance research. AI control studies protocols intended to prevent harmful outcomes even when an untrusted model may intentionally subvert the safety mechanism; Greenblatt et al. evaluate such protocols empirically in programming tasks \cite{greenblatt2024aicontrol}. Scalable-oversight work studies whether weaker judges can supervise stronger agents through mechanisms such as debate and consultancy \cite{kenton2024scalableoversight}. More recent work continues to examine disagreement resolution and strategic communication in oversight, reinforcing that a correct verdict does not by itself establish that the evidence-gathering process was robust \cite{jiang2026disagreement,holland2026debate}.
+
+EGA addresses a narrower and complementary question: before an external action is authorized, what properties of the evidence chain should be required, and what happens when those properties are themselves compromised? The benchmark therefore treats source dependence, provenance, freshness, external grounding, and escalation as explicit experimental variables rather than assuming that verifier agreement is independent.
+
+The provenance component is informed by established software-supply-chain assurance systems. in-toto provides signed statements about software supply-chain history, while SLSA defines verifiable provenance describing where and how artifacts were produced \cite{torresarias2019intoto,slsa2026}. These systems motivate the integrity experiments here, but EGA explicitly tests the distinction between authenticated provenance and truthful claims: a valid signature can establish who attested to a statement and protect its integrity, but cannot by itself establish that the statement is true.
+
+This paper does not claim that EGA is a replacement for AI control, scalable oversight, software provenance, or human review. Its contribution is a controlled benchmark for studying how failures in the evidence chain propagate into consequential action authorization.
+
 \section{Benchmark}
 The benchmark is generated deterministically with seed 42 and contains 500 unique underlying evidence situations across ten controlled failure families. Each underlying state is paired with a LOW- and HIGH-consequence action, producing 1,000 total cases.
 
