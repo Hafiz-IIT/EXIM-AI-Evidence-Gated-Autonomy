@@ -47,7 +47,7 @@ For the initial release, upload only the clean source needed to compile the manu
 
 Google Scholar is an indexing/discovery system rather than the publication venue.
 
-Google Scholar states that it indexes scholarly articles, preprints, technical reports and other scholarly literature when the content is accessible and technically crawlable. It recommends a separate searchable PDF/HTML per paper, a clear title and author line, an abstract/full text accessible without login, and a bibliography. cite not allowed in repo markdown
+Google Scholar states that it indexes scholarly articles, preprints, technical reports and other scholarly literature when the content is accessible and technically crawlable. It recommends a separate searchable PDF/HTML per paper, a clear title and author line, an abstract/full text accessible without login, and a bibliography.
 
 Practical sequence:
 
