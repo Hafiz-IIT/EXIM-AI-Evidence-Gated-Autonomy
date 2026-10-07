@@ -1,71 +1,109 @@
 # Publication Path — EGA v1
 
-## 1. GitHub research artifact
-Status: READY
+## Current state
 
-The public repository contains:
-- benchmark generator;
-- controller implementation;
-- provenance experiments;
-- result CSVs;
-- claim ledger;
-- threats-to-validity notes;
-- preregistered future studies;
-- full manuscript;
-- LaTeX source;
-- bibliography;
-- citation metadata.
+**Research artifact:** READY  
+**Manuscript:** substantially prepared  
+**LaTeX:** under automated compilation check  
+**arXiv:** requires the author's account/submission action  
+**Google Scholar:** follows public dissemination/indexing; it is not the publication venue
+
+## 1. Freeze the research artifact
+
+Before submission, freeze the exact v1 benchmark/results state:
+
+- 500 underlying synthetic evidence situations
+- 1,000 LOW/HIGH consequence cases
+- Experiments 1A–2E
+- 3,675 synthetic Ed25519 attestations
+- deterministic and stochastic result tables
+- adversarial/provenance/trust-root experiments
+- claims ledger
+- limitations and threats-to-validity
+
+No new experiment should silently change v1 after submission.
 
 ## 2. arXiv preprint
-Status: REQUIRES AUTHOR ACCOUNT ACTION
 
-arXiv expects authors to self-submit. A registered author starts a new submission, uploads the LaTeX source, checks compilation, enters metadata, chooses a license/category, and agrees to arXiv's submittal terms.
+**Status: READY FOR FINAL AUTHOR-SIDE SUBMISSION CHECK**
 
-Files prepared in this repository:
-- paper/main.tex
-- paper/references.bib
-- paper/ARXIV_METADATA.md
-- paper/ARXIV_SUBMISSION_CHECKLIST.md
+The repository contains:
 
-Do not claim peer review. The correct CV wording after public posting is:
-"Preprint: Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence, arXiv, 2026."
+- `paper/main.tex`
+- `paper/references.bib`
+- `paper/MANUSCRIPT.md`
+- `paper/RESULTS_AND_DISCUSSION.md`
+- `paper/ARXIV_METADATA.md`
+- `paper/ARXIV_SUBMISSION_CHECKLIST.md`
+- reproducibility materials and result CSVs
 
-Before an arXiv identifier exists, use:
-"Working paper / preprint in preparation."
+The author must still submit through the arXiv account, select the final subject classification/license, review the generated PDF, and accept arXiv's submission terms. Do not represent a manuscript as an arXiv preprint until an arXiv identifier exists.
+
+For the initial release, upload only the clean source needed to compile the manuscript. Do not expose private notes, credentials, client records, irrelevant files, or repository history.
+
+**Candidate category:** `cs.AI`. Cross-listing can be considered after checking the final manuscript framing and arXiv's current classification options.
 
 ## 3. Google Scholar
-Status: AFTER PUBLIC PREPRINT
 
-Google Scholar is an indexing/profile system, not the publication venue.
+Google Scholar is an indexing/discovery system rather than the publication venue.
 
-After the arXiv page becomes public:
-1. Create or open your Google Scholar author profile.
-2. Use an institutional email for profile verification if available.
-3. Search for the paper title and add the indexed record.
-4. If Scholar has not indexed it yet, use "Add article manually."
-5. Once Scholar later finds the indexed version, merge duplicate/manual records if necessary.
+Google Scholar states that it indexes scholarly articles, preprints, technical reports and other scholarly literature when the content is accessible and technically crawlable. It recommends a separate searchable PDF/HTML per paper, a clear title and author line, an abstract/full text accessible without login, and a bibliography. cite not allowed in repo markdown
 
-## 4. Version plan
-v1: Experiments 1A–2E.
-v2: Add Experiment 3 only after actual external-model execution.
-Later version/follow-up: human-oversight study only after actual participants and any required ethics review.
+Practical sequence:
 
-## 5. CV / fellowship wording
-Allowed now:
-- "Independent Researcher — Evidence-Gated Autonomy"
-- "Public research repository"
-- "1,000-case synthetic benchmark"
-- "3,675 synthetic Ed25519 attestations"
-- "manuscript prepared"
+1. Make the arXiv record public.
+2. Search the exact title + author in Google Scholar.
+3. If Scholar has indexed it, add/confirm it in the author's Scholar profile.
+4. If it has not appeared yet, add the paper manually to the profile while waiting for automatic indexing.
+5. Keep the public arXiv PDF stable and searchable.
+6. When additional versions exist, let Scholar group them rather than creating unnecessary duplicate records.
 
-Allowed only after arXiv is public:
-- "arXiv preprint"
-- arXiv identifier/link
+Google Scholar says new papers are normally added several times a week, but indexing is not guaranteed immediately.
 
-Not allowed:
-- peer-reviewed publication;
-- accepted paper;
-- production validation;
-- real-world safety proof;
-- completed external frontier-model evaluation;
-- completed human-subject study.
+## 4. Author/profile identity
+
+Use one consistent author identity everywhere:
+
+**Syed Hafiz Ali**
+
+Use the same title, author ordering, affiliation wording and email across:
+
+- manuscript
+- arXiv metadata
+- GitHub
+- Google Scholar
+- CV
+
+Do not claim an IIT Madras institutional research affiliation beyond what is actually accurate. The current manuscript uses:
+
+**Independent Researcher; BS in Data Science and Applications, IIT Madras**
+
+## 5. Citation and versioning
+
+### v1
+Experiments 1A–2E; current synthetic benchmark and provenance study.
+
+### v2
+External-model evaluation only after the frozen protocol is actually executed.
+
+### Later study
+Human-oversight evaluation only after actual participants and any required ethics/consent process.
+
+## 6. CV wording
+
+Before arXiv:
+> Working paper / research manuscript: *Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence.*
+
+After arXiv:
+> Preprint: *Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence.* arXiv, 2026.
+
+Never use:
+
+- peer-reviewed publication
+- accepted paper
+- production validation
+- real-world safety proof
+- completed human-subject study
+- completed frontier-model evaluation
+
+until those claims are independently true.
