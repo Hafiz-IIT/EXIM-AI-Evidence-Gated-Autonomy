@@ -1,124 +1,115 @@
-# Evidence-Gated Autonomy
+# EXIM AI — Evidence-Gated Autonomy
 
-**Research snapshot — synthetic proof-of-concept, not production safety validation.**
+<p align="center">
+  <strong>Can an AI system know when it has enough evidence to act?</strong><br/>
+  <sub>An inspectable research program connecting document intelligence, verification failure, provenance and action-conditioned escalation.</sub>
+</p>
 
-This repository contains the inspectable evidence for a research project asking:
+<p align="center">
+  <img src="https://img.shields.io/badge/status-research%20prototype-blue" alt="Research prototype"/>
+  <img src="https://img.shields.io/badge/data-synthetic-orange" alt="Synthetic data"/>
+  <img src="https://img.shields.io/badge/action-policy-ACT%20%7C%20VERIFY%20%7C%20REQUEST%20EVIDENCE%20%7C%20DEFER%20%7C%20ESCALATE-purple" alt="Action policy"/>
+</p>
 
-> **What evidence should an AI system require before it is allowed to take the next action?**
+## The research problem
 
-The work grew from multi-stage operational workflow questions into a narrower reliability problem: model confidence and verifier agreement are not always sufficient grounds for consequential action when evidence may be incomplete, conflicting, stale, correlated, machine-generated, or inconsistent with external observations.
+The project started from a practical EXIM/document workflow and narrowed into a general reliability question:
 
-## Proposed action policy
+> **Extraction is not consistency. Consistency is not truth. Verification is not automatically independent evidence.**
 
-`ACT / VERIFY / REQUEST EVIDENCE / DEFER / ESCALATE`
+A consequential AI system therefore needs to reason about **what evidence exists, where it came from, how fresh it is, whether sources are dependent, what was independently verified, and what happens if the action is wrong.**
 
-The gate reasons about evidence completeness, consistency, freshness, provenance, source dependence, external grounding, verifier status, and action consequence.
+## System idea
 
-## What is actually in this repository
-
-- 500 unique synthetic evidence situations paired into 1,000 LOW/HIGH-consequence cases.
-- Ten controlled failure families.
-- Baseline comparisons and ablations.
-- Stochastic imperfect-verification/review simulations.
-- Adversarial provenance/evidence stress tests.
-- Ed25519 provenance-attestation experiments.
-- Trust-root compromise tests.
-- Dual-lineage separation-of-duties experiment.
-- Preregistered protocols for the two studies not yet run: real model outputs and actual human reviewers.
-
-## Evidence map
-
-### Experiment results
-- [`results/exp1/summary.csv`](results/exp1/summary.csv) — deterministic Experiment 1A policy comparison.
-- [`results/exp1/exp1b_stochastic_summary.csv`](results/exp1/exp1b_stochastic_summary.csv) — optimistic/moderate/harsh imperfect-review simulations.
-- [`results/exp1/exp1c_stress_human90.csv`](results/exp1/exp1c_stress_human90.csv) — adversarial evidence/provenance stress at the predefined 90% reviewer-accuracy condition.
-- [`results/exp1/exp1d_ood_summary.csv`](results/exp1/exp1d_ood_summary.csv) — in-distribution, nuisance, confidence, provenance-dropout, and compound shifts.
-- [`results/exp2/deterministic_attack_comparison.csv`](results/exp2/deterministic_attack_comparison.csv) — Evidence Gate v1 vs attestation-aware v2 under provenance attacks.
-- [`results/exp2/EXP2_RESULTS.md`](results/exp2/EXP2_RESULTS.md) — Experiments 2A–2E interpretation and claim boundaries.
-- [`results/exp2/updated_claim_ledger.csv`](results/exp2/updated_claim_ledger.csv) — supported, rejected, and bounded provenance hypotheses.
-
-### Research audit / manuscript
-- [`paper/RESULTS_AND_DISCUSSION.md`](paper/RESULTS_AND_DISCUSSION.md) — current manuscript results/discussion section.
-- [`docs/FINAL_RESEARCH_AUDIT.md`](docs/FINAL_RESEARCH_AUDIT.md) — concise Experiments 1A–1D audit.
-- [`docs/THREATS_TO_VALIDITY.md`](docs/THREATS_TO_VALIDITY.md) — limitations and validity threats.
-- [`docs/PRIOR_ART_NOTES.md`](docs/PRIOR_ART_NOTES.md) — explicit boundary between established attestation techniques and the research question tested here.
-
-### Studies not yet run
-- [`docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md`](docs/REAL_MODEL_EXPERIMENT_PROTOCOL.md) — frozen protocol for replacing simulated errors with actual model outputs.
-- [`docs/HUMAN_OVERSIGHT_PREREGISTRATION.md`](docs/HUMAN_OVERSIGHT_PREREGISTRATION.md) — preregistered human-review study; no human-subject result is claimed.
-
-
-## Preprint manuscript
-
-A complete preprint draft is now included in this repository:
-
-- [Full manuscript (Markdown)](paper/MANUSCRIPT.md)
-- [arXiv-ready LaTeX source](paper/main.tex)
-- [Bibliography](paper/references.bib)
-- [arXiv / preprint release checklist](paper/ARXIV_SUBMISSION_CHECKLIST.md)
-- [Citation metadata](CITATION.cff)
-
-**Working title:** *Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence*
-
-The v1 manuscript covers Experiments 1A–2E only. The real-model experiment and human-oversight study remain preregistered future work and are not claimed as completed results.
-
-## Selected results
-
-### Experiment 1A
-Evidence Gate: **0/500** unsafe HIGH-risk ACT decisions in the deterministic testbed.
-
-Risk Gate and Always Verify: **50/500** each.
-
-This result is not treated as real-world validation.
-
-### Experiment 1B
-With imperfect simulated verification/review:
-- optimistic Evidence Gate ICAR: ~1.9%;
-- moderate: ~6.1%;
-- harsh: ~13.1%.
-
-### Experiment 1C/1D
-Provenance dropout and evidence masking expose a major failure boundary. Under compound shift, the Evidence Gate remained better than the tested simpler baselines but degraded materially.
-
-### Experiment 2
-Unsigned provenance/dependency spoofing caused Evidence Gate v1 to fail on specific families. Cryptographically binding the claims prevented direct silent ACTs under those unsigned attacks, but **valid signatures over false claims remained dangerous when trust roots were compromised**.
-
-A dual-lineage design separated verifier output authority from dependency-lineage authority. In the synthetic compromise test, verifier-only or one-lineage-authority compromise no longer fabricated independence; compromising both lineage authorities restored the failure.
-
-## Most important negative findings
-
-- Explicit verifier-status handling added no independent deterministic safety benefit once other checks were present.
-- Risk conditioning primarily improved coverage/cost in the current benchmark.
-- REQUEST EVIDENCE mainly improved resolution/coverage over pure deferral; it did not establish intrinsic safety benefit.
-- Cryptographic provenance does **not** prove evidence truth.
-- Human evidence-packet effectiveness has **not** been tested with real participants.
-- No external frontier-model batch experiment has been run.
-
-## Reproduce the benchmark and checks
-
-The large raw JSONL benchmark is intentionally not stored in the repository. It is deterministically regenerated from code so the public repo stays compact and inspectable.
-
-```bash
-python scripts/generate_benchmark.py
-python scripts/verify_benchmark.py
-python scripts/reproduce_tables.py
+```
+Documents / observations
+          ↓
+Extraction
+          ↓
+Cross-source consistency
+          ↓
+Evidence quality
+  provenance · freshness
+  independence · conflicts
+          ↓
+Action-conditioned gate
+          ↓
+ACT / VERIFY / REQUEST EVIDENCE / DEFER / ESCALATE
 ```
 
-## Repository boundaries
+## What this repository actually contains
 
-This repository intentionally excludes:
-- real client documents;
-- private family-business workflows;
-- commercial EXIM roadmap details;
-- scanner/radiation engineering concepts;
-- live government credentials/integrations.
+The repository includes an inspectable synthetic research environment with:
 
-All benchmark records are synthetic.
+- **500 unique synthetic evidence situations**
+- paired into **1,000 low/high-consequence cases**
+- **10 controlled failure families**
+- deterministic policy comparisons
+- imperfect-verification simulations
+- adversarial evidence/provenance stress tests
+- out-of-distribution shifts
+- Ed25519 provenance-attestation experiments
+- trust-root compromise tests
+- dual-lineage separation-of-duties experiments
+- preregistered protocols for future real-model and human-reviewer studies
 
-## Current research direction
+## Results are separated from future work
 
-The strongest open problem emerging from the experiments is not merely verification. It is:
+### Existing computational evidence
 
-> **How should an action-gating system establish trustworthy provenance and independence for the evidence on which its authorization decision depends, while remaining robust to compromised trust roots and imperfect human escalation?**
+- `results/exp1/summary.csv`
+- `results/exp1/exp1b_stochastic_summary.csv`
+- `results/exp1/exp1c_stress_human90.csv`
+- `results/exp1/exp1d_ood_summary.csv`
+- `results/exp2/deterministic_attack_comparison.csv`
+- `results/exp2/EXP2_RESULTS.md`
+- `results/exp2/updated_claim_ledger.csv`
 
-The next empirical stages are the frozen real-model protocol and the preregistered human-oversight study linked above.
+These are synthetic computational experiments. They should be read as evidence about the implemented simulation conditions—not as proof of performance on deployed AI systems.
+
+## Action policy
+
+The core policy family is:
+
+**ACT → VERIFY → REQUEST EVIDENCE → DEFER → ESCALATE**
+
+The interesting research question is not simply “does the model have high confidence?”
+
+It is:
+
+> **What evidence threshold should be required for a particular consequence?**
+
+A low-risk informational response and a high-consequence operational action should not necessarily require the same evidentiary standard.
+
+## EXIM origin
+
+The project is grounded in long-running exposure to export-import and logistics workflows, including document-heavy operational processes. That domain motivated the original problem decomposition; the resulting evidence-gating framework is intentionally broader than customs or trade.
+
+## Research boundary
+
+This repository does **not** claim:
+
+- production customs automation
+- regulatory approval
+- deployment in ICEGATE/DGFT
+- a working physical cargo scanner
+- human-subject validation
+- real-model validation unless explicitly identified in the experiment files
+- publication or peer review
+
+The strongest defensible contribution at this stage is the **formal problem decomposition + reproducible synthetic experimentation + explicit claim ledger**.
+
+## Related portfolio work
+
+- [Agent Evidence Probes](https://github.com/Hafiz-IIT/agent-evidence-probes)
+- [Memory Governor](https://github.com/Hafiz-IIT/memory-governor)
+- [Safe RL Action Gate](https://github.com/Hafiz-IIT/safe-rl-action-gate)
+- [EXIM Document Truth Bench](https://github.com/Hafiz-IIT/exim-document-truth-bench)
+- [EXIM Copilot Core](https://github.com/Hafiz-IIT/exim-copilot-core)
+- [Secure Document RAG Agent](https://github.com/Hafiz-IIT/secure-doc-rag-agent)
+- [Cargo Scan Consistency Lab](https://github.com/Hafiz-IIT/cargo-scan-consistency-lab)
+- [~haf.s__ OS Core](https://github.com/Hafiz-IIT/hafs-os-core)
+
+## Reproducibility
+
+Start with the experiment summaries, claim ledger and repository tests. The research materials are deliberately structured so that another reader can inspect the assumptions before interpreting the results.
