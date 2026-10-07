@@ -1,7 +1,7 @@
 # Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence
 
 **Syed Hafiz Ali**  
-Independent Researcher; BS in Data Science and Applications, Indian Institute of Technology Madras  
+BS in Data Science and Applications (student), Indian Institute of Technology Madras  
 GitHub: https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy
 
 ## Abstract
@@ -395,7 +395,7 @@ Whether such mechanisms improve real-world AI safety remains an empirical questi
 
 [2] Santiago Torres-Arias, Hammad Afzali, Trishank Karthik Kuppusamy, Reza Curtmola, and Justin Cappos. *in-toto: Providing farm-to-table guarantees for bits and bytes*. 28th USENIX Security Symposium, 2019.
 
-[3] SLSA Project. *Supply-chain Levels for Software Artifacts (SLSA): Provenance*. https://slsa.dev/
+[3] SLSA Project. *Supply-chain Levels for Software Artifacts (SLSA): Provenance*. https://slsa.dev/\n\n[4] Zachary Kenton et al. *On scalable oversight with weak LLMs judging strong LLMs*. arXiv:2407.04622, 2024.\n\n[5] Yuyang Jiang et al. *Collaborative Disagreement Resolution for Scalable Oversight*. arXiv:2607.01251, 2026.\n\n[6] Rayne Holland, Liming Zhu, and Jason Xue. *When Honesty is Not Enough in AI Debate*. arXiv:2609.29189, 2026.
 
 ## Citation
 
