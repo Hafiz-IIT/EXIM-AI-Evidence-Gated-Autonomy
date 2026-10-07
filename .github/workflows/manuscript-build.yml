@@ -48,3 +48,13 @@ jobs:
           name: ega-manuscript-pdf
           path: paper/main.pdf
           if-no-files-found: error
+
+      - name: Package arXiv source
+        run: zip -j ega-arxiv-source.zip paper/main.tex paper/references.bib
+
+      - name: Upload arXiv source package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-arxiv-source
+          path: ega-arxiv-source.zip
+          if-no-files-found: error
