@@ -1,0 +1,21 @@
+name: Manuscript Build
+
+on:
+  push:
+    paths:
+      - "paper/**"
+      - ".github/workflows/manuscript-build.yml"
+  pull_request:
+    paths:
+      - "paper/**"
+
+jobs:
+  latex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: paper/main.tex
+          working_directory: .
+          latexmk_use_xelatex: false
