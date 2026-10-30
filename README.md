@@ -113,3 +113,34 @@ The strongest defensible contribution at this stage is the **formal problem deco
 ## Reproducibility
 
 Start with the experiment summaries, claim ledger and repository tests. The research materials are deliberately structured so that another reader can inspect the assumptions before interpreting the results.
+
+
+## Architecture
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the action-authorization architecture: **ACT → VERIFY → REQUEST EVIDENCE → DEFER → ESCALATE**.
+
+## Key claims and claim ledger
+
+The numerical and security claims in the manuscript are tied to the repository's explicit claim ledger and experiment outputs. See [paper/claims.md](paper/claims.md) before interpreting any result.
+
+## Results summary
+
+| Evidence item | Result documented in the repository |
+|---|---|
+| Synthetic cases | 500 unique evidence situations × low/high consequence = 1,000 cases |
+| Controlled failure families | 10 |
+| Deterministic Evidence Gate | 0/500 unsafe high-consequence ACT in the reported setup |
+| Risk Gate / Always Verify | 50/500 in the reported deterministic comparison |
+| Stochastic high-risk incorrect-action rate | 1.86% optimistic; 6.10% moderate; 13.09% harsh |
+| Provenance attacks | Demonstrate that provenance mechanisms can fail under compromised trust assumptions |
+| Ed25519 experiments | Blocked direct unsafe ACT for several unsigned-metadata attacks; valid signatures over false claims remain dangerous under trust-root compromise |
+
+These are **synthetic computational results under the documented experimental assumptions**, not evidence of deployed-system safety.
+
+## One-command reproduction
+
+```bash
+python scripts/reproduce_all.py
+```
+
+This runs benchmark generation, integrity verification and publication-table reproduction. Full manuscript compilation is additionally exercised by GitHub Actions.
