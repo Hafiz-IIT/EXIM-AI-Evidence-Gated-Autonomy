@@ -26,3 +26,6 @@ The key transition is from **evidence quantity** to **evidence structure and tru
 
 ## Limitations
 All current performance results remain synthetic or Monte Carlo simulations. No external frontier-model batch evaluation, real customs dataset, production system, real cryptographic infrastructure, or human-subject study has been completed. The current evidence establishes a reproducible proof-of-concept and identifies failure modes; it does not establish real-world safety.
+
+
+<!-- Current-head reproducibility trigger: manuscript workflow also validates documentation-triggered revisions. -->
