@@ -1,0 +1,38 @@
+{
+  "benchmark_version": "0.4",
+  "parent_version": "0.3",
+  "seed": 42,
+  "records_per_family": 50,
+  "n_records": 1400,
+  "n_unique_case_ids": 1400,
+  "n_unique_underlying": 700,
+  "n_unique_fingerprints": 700,
+  "pair_integrity_failures": 0,
+  "family_counts": {
+    "C0_clean": 100,
+    "C1_extraction_error": 100,
+    "C2_cross_document_conflict": 100,
+    "C3_missing_critical_evidence": 100,
+    "C4_consistent_but_wrong": 100,
+    "C5_stale_evidence": 100,
+    "C6_verifier_false_accept": 100,
+    "C7_verifier_false_reject": 100,
+    "C8_correlated_verifier_failure": 100,
+    "C9_cascading_error": 100,
+    "C10_missing_invoice": 100,
+    "C11_missing_packing_list": 100,
+    "C12_duplicate_document_kind": 100,
+    "C13_corrupted_provenance": 100
+  },
+  "new_fault_families": [
+    "C10_missing_invoice",
+    "C11_missing_packing_list",
+    "C12_duplicate_document_kind",
+    "C13_corrupted_provenance"
+  ],
+  "document_lineage": "synthetic content digest; not a digital signature or external trust proof",
+  "files_sha256": {
+    "underlying.jsonl": "3b1c1f77a81acc251e972ebb8ea6b20629d4f6e8bdf5c6388a1a72b5c30b7206",
+    "cases.jsonl": "87b49a76973174ecb0ae9663593a3df4aae346108c22c20aa62acad2db307e6b"
+  }
+}
