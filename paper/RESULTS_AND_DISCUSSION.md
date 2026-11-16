@@ -29,3 +29,8 @@ All current performance results remain synthetic or Monte Carlo simulations. No 
 
 
 <!-- Current-head reproducibility trigger: manuscript workflow also validates documentation-triggered revisions. -->
+
+
+## Reproducibility qualification
+
+The historical 1B–2E result CSVs do not have their original experiment runners or complete parameter configurations in the repository history. The new `reconstruction_v1` outputs are generated from an explicit new protocol and are not historical reproductions. Experiment 1A's original downstream-resolution implementation is also missing. The historical numerical claims therefore remain pending source-level reconciliation.
