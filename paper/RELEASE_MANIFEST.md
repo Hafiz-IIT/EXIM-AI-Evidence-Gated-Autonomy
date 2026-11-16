@@ -61,7 +61,7 @@ The generated benchmark counts and raw JSONL SHA-256 hashes are pinned in [data/
 
 The v2 reconstruction and sensitivity protocol is documented in `experiments/reconstruction_v2/PROTOCOL.md`; the first results interpretation is in `experiments/reconstruction_v2/RESULTS_REVIEW.md`. It reruns 1B, 1C, 1D and 2B–2E on 700 HIGH-risk v0.4 cases, plus 25 sensitivity conditions (30 seeds each), and writes paired Evidence Gate-minus-baseline differences with SHA-256 output hashes.
 
-The full v2 experiment execution with the coherent-rewrite regression test passed in [run 43952541323](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43952541323); its v0.4 runner, historical-table loading and artifact uploads all succeeded. The paired sensitivity/output hashes and source provenance are pinned in [manifest-43952541323.json](../results/reconstruction_v2/manifest-43952541323.json). The earlier full pipeline run [43951632081](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43951632081) also passed manuscript compilation. The later run is the current revalidation for the coherent-rewrite test and documentation updates.
+The full v2 experiment execution with the coherent-rewrite regression test passed in [run 43952541323](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43952541323); its v0.4 runner, historical-table loading, artifact uploads, execution-status publication and LaTeX compilation all succeeded. The paired sensitivity/output hashes and source provenance are pinned in [manifest-43952541323.json](../results/reconstruction_v2/manifest-43952541323.json).
 
 ## Required before submission
 
