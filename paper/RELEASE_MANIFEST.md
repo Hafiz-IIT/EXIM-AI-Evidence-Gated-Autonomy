@@ -5,10 +5,11 @@
 - **Paper:** Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence
 - **Author:** Syed Hafiz Ali
 - **Repository:** https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy
-- **Version:** v1 synthetic benchmark and reported Experiments 1A–2E
-- **Benchmark:** 500 underlying evidence situations paired across LOW/HIGH consequence = 1,000 cases
+- **Version:** Historical v1 artifact plus separately versioned benchmark v0.4 / reconstruction v2
+- **Historical benchmark v0.3:** 500 underlying evidence situations paired across LOW/HIGH consequence = 1,000 cases
+- **Extended benchmark v0.4:** 700 underlying evidence situations paired across LOW/HIGH consequence = 1,400 cases; 14 fault families
 - **Benchmark seed:** 42
-- **Attestations reported:** 3,675 synthetic Ed25519 attestations in Experiment 2
+- **Historical attestations reported:** 3,675 synthetic Ed25519 attestations in Experiment 2
 
 ## Current status
 
@@ -48,6 +49,19 @@ A separately versioned reconstruction now exists:
 It covers new versions of 1B, 1C, 1D, and 2B–2E using explicit parameters and 30 seeds per Monte Carlo condition. The verified run [43949299526](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43949299526) passed tests, benchmark integrity checks, the full reconstruction runner, historical-table loading, artifact upload and manuscript compilation. The output manifest is pinned at [manifest-43949299526.json](../results/reconstruction_v1/manifest-43949299526.json), with SHA-256 hashes for all 12 generated CSVs, source commit `b3e07190a6c365daec33ce83f92e53cf3019e7a5`, Python 3.11.18, and 21,500 synthetic signature records created across the repeated 2B–2E sweeps. These outputs are **not** reproductions of the historical result tables. Experiment 1A's original downstream-resolution logic is also not recoverable from the committed source.
 
 The verified CI execution above passed the regression tests, benchmark generation and integrity verification, reconstruction runner, historical table loading, artifact upload, and manuscript build. Later runner revisions must be revalidated on their own latest CI run before these outputs are treated as final.
+
+
+## Benchmark v0.4 and reconstruction v2
+
+The extended benchmark adds C10 missing invoice, C11 missing packing list, C12 duplicate document kind and C13 corrupted provenance. Its generator and verifier are:
+- `scripts/generate_benchmark_v04.py`
+- `scripts/verify_benchmark_v04.py`
+
+The v0.4 policy regression tests cover all four new cases. A further test deliberately performs a coherent rewrite of the documents, extraction and external measurement, recomputes the unkeyed digest, and confirms the current gate still returns ACT. This is an explicit security limitation: SHA-256 without a trusted signature detects mismatches, not maliciously rewritten evidence.
+
+The v2 reconstruction and sensitivity protocol is documented in `experiments/reconstruction_v2/PROTOCOL.md`; the first results interpretation is in `experiments/reconstruction_v2/RESULTS_REVIEW.md`. It reruns 1B, 1C, 1D and 2B–2E on 700 HIGH-risk v0.4 cases, plus 25 sensitivity conditions (30 seeds each), and writes paired Evidence Gate-minus-baseline differences with SHA-256 output hashes.
+
+The successful full v2 CI execution is [run 43951632081](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43951632081). It passed regression tests, v0.3/v0.4 benchmark integrity, both reconstruction runners, historical-table loading, artifact uploads and LaTeX compilation. Its raw benchmark and experiment outputs are retained as GitHub Actions artifacts. The additional coherent-rewrite regression test was added afterward and is being revalidated in a subsequent CI run; the earlier v2 numerical outputs are unchanged by that test-only addition.
 
 ## Required before submission
 
