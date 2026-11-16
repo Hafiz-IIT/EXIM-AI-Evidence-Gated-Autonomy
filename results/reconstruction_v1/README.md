@@ -24,7 +24,7 @@ This directory is populated by `python scripts/run_reconstruction_v1.py` and by 
 
 See [the preliminary results review](../../experiments/reconstruction_v1/RESULTS_REVIEW.md) for the first run's numerical findings and limitations.
 
-The generated manifest records the source commit, workflow run ID, Python version, signature-record count and SHA-256 hashes for each generated CSV.
+The run manifest is pinned at [manifest-43949299526.json](manifest-43949299526.json); it records the source commit, workflow run ID, Python version, signature-record count and SHA-256 hashes for each generated CSV.
 
 ## Interpretation cautions
 
