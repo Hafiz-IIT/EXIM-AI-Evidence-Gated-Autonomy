@@ -3,7 +3,8 @@
 **Benchmark:** v0.4 (1,400 cases; 700 HIGH-risk cases; 14 families)  
 **Protocol:** [PROTOCOL.md](PROTOCOL.md)  
 **Runner:** [run_reconstruction_v2.py](../../scripts/run_reconstruction_v2.py)  
-**Output manifest:** generated as `results/reconstruction_v2/manifest.json`  
+**Verified CI run:** [43952541323](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43952541323)  
+**Pinned output manifest:** [manifest-43952541323.json](../../results/reconstruction_v2/manifest-43952541323.json)  
 **Status:** Synthetic reconstruction. Not a historical reproduction and not manuscript-approved.
 
 The CI artifact contains per-seed CSVs, aggregate summaries, paired sensitivity deltas and a SHA-256 manifest. All percentages below are computed on the v0.4 synthetic benchmark. Monte Carlo intervals describe simulation-seed variability only.
