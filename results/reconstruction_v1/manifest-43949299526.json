@@ -1,0 +1,40 @@
+{
+  "protocol": "EGA reconstruction v1",
+  "historical_reproduction": false,
+  "benchmark_seed": 42,
+  "monte_carlo_seeds_per_condition": 30,
+  "experiments": ["1B", "1C", "1D", "2B", "2C", "2D", "2E"],
+  "generated_files": [
+    "exp1b_seed_results.csv",
+    "exp1b_summary.csv",
+    "exp1c_seed_results.csv",
+    "exp1c_summary.csv",
+    "exp1d_seed_results.csv",
+    "exp1d_summary.csv",
+    "exp2_unsigned_attack_cases.csv",
+    "exp2_unsigned_attack_summary.csv",
+    "exp2c_seed_results.csv",
+    "exp2c_summary.csv",
+    "exp2d_trust_root_summary.csv",
+    "exp2e_dual_lineage_summary.csv"
+  ],
+  "outputs_sha256": {
+    "exp1b_seed_results.csv": "36b1b1580d56d67e7ffdbf79030776bee24938d263c02f85f0086c7458e3c673",
+    "exp1b_summary.csv": "15a10771978e1f033fa784444879015ab4d1ffc1c80d60f9da66f75f32eb4fbf",
+    "exp1c_seed_results.csv": "1f940f6f3dfa510d5829071b531ac1eb15888b4ce323fcc51f6d04ef3f6ba9bc",
+    "exp1c_summary.csv": "e11445490888baec61ee849d373b2b73c7a091ceb83b6869e21af4313c115204",
+    "exp1d_seed_results.csv": "f38477e1491a2f5d1519dabcb8406ed430d9a2ddffb8af005b08b0f9b904b18a",
+    "exp1d_summary.csv": "a4460421ab365fde99c272a3930ef2449a9106094b65865ddd174e51c08d2816",
+    "exp2_unsigned_attack_cases.csv": "bb75a276dfcf83b8d8dc62ce0e7563ec45f6c16b1304e65b9fa031968e43f62a",
+    "exp2_unsigned_attack_summary.csv": "6bd896ee99805bbda5a61caffcfaf0e13bce38ba300d67353a74960ed8527dbf",
+    "exp2c_seed_results.csv": "7b4145eff5110030f0c9394e7b089f9848b160c179a9d468071b55de98f41c76",
+    "exp2c_summary.csv": "2d295e6cda48c013db5a4453a0ad48395d7b2482db21576953353e08ca5c7935",
+    "exp2d_trust_root_summary.csv": "e011e8d0682cf91de583d3dedf19af5b70188fceef07fc6d2dcc7fe2345525b9",
+    "exp2e_dual_lineage_summary.csv": "83925ce31ac34928eae424b6d343a1bd7a5e2776f7f944425757225bcd34aac8"
+  },
+  "signature_records_created": 21500,
+  "source_commit": "b3e07190a6c365daec33ce83f92e53cf3019e7a5",
+  "workflow_run_id": "43949299526",
+  "python_version": "3.11.18",
+  "note": "New explicitly parameterized reconstruction. Three role-scoped attestations per HIGH-risk case in 2B. Do not substitute these outputs for historical v1 result tables."
+}
