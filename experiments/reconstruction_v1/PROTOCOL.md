@@ -60,7 +60,7 @@ The in-distribution control applies no transformation.
 
 ## 2B signed provenance and unsigned attacks
 
-For each HIGH-risk case, the reconstruction creates three SHA-256-bound Ed25519 attestations: a verifier authority signs verifier outputs/classification, a sensor authority signs measured weight/inspection item, and an authorization authority signs authorization timing. Each signer is scoped to its own component. A changed component invalidates that component's signature and causes v2 to ESCALATE. This creates 1,500 role-scoped attestations (3 × 500 HIGH-risk cases); it does not reproduce the historical 3,675-attestation design.
+For each HIGH-risk case, the reconstruction creates three SHA-256-bound Ed25519 attestations: a verifier authority signs verifier outputs/classification, a sensor authority signs measured weight/inspection item, and an authorization authority signs authorization timing. Each signer is scoped to its own component. A changed component invalidates that component's signature and causes v2 to ESCALATE. The 2B baseline creates 1,500 role-scoped attestations per attack condition (3 × 500 HIGH-risk cases); repeated attack conditions and the 2D/2E sweeps create additional signature records. The runner counts every signature record in its manifest. This does not reproduce the historical 3,675-attestation design.
 
 ## 2C imperfect escalation
 
