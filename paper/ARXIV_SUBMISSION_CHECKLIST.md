@@ -2,7 +2,7 @@
 
 ## Current decision
 
-<badge>NOT READY FOR SUBMISSION</badge>
+**NOT READY FOR SUBMISSION**
 
 The project has reported synthetic results and a compiled manuscript, but the full experiment runners for Experiments 1B–2E are not present in the repository. The current reproduction command regenerates the benchmark and loads existing CSVs; it does not rerun the simulations that produced those CSVs.
 
