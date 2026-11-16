@@ -1,9 +1,9 @@
 # Reconstruction v1 — Preliminary Results Review
 
-**Source run:** [GitHub Actions run 43949104719](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43949104719)  
+**Source run:** [GitHub Actions run 43949299526](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43949104719)  
 **Protocol:** [PROTOCOL.md](PROTOCOL.md)  
 **Runner:** [run_reconstruction_v1.py](../../scripts/run_reconstruction_v1.py)  
-**Status:** Synthetic reconstruction; not historical reproduction; not yet manuscript-approved.
+**Status:** Synthetic reconstruction; not historical reproduction; not yet manuscript-approved. The run manifest is pinned at [manifest-43949299526.json](../../results/reconstruction_v1/manifest-43949299526.json).
 
 The values below are from the generated reconstruction artifact. The protocol and raw per-seed CSVs must be consulted before secondary analysis. These numbers must not replace the historical result tables without a separate review decision.
 
