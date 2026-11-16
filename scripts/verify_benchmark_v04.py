@@ -2,6 +2,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 import json
 import sys
+import hashlib
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -21,6 +22,9 @@ def main():
     underlying = load_jsonl(bench / "underlying.jsonl")
     manifest = json.loads((bench / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["benchmark_version"] == "0.4"
+    for name, expected in manifest["files_sha256"].items():
+        actual = hashlib.sha256((bench / name).read_bytes()).hexdigest()
+        assert actual == expected, f"SHA-256 mismatch for {name}"
     assert len(underlying) == 700 and len(cases) == 1400
     assert len({x["case_id"] for x in cases}) == 1400
     assert len({x["underlying_id"] for x in underlying}) == 700
