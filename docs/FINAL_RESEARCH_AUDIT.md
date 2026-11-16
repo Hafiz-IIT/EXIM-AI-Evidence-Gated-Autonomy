@@ -41,7 +41,7 @@ The historical 1B–2E result CSVs were added to Git without their original simu
 
 ## New reconstruction v1
 
-A separate executable reconstruction is now defined in:
+The verified execution is [GitHub Actions run 43949299526](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43949299526), and its output hashes/source provenance are pinned in [manifest-43949299526.json](../results/reconstruction_v1/manifest-43949299526.json). It completed successfully, including manuscript compilation. A separate executable reconstruction is defined in:
 - `experiments/reconstruction_v1/PROTOCOL.md`
 - `scripts/run_reconstruction_v1.py`
 - `tests/test_reconstruction_v1.py`
