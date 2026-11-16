@@ -156,6 +156,10 @@ The runner covers 1B, 1C, 1D and 2B–2E under newly specified assumptions. It d
 
 The v0.4 policy now requests missing required documents and escalates duplicate document kinds or corrupted document-set digests. The digest is a synthetic integrity field, not a digital signature or proof of document truth.
 
+
+
+**Security limitation discovered in v0.4:** the document-set SHA-256 is unkeyed. A test demonstrates that a coherent attacker rewrite followed by digest recomputation still passes the current gate. It detects mismatched/corrupted content, not a maliciously rewritten source. Authenticity requires a trusted signature/attestation bound to the raw document set and signer identity; v0.4 does not provide that.
+
 ## One-command reproduction
 
 ```bash
