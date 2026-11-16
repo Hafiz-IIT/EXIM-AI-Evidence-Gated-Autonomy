@@ -60,3 +60,62 @@ It runs new 1B, 1C, 1D, 2B, 2C, 2D and 2E experiments under explicit assumptions
 - Under 2E, the stylized C8 test gives 0% ICAR under no/single-authority compromise and 10% when both lineage authorities are compromised.
 
 These results are synthetic and conditional on the new protocol. They are not replacements for the historical tables and must not be inserted into the manuscript until independent review, stronger OOD design, sensitivity analysis and claim reconciliation are complete.
+
+## Benchmark v0.4 and reconstruction v2
+
+### Benchmark changes
+
+Benchmark v0.4 is generated separately from v0.3 and preserves the historical dataset:
+- 700 unique underlying situations, paired into 1,400 LOW/HIGH cases.
+- 14 fault families, 100 paired-risk cases per family.
+- New families: missing invoice, missing packing list, duplicate document kind, corrupted provenance.
+- The verifier checks pair integrity, family counts, fault placement and SHA-256 checksums for generated JSONL files.
+- Policy tests verify that missing invoice/packing list request evidence and duplicate document kinds/corrupted digests escalate.
+
+**Security boundary:** the document-set digest is unkeyed. A regression test coherently rewrites document, extraction and external-weight values, recomputes the digest and confirms the current gate still returns ACT. It therefore detects mismatch/corruption, not malicious source rewriting or authenticity. A trusted document-root signature is still required.
+
+### Reconstruction v2 execution
+
+The full v2 run [43951632081](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43951632081) passed tests, v0.3/v0.4 benchmark generation and integrity checks, v1/v2 reconstruction, historical-table loading, artifact uploads and LaTeX compilation. Its manifest is included in the `ega-reconstruction-v2-benchmark-v04` artifact. It records:
+- 1,400 benchmark records / 700 HIGH-risk cases;
+- 30 Monte Carlo seeds per stochastic condition;
+- 25 sensitivity conditions and 2,250 per-seed sensitivity rows;
+- 75 sensitivity summary groups;
+- 30,100 synthetic signature records across the 2B–2E reconstruction;
+- SHA-256 hashes for all 16 CSV outputs;
+- source commit `ebe1b144e4495f0a97872cd0eafcaf28c398f3c4`, Python 3.11.18.
+
+The later coherent-rewrite regression test was added after this numerical run. It does not change the experiment runner or generated outputs; it is being revalidated in a subsequent full CI run.
+
+### Main v0.4 results
+
+- **1B moderate regime:** Evidence Gate ICAR 5.03%; Risk Gate 5.72%. The paired EGA-minus-Risk-Gate difference is −0.70 percentage points (95% t interval −1.25 to −0.14 pp). The optimistic interval includes zero; the harsh difference is −1.35 pp (−1.97 to −0.74 pp).
+- Evidence Gate mean intervention cost is 1.4286 versus 1.0000 for Risk Gate under the current cost model (+0.4286 units per HIGH-risk case).
+- **1C:** Evidence Gate ICAR rises from 5.99% without attack to 12.12–12.95% under the individual metadata attacks and 25.72% under combined spoofing.
+- **1D:** Evidence Gate ICAR is 6.28% in-distribution and 5.94% under the current compound shift. The current OOD transformations do not establish robustness or degradation.
+- **2B:** the signed variant records zero unsafe ACTs for the tested unsigned metadata attacks by escalating when covered component digests fail.
+- **2C:** under 90%-accurate simulated human review, ICAR ranges from 2.65% to 8.74% across the tested attack conditions.
+- **2D:** one relevant trust-root compromise yields 7.14% ICAR; all three covered roots compromised yields 21.43%.
+- **2E:** both lineage authorities compromised yields 7.14% ICAR in the stylized C8 test; no/single-authority compromise yields zero.
+
+### Sensitivity findings
+
+Paired differences are Evidence Gate minus Risk Gate ICAR, in percentage points, with 30 seeds per condition:
+- Verifier accuracy 0.75: −11.37 pp; 0.85: −5.40 pp; 0.93: −0.62 pp; 0.99: **+2.80 pp**.
+- Human accuracy 0.70: **+5.16 pp**; 0.80: **+2.04 pp**; 0.90: −0.92 pp; 0.98: −3.47 pp.
+- Retrieval success 0.70–0.99: −0.28 to −1.23 pp.
+- Escalation availability 0.70–1.00: −0.79 to −1.02 pp.
+- In the human-accuracy × availability interaction, low reviewer accuracy (0.70) leaves Evidence Gate 4.90–5.30 pp worse than Risk Gate; at reviewer accuracy 0.98 it is 3.43–3.54 pp better.
+
+**Interpretation:** the policy's relative advantage depends strongly on downstream verifier/reviewer quality. At very high verifier accuracy, Always Verify/Risk Gate can outperform a gate that directly authorizes selected cases. Low human-review accuracy can reverse the benefit of escalation. The current cost model also makes Evidence Gate more intervention-intensive.
+
+### Remaining research blockers
+
+1. Add a dedicated document-root signer covering raw document instances and normalized documents; test coherent rewrites, signer compromise, revocation/rotation and replay.
+2. Improve OOD shifts and expand sensitivity beyond one-factor and selected two-factor sweeps.
+3. Inspect false accepts/false blocks by family and severity.
+4. Recover or retire the historical 1A downstream-resolution comparison.
+5. Reconcile manuscript claims against the new results without fitting parameters to historical values.
+6. Complete an independent literature/novelty and methods review.
+
+The v0.4 outputs are new synthetic evidence, not historical reproductions, production security evidence, real customs performance, real-model evaluation or human-subject validation. The manuscript remains **not ready for arXiv submission**.
