@@ -68,6 +68,12 @@ def make_new(fi, family, j):
 
     if "document_instances" not in obs:
         attach_document_lineage(obs)
+    elif "provenance" not in obs:
+        obs["provenance"] = {
+            "integrity_status": "valid",
+            "document_set_sha256": canonical_hash(obs["document_instances"]),
+            "scheme": "synthetic-content-digest-v1",
+        }
 
     if family == "C13_corrupted_provenance":
         # The content digest intentionally does not match the listed document instances.
