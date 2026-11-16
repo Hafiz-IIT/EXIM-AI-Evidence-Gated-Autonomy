@@ -34,3 +34,29 @@ The strongest defensible conclusion is not that evidence gating "solves" agent s
 
 ## Research status
 These are synthetic and Monte Carlo experiments. No external LLM API outputs, real customs records, production deployment, or human-subject experiments are represented here.
+
+## Historical reproducibility qualification
+
+The historical 1B–2E result CSVs were added to Git without their original simulation runners or complete parameter configurations. Git history for the 1B summary confirms that the result file was committed by itself. The original Experiment 1A downstream-resolution implementation is also absent. Historical numbers are therefore preserved as reported outputs, not independently reproduced results.
+
+## New reconstruction v1
+
+A separate executable reconstruction is now defined in:
+- `experiments/reconstruction_v1/PROTOCOL.md`
+- `scripts/run_reconstruction_v1.py`
+- `tests/test_reconstruction_v1.py`
+- `results/reconstruction_v1/README.md`
+- `experiments/reconstruction_v1/RESULTS_REVIEW.md`
+
+It runs new 1B, 1C, 1D, 2B, 2C, 2D and 2E experiments under explicit assumptions and 30 Monte Carlo seeds per condition. It does not claim to recreate the historical results. The runner creates role-scoped synthetic attestations, preserves baseline gate decisions in dual-lineage tests, records source revision/run metadata, and hashes generated CSV outputs in its manifest.
+
+### Preliminary interpretation
+
+- Under the new 1B protocol, Evidence Gate's ICAR is 0.81% optimistic, 4.95% moderate and 13.51% harsh. In the moderate regime Risk Gate is 5.30%, so the observed advantage is small and costs more intervention units.
+- Under 1C, the new Evidence Gate ICAR is 6.21% without attack and 14.71–33.89% across the specified metadata attacks.
+- Under 1D, the chosen shifts do not increase Evidence Gate ICAR (6.52% in-distribution; 6.20% compound). The current OOD protocol is insufficient to support a robustness or degradation claim.
+- Under 2B, role-scoped attestations block direct unsafe ACTs under the unsigned metadata attacks by causing escalation.
+- Under 2D, compromising a single relevant root produces 10% ICAR; compromising all three produces 30%.
+- Under 2E, the stylized C8 test gives 0% ICAR under no/single-authority compromise and 10% when both lineage authorities are compromised.
+
+These results are synthetic and conditional on the new protocol. They are not replacements for the historical tables and must not be inserted into the manuscript until independent review, stronger OOD design, sensitivity analysis and claim reconciliation are complete.
