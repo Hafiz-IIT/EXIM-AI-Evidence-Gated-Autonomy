@@ -6,6 +6,7 @@ The output directory contains:
 - v0.4 reruns of experiments 1B, 1C, 1D and 2B–2E;
 - per-seed and aggregate CSVs;
 - one-factor sensitivity per-seed and summary CSVs;
+- paired per-seed Evidence Gate minus baseline deltas and paired summary intervals;
 - human-review-accuracy × escalation-availability interaction sweeps;
 - `manifest.json` with source/run provenance and SHA-256 output hashes.
 
