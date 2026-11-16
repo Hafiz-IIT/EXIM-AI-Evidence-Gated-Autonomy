@@ -22,6 +22,10 @@ This directory is populated by `python scripts/run_reconstruction_v1.py` and by 
 | `exp2e_dual_lineage_summary.csv` | Dual-lineage separation-of-duties compromise outcomes |
 | `manifest.json` | Protocol identity, seed count, experiment names and generated-file inventory |
 
+See [the preliminary results review](../../experiments/reconstruction_v1/RESULTS_REVIEW.md) for the first run's numerical findings and limitations.
+
+The generated manifest records the source commit, workflow run ID, Python version, signature-record count and SHA-256 hashes for each generated CSV.
+
 ## Interpretation cautions
 
 - A Monte Carlo confidence interval describes variation across the specified simulation seeds, not uncertainty about real-world performance.
