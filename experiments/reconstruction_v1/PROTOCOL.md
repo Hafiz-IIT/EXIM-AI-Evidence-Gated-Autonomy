@@ -60,7 +60,7 @@ The in-distribution control applies no transformation.
 
 ## 2B signed provenance and unsigned attacks
 
-For each HIGH-risk case, the reconstruction signs a SHA-256 digest of the pre-attack observable evidence object using a deterministic synthetic Ed25519 test key. A changed evidence object invalidates the signature binding and causes v2 to ESCALATE. This is a new one-snapshot-per-case protocol; it does not reproduce the historical 3,675-attestation design.
+For each HIGH-risk case, the reconstruction creates three SHA-256-bound Ed25519 attestations: a verifier authority signs verifier outputs/classification, a sensor authority signs measured weight/inspection item, and an authorization authority signs authorization timing. Each signer is scoped to its own component. A changed component invalidates that component's signature and causes v2 to ESCALATE. This creates 1,500 role-scoped attestations (3 × 500 HIGH-risk cases); it does not reproduce the historical 3,675-attestation design.
 
 ## 2C imperfect escalation
 
@@ -68,11 +68,11 @@ Detected tampering is passed to a simulated 90%-accurate reviewer. The same 30-s
 
 ## 2D trust-root compromise
 
-A compromised role can re-sign a modified evidence snapshot. Conditions: verifier root for dependency spoof, sensor root for external masking, authorization root for timestamp masking, and all roots for combined spoofing. This deliberately demonstrates that valid signatures authenticate a signer and payload integrity, not the truth of the payload.
+A compromised role can re-sign only the evidence component under its authority. Conditions: verifier root for dependency spoof, sensor root for external masking, authorization root for timestamp masking, and all three roots for combined spoofing. This deliberately demonstrates that valid signatures authenticate a signer and payload integrity, not the truth of the payload.
 
 ## 2E dual lineage
 
-Two distinct synthetic lineage authorities sign dependency-lineage claims. The evaluator checks both signatures and requires both claims to report independent lineage. Conditions compromise neither, verifier only, lineage A only, lineage B only, or both lineage authorities. This is a stylized benchmark attack model, not a real PKI or security proof.
+Two distinct synthetic lineage authorities independently sign the verifier dependency-group list. The gate preserves all existing evidence checks and authorizes only if both signatures are valid, both signed lists agree with each other and with the observed list, and at least two dependency groups are present. The tested attack is limited to C8 correlated-verifier cases. Conditions compromise neither, verifier only, lineage A only, lineage B only, or both lineage authorities. This is a stylized benchmark attack model, not a real PKI or security proof.
 
 ## Outputs and integrity
 
