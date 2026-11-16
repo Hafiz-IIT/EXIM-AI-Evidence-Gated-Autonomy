@@ -151,6 +151,7 @@ The runner covers 1B, 1C, 1D and 2B–2E under newly specified assumptions. It d
 - [v0.4 protocol](experiments/reconstruction_v2/PROTOCOL.md)
 - [v0.4 generator](scripts/generate_benchmark_v04.py)
 - [v0.4 verifier](scripts/verify_benchmark_v04.py)
+- [pinned v0.4 manifest and raw-data SHA-256 checksums](data/benchmark_v0.4/manifest.json)
 - [v0.4 experiment and sensitivity runner](scripts/run_reconstruction_v2.py)
 - [v0.4 output guide](results/reconstruction_v2/README.md)
 - [v0.4 results and paired sensitivity review](experiments/reconstruction_v2/RESULTS_REVIEW.md)
