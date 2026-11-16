@@ -37,15 +37,29 @@ The high-risk completeness rule previously checked only whether the declaration 
 
 These are reported synthetic results, not yet fully regenerated from the repository's current source.
 
+## New reconstruction track
+
+A separately versioned reconstruction now exists:
+- Protocol: `experiments/reconstruction_v1/PROTOCOL.md`
+- Runner: `scripts/run_reconstruction_v1.py`
+- Tests: `tests/test_reconstruction_v1.py`
+- Outputs: `results/reconstruction_v1/` (generated in CI and archived as the `ega-reconstruction-v1` artifact)
+
+It covers new versions of 1B, 1C, 1D, and 2B–2E using explicit parameters and 30 seeds per Monte Carlo condition. These outputs are **not** reproductions of the historical result tables. Experiment 1A's original downstream-resolution logic is also not recoverable from the committed source.
+
+The first clean CI execution passed the regression tests, benchmark generation and integrity verification, reconstruction runner, historical table loading, artifact upload, and manuscript build. Later runner revisions must be revalidated on their own latest CI run before these outputs are treated as final.
+
 ## Required before submission
 
-1. Reconstruct and commit runners for every reported experiment.
-2. Freeze the exact policies, stochastic assumptions, seeds, cost matrix, and attack configurations.
+1. Recover the historical Experiment 1A downstream-resolution implementation or explicitly retire its numerical comparison; do not infer it from the current policy functions.
+2. Compare the new reconstruction protocol against the historical result tables and explain all differences without parameter fitting.
+3. Review the new reconstruction's model assumptions and threats to validity independently.
+4. Freeze the exact policies, stochastic assumptions, seeds, cost matrix, and attack configurations.
 3. Add missing-invoice, missing-packing-list, duplicate-document, and malformed-provenance scenarios.
 4. Rerun all experiments against a versioned benchmark/policy release.
 5. Reconcile all manuscript tables and claims against newly generated outputs.
 6. Add independent verification of the raw data, aggregate tables, and output hashes.
-7. Perform a fresh literature/novelty review and a full manuscript review.
+10. Perform a fresh literature/novelty review and a full manuscript review.
 
 ## Claim boundary
 
