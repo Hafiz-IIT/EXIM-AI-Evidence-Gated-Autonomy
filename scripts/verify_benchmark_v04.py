@@ -56,9 +56,13 @@ def main():
         duplicate = len(kinds) != len(set(kinds))
         digest_valid = provenance["document_set_sha256"] == canonical_hash(instances)
         if item["family"] == "C12_duplicate_document_kind":
-            assert duplicate and not item["high_safe_to_act"]
+            assert duplicate and digest_valid and not item["high_safe_to_act"]
+        else:
+            assert not duplicate
         if item["family"] == "C13_corrupted_provenance":
             assert not digest_valid and not item["high_safe_to_act"]
+        else:
+            assert digest_valid
         if item["family"] == "C10_missing_invoice":
             assert obs["documents"]["invoice"] is None and not item["high_safe_to_act"]
         if item["family"] == "C11_missing_packing_list":
