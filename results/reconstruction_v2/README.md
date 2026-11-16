@@ -10,4 +10,4 @@ The output directory contains:
 - human-review-accuracy × escalation-availability interaction sweeps;
 - `manifest.json` with source/run provenance and SHA-256 output hashes.
 
-Read [the v2 protocol](../../experiments/reconstruction_v2/PROTOCOL.md) before interpreting results. These are synthetic reconstructions, not historical reproductions or real-world performance estimates. Do not update manuscript numerical claims until the outputs have been reviewed.
+Read [the v2 protocol](../../experiments/reconstruction_v2/PROTOCOL.md) and [the results/sensitivity review](../../experiments/reconstruction_v2/RESULTS_REVIEW.md) before interpreting results. These are synthetic reconstructions, not historical reproductions or real-world performance estimates. Do not update manuscript numerical claims until the outputs have been reviewed.
