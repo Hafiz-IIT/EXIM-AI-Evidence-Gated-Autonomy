@@ -11,6 +11,8 @@ import csv
 import hashlib
 import json
 import math
+import os
+import platform
 import random
 import statistics
 from collections import defaultdict
@@ -386,14 +388,19 @@ def main():
     exp1c(cases)
     exp1d(cases)
     exp2(cases)
+    csv_files=sorted(OUT.glob("*.csv"))
     manifest={
         "protocol":"EGA reconstruction v1",
         "historical_reproduction":False,
         "benchmark_seed":42,
         "monte_carlo_seeds_per_condition":N_SEEDS,
         "experiments":["1B","1C","1D","2B","2C","2D","2E"],
-        "generated_files":sorted(p.name for p in OUT.glob("*.csv")),
+        "generated_files":[p.name for p in csv_files],
+        "outputs_sha256":{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in csv_files},
         "attestations_generated":1500,
+        "source_commit":os.environ.get("GITHUB_SHA"),
+        "workflow_run_id":os.environ.get("GITHUB_RUN_ID"),
+        "python_version":platform.python_version(),
         "note":"New explicitly parameterized reconstruction. Three role-scoped attestations per HIGH-risk case in 2B. Do not substitute these outputs for historical v1 result tables.",
     }
     (OUT/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")
