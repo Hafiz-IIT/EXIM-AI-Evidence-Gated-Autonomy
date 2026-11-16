@@ -220,7 +220,12 @@ def private_key(role):
     return Ed25519PrivateKey.from_private_bytes(seed)
 
 
+ATTESTATIONS_CREATED = 0
+
+
 def signed_record(role, payload):
+    global ATTESTATIONS_CREATED
+    ATTESTATIONS_CREATED += 1
     key=private_key(role)
     raw=json.dumps(payload,sort_keys=True,separators=(",",":")).encode()
     return {"role":role,"payload":payload,"signature":key.sign(raw)}
@@ -397,7 +402,7 @@ def main():
         "experiments":["1B","1C","1D","2B","2C","2D","2E"],
         "generated_files":[p.name for p in csv_files],
         "outputs_sha256":{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in csv_files},
-        "attestations_generated":1500,
+        "signature_records_created":ATTESTATIONS_CREATED,
         "source_commit":os.environ.get("GITHUB_SHA"),
         "workflow_run_id":os.environ.get("GITHUB_RUN_ID"),
         "python_version":platform.python_version(),
