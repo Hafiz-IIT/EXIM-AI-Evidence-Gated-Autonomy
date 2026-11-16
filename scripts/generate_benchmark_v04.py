@@ -175,6 +175,10 @@ def main():
     }
     (root / "underlying.jsonl").write_text("".join(json.dumps(x, sort_keys=True) + "\n" for x in underlying), encoding="utf-8")
     (root / "cases.jsonl").write_text("".join(json.dumps(x, sort_keys=True) + "\n" for x in cases), encoding="utf-8")
+    manifest["files_sha256"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in ("underlying.jsonl", "cases.jsonl")
+    }
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(manifest, indent=2))
 
