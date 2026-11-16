@@ -134,6 +134,16 @@ The numerical and security claims in the manuscript are tied to the repository's
 
 These are **synthetic computational results under the documented experimental assumptions**, not evidence of deployed-system safety.
 
+## New transparent reconstruction
+
+The new synthetic reconstruction is separate from the historical reported result CSVs:
+- [Protocol and assumptions](experiments/reconstruction_v1/PROTOCOL.md)
+- [Preliminary results and critical interpretation](experiments/reconstruction_v1/RESULTS_REVIEW.md)
+- [Pinned run manifest and output hashes](results/reconstruction_v1/manifest-43949299526.json)
+- [Successful CI run and downloadable raw CSV artifact](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43949299526)
+
+The runner covers 1B, 1C, 1D and 2B–2E under newly specified assumptions. It does **not** reproduce historical v1 results; Experiment 1A's original downstream-resolution logic also remains unrecovered. The preliminary results show only a small Evidence Gate advantage over Risk Gate in the moderate 1B regime and no ICAR increase under the current 1D shifts. These negative findings are retained.
+
 ## One-command reproduction
 
 ```bash
