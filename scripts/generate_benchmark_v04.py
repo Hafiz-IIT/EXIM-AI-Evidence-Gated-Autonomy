@@ -6,7 +6,10 @@ from pathlib import Path
 import copy
 import hashlib
 import json
+import sys
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 from scripts.generate_benchmark import SEED, SEV, FAMILIES as V03_FAMILIES, make as make_v03
 
 NEW_FAMILIES = [
