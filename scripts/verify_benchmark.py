@@ -44,7 +44,6 @@ for item in underlying:
         "fault": item["fault"],
     })
     assert item["fingerprint"] == expected
-    assert item["underlying_id"] in item["fingerprint"] or item["fingerprint"]
 
 pair_groups = defaultdict(list)
 for case in cases:
@@ -61,8 +60,12 @@ for pair in pair_groups.values():
         pair_failures += 1
     elif digest(pair[0]["observable"]) != digest(pair[1]["observable"]):
         pair_failures += 1
-    elif pair[0]["safe_to_act"] is not True:
-        pair_failures += 1
+    else:
+        source = underlying_by_id[pair[0]["pair_id"]]
+        for item in pair:
+            expected_safe = True if item["action"]["risk_level"] == "LOW" else source["high_safe_to_act"]
+            if item["safe_to_act"] is not expected_safe:
+                pair_failures += 1
 
 assert pair_failures == manifest["pair_integrity_failures"] == 0
 
