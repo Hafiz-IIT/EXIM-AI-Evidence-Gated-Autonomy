@@ -19,7 +19,7 @@ def visible_features(r):
 
     return {
         "confidence": ex["confidence"],
-        "complete": dec is not None,
+        "complete": all(d is not None for d in (inv, pack, dec)),
         "doc_agree": all(agree(x) for x in ("quantity", "gross_weight", "hs")),
         "auth_present": auth["present"],
         "fresh": auth["present"] and auth["expiry_day"] >= o["external"]["evaluation_day"],
