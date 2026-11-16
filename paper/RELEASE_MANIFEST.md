@@ -57,7 +57,7 @@ The extended benchmark adds C10 missing invoice, C11 missing packing list, C12 d
 - `scripts/generate_benchmark_v04.py`
 - `scripts/verify_benchmark_v04.py`
 
-The v0.4 policy regression tests cover all four new cases. A further test deliberately performs a coherent rewrite of the documents, extraction and external measurement, recomputes the unkeyed digest, and confirms the current gate still returns ACT. This is an explicit security limitation: SHA-256 without a trusted signature detects mismatches, not maliciously rewritten evidence.
+The generated benchmark counts and raw JSONL SHA-256 hashes are pinned in [data/benchmark_v0.4/manifest.json](../data/benchmark_v0.4/manifest.json). The v0.4 policy regression tests cover all four new cases. A further test deliberately performs a coherent rewrite of the documents, extraction and external measurement, recomputes the unkeyed digest, and confirms the current gate still returns ACT. This is an explicit security limitation: SHA-256 without a trusted signature detects mismatches, not maliciously rewritten evidence.
 
 The v2 reconstruction and sensitivity protocol is documented in `experiments/reconstruction_v2/PROTOCOL.md`; the first results interpretation is in `experiments/reconstruction_v2/RESULTS_REVIEW.md`. It reruns 1B, 1C, 1D and 2B–2E on 700 HIGH-risk v0.4 cases, plus 25 sensitivity conditions (30 seeds each), and writes paired Evidence Gate-minus-baseline differences with SHA-256 output hashes.
 
