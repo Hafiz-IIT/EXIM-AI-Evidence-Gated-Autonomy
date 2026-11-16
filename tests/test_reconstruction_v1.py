@@ -72,6 +72,7 @@ class ReconstructionProtocolTests(unittest.TestCase):
         self.assertTrue(component_records_valid(records, original))
 
         tampered = mutate_case(original, "external_masking")
+        tampered["observable"]["external"]["measured_weight"] += 5.0
         self.assertFalse(component_records_valid(records, tampered))
 
         # Only the sensor authority can re-attest the sensor component.
