@@ -41,7 +41,7 @@ def attach_document_lineage(observable):
 
 def make_new(fi, family, j):
     # Start from a clean, deterministic source record; apply exactly one new fault.
-    item = make_v03(0, "C0_clean", j)
+    item = make_v03(fi, "C0_clean", j)
     item["underlying_id"] = f"U-{fi:02d}-{j:03d}"
     item["family"] = family
     item["fault"] = {"family": family, "severity": SEV[j]}
