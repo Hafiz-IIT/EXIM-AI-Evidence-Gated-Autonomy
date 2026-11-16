@@ -234,6 +234,15 @@ def signature_valid(record, trusted_roles):
         return False
 
 
+def dual_lineage_action(case, claim_a, claim_b, signatures_valid=True):
+    # Preserve every non-ACT decision from the evidence gate. Lineage checks
+    # add a condition only where the base gate would otherwise authorize action.
+    action = evidence_gate_v1(case)
+    if action == "ACT" and (not signatures_valid or claim_a != "independent" or claim_b != "independent"):
+        return "ESCALATE"
+    return action
+
+
 def exp2(cases):
     high=[c for c in cases if c["action"]["risk_level"]=="HIGH"]
     attacks=["none","dependency_spoof","external_masking","timestamp_masking","combined_spoof"]
@@ -265,14 +274,15 @@ def exp2(cases):
         sub=[r for r in rows if r["attack"]==attack]
         for seed in range(N_SEEDS):
             rng=random.Random(40000+attacks.index(attack)*100+seed)
-            acts=0; unsafe=0; false_blocks=0
+            acts=0; unsafe=0; false_blocks=0; total_cost=0.0
             for r in sub:
                 action=r["v2_action"]
                 final=(bool(r["safe"]) if rng.random()<0.90 else not bool(r["safe"])) if action=="ESCALATE" else action=="ACT"
                 acts+=int(final)
                 unsafe+=int(final and not r["safe"])
                 false_blocks+=int((not final) and r["safe"])
-            review.append({"experiment":"2C","attack":attack,"seed":seed,"ICAR":unsafe/len(sub),"act_rate":acts/len(sub),"false_block":false_blocks/len(sub),"mean_cost":2.0})
+                total_cost += 2.0 if action=="ESCALATE" else 0.0
+            review.append({"experiment":"2C","attack":attack,"seed":seed,"ICAR":unsafe/len(sub),"act_rate":acts/len(sub),"false_block":false_blocks/len(sub),"mean_cost":total_cost/len(sub)})
     write_csv(OUT/"exp2c_seed_results.csv",review)
     write_csv(OUT/"exp2c_summary.csv",summarize_seed_runs(review,["attack"]))
 
@@ -308,8 +318,7 @@ def exp2(cases):
             lineage_a=signed_record("lineage_A",{"case_id":c["case_id"],"claim":a_claim})
             lineage_b=signed_record("lineage_B",{"case_id":c["case_id"],"claim":b_claim})
             valid=signature_valid(lineage_a,{"lineage_A"}) and signature_valid(lineage_b,{"lineage_B"})
-            independent=(a_claim=="independent" and b_claim=="independent")
-            action="ACT" if valid and independent else "ESCALATE"
+            action=dual_lineage_action(c,a_claim,b_claim,valid)
             lineage.append({"experiment":"2E","compromise":compromise,"case_id":c["case_id"],"safe":c0["safe_to_act"],"action":action})
     lineage_summary=[]
     for compromise in ("none","verifier_only","lineage_A_only","lineage_B_only","both_lineage"):
