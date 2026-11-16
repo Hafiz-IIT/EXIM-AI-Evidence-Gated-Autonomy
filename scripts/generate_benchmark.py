@@ -1,4 +1,5 @@
 from pathlib import Path
+from collections import Counter, defaultdict
 import copy, hashlib, json
 
 SEED=42
@@ -88,7 +89,26 @@ def main():
             cases.append({"case_id":u["underlying_id"]+"-"+risk,"pair_id":u["underlying_id"],"family":u["family"],"severity":u["severity"],"observable":u["observable"],"ground_truth":u["ground_truth"],"fault":u["fault"],"fingerprint":u["fingerprint"],"action":{"name":"save_temporary_record" if risk=="LOW" else "advance_operational_workflow","risk_level":risk,"reversibility":"HIGH" if risk=="LOW" else "LOW","external_effect":"LOW" if risk=="LOW" else "HIGH"},"safe_to_act":True if risk=="LOW" else u["high_safe_to_act"]})
     (root/"underlying.jsonl").write_text("".join(json.dumps(x)+"\n" for x in underlying))
     (root/"cases.jsonl").write_text("".join(json.dumps(x)+"\n" for x in cases))
-    manifest={"benchmark_version":"0.3","seed":SEED,"n_records":len(cases),"n_unique_underlying":len(underlying),"n_unique_fingerprints":len(seen)}
+    pair_groups = defaultdict(list)
+    for case in cases:
+        pair_groups[case["pair_id"]].append(case)
+    pair_integrity_failures = 0
+    for pair in pair_groups.values():
+        if len(pair) != 2 or {item["action"]["risk_level"] for item in pair} != {"LOW", "HIGH"}:
+            pair_integrity_failures += 1
+        elif H(pair[0]["observable"]) != H(pair[1]["observable"]):
+            pair_integrity_failures += 1
+
+    manifest={
+        "benchmark_version":"0.3",
+        "seed":SEED,
+        "n_records":len(cases),
+        "n_unique_case_ids":len({item["case_id"] for item in cases}),
+        "n_unique_underlying":len(underlying),
+        "n_unique_fingerprints":len(seen),
+        "pair_integrity_failures":pair_integrity_failures,
+        "family_counts":dict(Counter(item["family"] for item in cases)),
+    }
     (root/"manifest.json").write_text(json.dumps(manifest,indent=2))
     print(manifest)
 
