@@ -128,15 +128,16 @@ def resolve_action(action, safe, params, rng):
     raise ValueError(f"Unknown policy action: {action}")
 
 
-def evaluate_policy(cases, policy, params, seed, attack=None, shift=None):
+def evaluate_policy(cases, policy, params, seed, attack=None, shift=None, shift_seed=None):
     rng = random.Random(seed)
+    shift_rng = random.Random(seed if shift_seed is None else shift_seed)
     high = [c for c in cases if c["action"]["risk_level"] == "HIGH"]
     unsafe_acts = false_blocks = acts = 0
     costs = []
     for original in high:
         c = mutate_case(original, attack) if attack else json.loads(json.dumps(original))
         if shift:
-            c = shift_case(c, shift, rng)
+            c = shift_case(c, shift, shift_rng)
         action = policy(c)
         final_act = resolve_action(action, c["safe_to_act"], params, rng)
         acts += int(final_act)
@@ -202,7 +203,7 @@ def exp1d(cases):
     for si, shift in enumerate(shifts):
         for pi,(pname,policy) in enumerate(policies.items()):
             for seed in range(N_SEEDS):
-                r=evaluate_policy(cases,policy,params,30000+si*1000+pi*100+seed,shift=None if shift=="in_distribution" else shift)
+                r=evaluate_policy(cases,policy,params,30000+si*1000+pi*100+seed,shift=None if shift=="in_distribution" else shift,shift_seed=30000+si*1000+seed)
                 raw.append({"experiment":"1D","shift":shift,"policy":pname,"seed":seed,**r})
     write_csv(OUT/"exp1d_seed_results.csv",raw)
     write_csv(OUT/"exp1d_summary.csv",summarize_seed_runs(raw,["shift","policy"]))
