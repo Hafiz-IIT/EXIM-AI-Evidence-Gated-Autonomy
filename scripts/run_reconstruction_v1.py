@@ -15,6 +15,10 @@ import random
 import statistics
 from collections import defaultdict
 from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
@@ -23,7 +27,6 @@ from src.core import (
     selective_abstention, weak_strong, risk_gate, evidence_gate_v1,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
 BENCH = ROOT / "data" / "benchmark"
 OUT = ROOT / "results" / "reconstruction_v1"
 N_SEEDS = 30
