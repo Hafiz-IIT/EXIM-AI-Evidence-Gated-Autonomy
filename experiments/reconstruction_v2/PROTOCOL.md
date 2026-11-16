@@ -31,6 +31,10 @@ These are policy behaviors under test, not evidence of real customs-system readi
 
 The v2 runner reruns the transparent 1B, 1C, 1D and 2B–2E reconstruction suite against all 700 HIGH-risk v0.4 cases, with 30 Monte Carlo seeds per stochastic condition. Outputs are written separately to `results/reconstruction_v2/`; v0.3 and v1 outputs are not overwritten.
 
+### Security experiment boundary
+
+The inherited 2B/2D reconstruction signs verifier, sensor and authorization components. It does not yet include a dedicated document-root signer over `document_instances` and the normalized document map. Therefore those results do not demonstrate authenticity of raw invoice/packing-list/declaration content. A document-root attestation and coherent-rewrite attack remain required follow-up work.
+
 ## Parameter sensitivity
 
 One-factor-at-a-time sweeps compare Always Verify, Risk Gate and Evidence Gate while varying one parameter and holding the other parameters at the moderate baseline:
