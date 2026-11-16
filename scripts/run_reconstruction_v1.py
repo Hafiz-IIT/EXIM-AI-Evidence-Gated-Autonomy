@@ -235,11 +235,63 @@ def signature_valid(record, trusted_roles):
         return False
 
 
-def dual_lineage_action(case, claim_a, claim_b, signatures_valid=True):
-    # Preserve every non-ACT decision from the evidence gate. Lineage checks
-    # add a condition only where the base gate would otherwise authorize action.
+def component_payloads(case):
+    obs = case["observable"]
+    return {
+        "verifier_root": {
+            "verifiers": obs["machine"]["verifiers"],
+            "classification": obs["machine"]["classification"],
+        },
+        "sensor_root": {
+            "measured_weight": obs["external"]["measured_weight"],
+            "inspection_item_type": obs["external"]["inspection_item_type"],
+        },
+        "authorization_root": {
+            "authorization": obs["external"]["authorization"],
+            "evaluation_day": obs["external"]["evaluation_day"],
+        },
+    }
+
+
+def sign_component_records(case):
+    return {
+        role: signed_record(role, {
+            "case_id": case["case_id"],
+            "component_sha256": canonical_hash(payload),
+        })
+        for role, payload in component_payloads(case).items()
+    }
+
+
+def component_records_valid(records, case):
+    payloads = component_payloads(case)
+    for role, payload in payloads.items():
+        record = records.get(role)
+        if record is None or not signature_valid(record, {role}):
+            return False
+        if record["payload"].get("case_id") != case["case_id"]:
+            return False
+        if record["payload"].get("component_sha256") != canonical_hash(payload):
+            return False
+    return True
+
+
+def dual_lineage_action(case, original_groups, compromised_authorities=()):
+    # The two lineage authorities independently attest the dependency labels.
+    observed = [v["dependency_group"] for v in case["observable"]["machine"]["verifiers"]]
+    claim_a = observed if "lineage_A" in compromised_authorities else original_groups
+    claim_b = observed if "lineage_B" in compromised_authorities else original_groups
+    record_a = signed_record("lineage_A", {"case_id": case["case_id"], "dependency_groups": claim_a})
+    record_b = signed_record("lineage_B", {"case_id": case["case_id"], "dependency_groups": claim_b})
+    valid = (
+        signature_valid(record_a, {"lineage_A"})
+        and signature_valid(record_b, {"lineage_B"})
+        and record_a["payload"]["case_id"] == record_b["payload"]["case_id"]
+    )
+    claims_match_observed = claim_a == claim_b == observed
+    independent = len(set(observed)) >= 2
     action = evidence_gate_v1(case)
-    if action == "ACT" and (not signatures_valid or claim_a != "independent" or claim_b != "independent"):
+    if action == "ACT" and not (valid and claims_match_observed and independent):
         return "ESCALATE"
     return action
 
@@ -251,10 +303,9 @@ def exp2(cases):
     for attack in attacks:
         for c0 in high:
             c=mutate_case(c0, "all_metadata_spoof" if attack=="combined_spoof" else (None if attack=="none" else attack))
-            # One signed evidence snapshot per case. This is a new protocol, not the historical 3,675-attestation design.
-            payload={"case_id":c["case_id"],"observable_sha256":canonical_hash(c0["observable"])}
-            record=signed_record("evidence-root",payload)
-            valid=signature_valid(record,{"evidence-root"}) and record["payload"]["observable_sha256"]==canonical_hash(c["observable"])
+            # Three role-scoped attestations per case; each signer covers only its own evidence component.
+            records=sign_component_records(c0)
+            valid=component_records_valid(records,c)
             v1=evidence_gate_v1(c)
             v2="ESCALATE" if not valid else v1
             rows.append({"experiment":"2B","attack":attack,"case_id":c["case_id"],"safe":c0["safe_to_act"],"v1_action":v1,"v2_action":v2,"signature_valid":valid})
@@ -294,9 +345,12 @@ def exp2(cases):
         for c0 in high:
             c=mutate_case(c0,"all_metadata_spoof" if attack=="combined_spoof" else attack)
             role={"dependency_spoof":"verifier_root","external_masking":"sensor_root","timestamp_masking":"authorization_root","combined_spoof":"all_roots"}[attack]
-            # A compromised root re-signs the modified evidence snapshot; the signature is valid but the claim may be false.
-            record=signed_record(role,{"case_id":c["case_id"],"observable_sha256":canonical_hash(c["observable"])})
-            valid=signature_valid(record,{role})
+            records=sign_component_records(c0)
+            compromised_roles={"verifier_root","sensor_root","authorization_root"} if role=="all_roots" else {role}
+            # A compromised signer can re-sign only the component it controls.
+            for signer in compromised_roles:
+                records[signer]=signed_record(signer,{"case_id":c["case_id"],"component_sha256":canonical_hash(component_payloads(c)[signer])})
+            valid=component_records_valid(records,c)
             action=evidence_gate_v1(c) if valid else "ESCALATE"
             trust.append({"compromise":compromised,"case_id":c["case_id"],"safe":c0["safe_to_act"],"action":action})
     trust_summary=[]
@@ -310,16 +364,10 @@ def exp2(cases):
     lineage=[]
     for compromise in ("none","verifier_only","lineage_A_only","lineage_B_only","both_lineage"):
         for c0 in high:
-            c=mutate_case(c0,"dependency_spoof")
             original_groups=[v["dependency_group"] for v in c0["observable"]["machine"]["verifiers"]]
-            actual_shared=len(set(original_groups))==1
-            a_claim="independent" if compromise in ("lineage_A_only","both_lineage") else ("shared" if actual_shared else "independent")
-            b_claim="independent" if compromise in ("lineage_B_only","both_lineage") else ("shared" if actual_shared else "independent")
-            # Verifier-only compromise cannot alter either lineage authority's independently signed claim.
-            lineage_a=signed_record("lineage_A",{"case_id":c["case_id"],"claim":a_claim})
-            lineage_b=signed_record("lineage_B",{"case_id":c["case_id"],"claim":b_claim})
-            valid=signature_valid(lineage_a,{"lineage_A"}) and signature_valid(lineage_b,{"lineage_B"})
-            action=dual_lineage_action(c,a_claim,b_claim,valid)
+            c=mutate_case(c0,"dependency_spoof") if c0["family"]=="C8_correlated_verifier_failure" else json.loads(json.dumps(c0))
+            compromised={"lineage_A","lineage_B"} if compromise=="both_lineage" else ({"lineage_A"} if compromise=="lineage_A_only" else ({"lineage_B"} if compromise=="lineage_B_only" else set()))
+            action=dual_lineage_action(c,original_groups,compromised)
             lineage.append({"experiment":"2E","compromise":compromise,"case_id":c["case_id"],"safe":c0["safe_to_act"],"action":action})
     lineage_summary=[]
     for compromise in ("none","verifier_only","lineage_A_only","lineage_B_only","both_lineage"):
@@ -345,7 +393,8 @@ def main():
         "monte_carlo_seeds_per_condition":N_SEEDS,
         "experiments":["1B","1C","1D","2B","2C","2D","2E"],
         "generated_files":sorted(p.name for p in OUT.glob("*.csv")),
-        "note":"New explicitly parameterized reconstruction. Do not substitute these outputs for historical v1 result tables.",
+        "attestations_generated":1500,
+        "note":"New explicitly parameterized reconstruction. Three role-scoped attestations per HIGH-risk case in 2B. Do not substitute these outputs for historical v1 result tables.",
     }
     (OUT/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(manifest,indent=2))
