@@ -4,6 +4,9 @@ import unittest
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+from scripts.generate_benchmark_v04 import attach_document_lineage
+from scripts.generate_benchmark import make as make_v03
+from src.core import evidence_gate_v1
 from src.provenance import (
     create_document_root_attestation,
     verify_document_root_attestation,
@@ -119,6 +122,44 @@ class DocumentRootAttestationTests(unittest.TestCase):
         consumed = set()
         self.assertEqual(verify(self.record, self.instances, self.normalized, consumed=consumed), (True, "valid"))
         self.assertEqual(verify(self.record, self.instances, self.normalized, consumed=consumed), (False, "replay"))
+
+    def test_compromised_root_and_coordinated_upstream_rewrite_can_yield_unsafe_act(self):
+        underlying = make_v03(4, "C4_consistent_but_wrong", 0)
+        obs = copy.deepcopy(underlying["observable"])
+        attach_document_lineage(obs)
+        forged_source = next(d for d in obs["documents"].values() if d is not None)
+        forged = {
+            "quantity": int(forged_source["quantity"]) + 7,
+            "gross_weight": round(float(forged_source["gross_weight"]) + 11.25, 2),
+            "hs": "9999",
+        }
+        for fields in obs["documents"].values():
+            if fields is not None:
+                fields.update(forged)
+        for instance in obs["document_instances"]:
+            instance["fields"].update(forged)
+        obs["machine"]["extraction"].update(forged)
+        obs["machine"]["classification"]["hs"] = forged["hs"]
+        obs["external"]["measured_weight"] = forged["gross_weight"]
+        from src.provenance import canonical_sha256
+        obs["provenance"]["document_set_sha256"] = canonical_sha256(obs["document_instances"])
+        obs["provenance"]["integrity_status"] = "valid"
+
+        case = {
+            "case_id": "compromised-root-coordinated-rewrite",
+            "observable": obs,
+            "action": {"risk_level": "HIGH"},
+            "safe_to_act": underlying["high_safe_to_act"],
+        }
+        self.assertFalse(case["safe_to_act"])
+        compromised_key = test_key("doc-root-k1")
+        forged_record = attest(
+            obs["document_instances"], obs["documents"], key=compromised_key,
+            nonce="nonce-compromised-root",
+        )
+        self.assertEqual(verify(forged_record, obs["document_instances"], obs["documents"]), (True, "valid"))
+        # This is the expected failure mode under the combined compromise assumptions.
+        self.assertEqual(evidence_gate_v1(case), "ACT")
 
     def test_invalid_signature_is_rejected(self):
         altered = copy.deepcopy(self.record)
