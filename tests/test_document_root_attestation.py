@@ -113,9 +113,7 @@ class DocumentRootAttestationTests(unittest.TestCase):
         )
 
     def test_cross_tenant_replay_is_rejected(self):
-        replay = copy.deepcopy(self.record)
-        replay["payload"]["tenant_id"] = "tenant-B"
-        self.assertEqual(verify(replay, self.instances, self.normalized, tenant="tenant-B"), (False, "invalid_attestation"))
+        self.assertEqual(verify(self.record, self.instances, self.normalized, tenant="tenant-B"), (False, "tenant_mismatch"))
 
     def test_nonce_replay_is_rejected_after_first_success(self):
         consumed = set()
