@@ -55,10 +55,11 @@ The verified CI execution above passed the regression tests, benchmark generatio
 2. Compare the new reconstruction protocol against the historical result tables and explain all differences without parameter fitting.
 3. Review the new reconstruction's model assumptions and threats to validity independently.
 4. Freeze the exact policies, stochastic assumptions, seeds, cost matrix, and attack configurations.
-3. Add missing-invoice, missing-packing-list, duplicate-document, and malformed-provenance scenarios.
-4. Rerun all experiments against a versioned benchmark/policy release.
-5. Reconcile all manuscript tables and claims against newly generated outputs.
-6. Add independent verification of the raw data, aggregate tables, and output hashes.
+5. Complete a document-root attestation experiment that signs raw document instances and normalized documents; test coherent rewrites, signer compromise, key rotation/revocation and replay.
+6. Redesign OOD transformations to test meaningful evidence-quality/dependency shifts.
+7. Expand sensitivity analysis beyond the current one-factor and selected two-factor sweeps.
+8. Reconcile all manuscript tables and claims against newly generated outputs.
+9. Independently verify raw data, aggregate tables, output hashes and the full reproduction command.
 10. Perform a fresh literature/novelty review and a full manuscript review.
 
 ## Claim boundary
