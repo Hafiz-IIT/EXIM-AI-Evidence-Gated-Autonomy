@@ -25,17 +25,17 @@ The runner evaluates these scenarios for each HIGH-risk v0.4 case:
 
 1. Valid baseline attestation.
 2. Raw document-instance tampering.
-3. Coherent rewrite of raw and normalized documents without access to the trusted private key.
-4. Trusted document-root signer compromise, where the attacker can produce a new valid signature over rewritten data.
+3. Coherent rewrite of raw and normalized documents without access to the trusted private key; the study harness fails closed to ESCALATE when attestation verification fails.
+4. Trusted document-root signer compromise plus coherent upstream rewrite of raw documents, normalized slots, extraction and measured weight. The attacker can produce a new valid signature over the rewritten documents; the existing evidence gate is then evaluated to measure whether other checks still block unsafe ACT.
 5. Revoked old signing key.
 6. Key rotation to a new trusted key while the old key is revoked.
 7. Cross-tenant replay.
 8. First use of a nonce and second-use replay.
 
-The intended expected outcomes are:
-- valid baseline: accept;
-- raw tamper and coherent rewrite without the private key: reject;
-- signer compromise: accept, demonstrating that a compromised trust root defeats this control;
+The CSV distinguishes **attestation acceptance** from the downstream **policy action**. The intended expected outcomes are:
+- valid baseline: attestation accepted; existing evidence gate decides the action;
+- raw tamper and coherent rewrite without the private key: attestation rejected and harness action is ESCALATE;
+- signer compromise: forged attestation accepted, then the existing evidence gate is evaluated. Unsafe ACTs, if any, are counted against the original benchmark ground truth. This demonstrates the limits of document-root signing under trust-root compromise plus coordinated upstream manipulation;
 - revoked key: reject;
 - rotated new key: accept;
 - cross-tenant replay: reject;
