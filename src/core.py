@@ -1,4 +1,11 @@
+import hashlib
+import json
 import math
+
+
+def _canonical_hash(value):
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(raw).hexdigest()
 
 
 def visible_features(r):
@@ -16,6 +23,18 @@ def visible_features(r):
     ex = o["machine"]["extraction"]
     vs = o["machine"]["verifiers"]
     ext = o["external"]["measured_weight"]
+    instances = o.get("document_instances")
+    duplicate_document_kind = False
+    if instances is not None:
+        kinds = [item["kind"] for item in instances]
+        duplicate_document_kind = len(kinds) != len(set(kinds))
+    provenance = o.get("provenance")
+    provenance_valid = True  # v0.3 records predate the explicit lineage envelope.
+    if provenance is not None:
+        provenance_valid = (
+            provenance.get("integrity_status") == "valid"
+            and provenance.get("document_set_sha256") == _canonical_hash(instances or [])
+        )
 
     return {
         "confidence": ex["confidence"],
@@ -31,6 +50,8 @@ def visible_features(r):
         "v_rejects": sum(not bool(v["accept"]) for v in vs),
         "n_verifiers": len(vs),
         "indep_verifiers": len({v["dependency_group"] for v in vs}),
+        "duplicate_document_kind": duplicate_document_kind,
+        "provenance_valid": provenance_valid,
         "risk": r["action"]["risk_level"],
     }
 
@@ -39,6 +60,8 @@ def evidence_gate_v1(r):
     f = visible_features(r)
     if f["risk"] == "LOW":
         return "ACT"
+    if f["duplicate_document_kind"] or not f["provenance_valid"]:
+        return "ESCALATE"
     if not f["complete"] or not f["auth_present"] or not f["fresh"]:
         return "REQUEST_EVIDENCE"
     if not f["doc_agree"]:
