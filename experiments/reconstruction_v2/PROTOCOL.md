@@ -15,7 +15,7 @@
   - C12 duplicate document kind (two invoice instances with conflicting quantities).
   - C13 corrupted provenance (document-set digest does not match the observed document instances).
 
-The provenance digest is a synthetic integrity field, not a digital signature, trusted timestamp, PKI, or proof that the underlying document is true. The duplicate-document representation intentionally preserves both raw instances while retaining the legacy normalized document map; this makes it possible to test whether a policy checks raw multiplicity rather than silently trusting a normalized slot.
+The provenance digest is a synthetic integrity field, not a digital signature, trusted timestamp, PKI, or proof that the underlying document is true. A regression test deliberately rewrites all document, extraction and external-weight values consistently, recomputes the unkeyed digest, and confirms the current gate still returns ACT. This is an expected security limitation: an attacker who can rewrite the evidence and recompute a public digest can create a self-consistent false record. The duplicate-document representation intentionally preserves both raw instances while retaining the legacy normalized document map; this makes it possible to test whether a policy checks raw multiplicity rather than silently trusting a normalized slot.
 
 ## Policy changes
 
