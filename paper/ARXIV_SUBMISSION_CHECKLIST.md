@@ -1,49 +1,57 @@
 # arXiv / Preprint Release Checklist
 
+## Current decision
+
+<badge>NOT READY FOR SUBMISSION</badge>
+
+The project has reported synthetic results and a compiled manuscript, but the full experiment runners for Experiments 1B–2E are not present in the repository. The current reproduction command regenerates the benchmark and loads existing CSVs; it does not rerun the simulations that produced those CSVs.
+
 ## Paper identity
 **Title:** Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence  
 **Author:** Syed Hafiz Ali  
-**Current manuscript:** `paper/MANUSCRIPT.md`
+**Current manuscript:** `paper/main.tex`
 
-## Claims allowed in v1
-- 500 unique synthetic evidence states paired into 1,000 LOW/HIGH-consequence cases.
-- Evidence Gate deterministic result: 0/500 unsafe HIGH-risk ACT decisions.
-- Risk Gate and Always Verify deterministic result: 50/500 each.
-- Stochastic Evidence Gate ICAR: 1.86% optimistic, 6.10% moderate, 13.09% harsh.
-- Dependency spoofing and external-evidence masking are demonstrated benchmark failure modes.
-- 3,675 synthetic Ed25519 attestations were tested.
-- Signed provenance blocked several unsigned metadata attacks in the synthetic benchmark.
-- Trust-root compromise remained a failure mode.
-- Dual-lineage separation of duties raised the compromise threshold in the synthetic benchmark.
+## Claims that may be stated with explicit synthetic boundaries
+- 500 underlying synthetic evidence states paired into 1,000 LOW/HIGH-consequence cases.
+- Reported deterministic Evidence Gate result: 0/500 unsafe HIGH-risk ACT decisions in the documented setup.
+- Reported Risk Gate and Always Verify deterministic result: 50/500 each.
+- Reported stochastic Evidence Gate ICAR: 1.86% optimistic, 6.10% moderate, 13.09% harsh.
+- Reported provenance attacks demonstrate failures under compromised metadata/trust assumptions.
+- Reported 3,675 synthetic Ed25519 attestations.
+- The reported results are synthetic and not production-safety evidence.
 
-## Claims forbidden in v1
+These are currently claims cross-checked against stored result files, not independently regenerated from complete committed experiment source.
+
+## Claims forbidden
 - "solves AI safety"
-- "safe" or "guarantees safety"
+- "guarantees safety"
 - "production-ready"
 - "real-world validated"
-- "frontier-proof"
+- "frontier-model evaluation completed"
 - "works on real customs data"
 - "human oversight was validated"
-- "external frontier-model evaluation completed"
-- "cryptography proves truth"
+- "cryptography proves evidence truth"
 
-## Verified before arXiv submission
-1. **PASS —** benchmark and tables reproduced in CI:
-   - `python scripts/generate_benchmark.py`
-   - `python scripts/verify_benchmark.py`
-   - `python scripts/reproduce_tables.py`
-2. **PASS —** LaTeX source compiled; final CI artifact is 5 pages and page 1, page 3, and page 5 were visually inspected.
-3. **PASS —** reported numerical claims were cross-checked against the version-controlled `results/` files.
-4. **PASS —** source package boundary is limited to the manuscript compilation inputs; no private client material is part of the intended arXiv package.
-5. **READY —** upload only `main.tex` and `references.bib`.
-6. **READY —** submit as a preprint, not as a peer-reviewed publication.
-7. After arXiv assigns an identifier, add that identifier to README and CITATION.cff.
-8. Add the indexed paper to a public Google Scholar profile. If Scholar does not find it, use "Add article manually."
+## Required blockers
 
-## Versioning
-- **v1:** Experiments 1A-2E.
-- **v2:** Add Experiment 3 only after the frozen external-model protocol is actually run.
-- **Later version/follow-up:** Add the human-oversight study only after real participants and any required ethics review.
+- [ ] Commit executable experiment runners for stochastic verification/retrieval/escalation (1B).
+- [ ] Commit executable runners for adversarial metadata/evidence stress (1C).
+- [ ] Commit executable runners for OOD/compound-shift evaluation (1D).
+- [ ] Commit executable runners for attestation attacks, trust-root compromise, and dual-lineage experiments (2A–2E).
+- [ ] Expand benchmark coverage for missing invoice and missing packing-list evidence.
+- [ ] Rerun all results from a clean checkout and compare output hashes.
+- [ ] Reconcile manuscript tables, claims ledger, and manifests with regenerated results.
+- [ ] Complete a fresh literature/novelty review.
+- [ ] Complete final mathematical, security, and manuscript review.
 
-## Suggested classification
-Candidate categories include **cs.AI**, **cs.LG**, or **cs.CY** depending on final framing and arXiv moderation. Do not treat this suggestion as a guarantee of category acceptance or endorsement.
+## Checks already completed
+
+- [x] LaTeX source compiles in GitHub Actions.
+- [x] Existing result CSVs are checked into version control.
+- [x] A regression test now verifies that missing invoice, packing list, or declaration requests evidence.
+- [x] Benchmark generation and pair-integrity checks run in CI.
+- [x] Manuscript and claim boundary explicitly state that results are synthetic.
+
+## Release decision
+
+Do not upload the current manuscript as a research preprint until every blocker above is closed. A successful LaTeX build or benchmark-generation workflow is not a substitute for rerunning the experiments.
