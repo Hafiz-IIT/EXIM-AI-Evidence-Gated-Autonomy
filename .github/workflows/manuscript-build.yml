@@ -43,6 +43,14 @@ jobs:
       - name: Verify benchmark v0.4 integrity
         id: v04_verify
         run: python scripts/verify_benchmark_v04.py
+      - name: Upload benchmark v0.4 source data
+        if: always() && steps.v04_verify.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-benchmark-v04
+          path: data/benchmark_v0.4/
+          if-no-files-found: error
+          retention-days: 90
       - name: Run v0.4 reconstruction and sensitivity analysis
         id: runner_v2
         run: |
