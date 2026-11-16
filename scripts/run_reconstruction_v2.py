@@ -7,10 +7,11 @@ import os
 import platform
 import random
 from pathlib import Path
-
-import scripts.run_reconstruction_v1 as base
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+import scripts.run_reconstruction_v1 as base
 base.BENCH = ROOT / "data" / "benchmark_v0.4"
 base.OUT = ROOT / "results" / "reconstruction_v2"
 OUT = base.OUT
