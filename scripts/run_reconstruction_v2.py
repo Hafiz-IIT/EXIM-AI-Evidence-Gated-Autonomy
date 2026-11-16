@@ -47,6 +47,8 @@ def run_sensitivity(cases):
                         "condition": condition,
                         "varied_parameter": parameter,
                         "varied_value": level,
+                        "human_accuracy": params["human_accuracy"],
+                        "escalation_available": params["escalation_available"],
                         "policy": policy_name,
                         "seed": seed,
                         **metrics,
