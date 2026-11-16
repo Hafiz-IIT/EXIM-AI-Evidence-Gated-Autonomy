@@ -154,6 +154,9 @@ def summarize_seed_runs(rows, group_fields):
         for metric in ("ICAR", "false_block", "act_rate", "mean_cost"):
             vals = [float(x[metric]) for x in items]
             m, sd, lo, hi = mean_ci(vals)
+            if metric == "mean_cost":
+                half = T95_DF29 * sd / math.sqrt(len(vals)) if len(vals) > 1 else 0.0
+                lo, hi = m-half, m+half
             result[metric+"_mean"] = round(m, 8)
             result[metric+"_sd"] = round(sd, 8)
             result[metric+"_95ci_low"] = round(lo, 8)
@@ -259,14 +262,16 @@ def exp2(cases):
         sub=[r for r in rows if r["attack"]==attack]
         for seed in range(N_SEEDS):
             rng=random.Random(40000+attacks.index(attack)*100+seed)
-            acts=0; unsafe=0
+            acts=0; unsafe=0; false_blocks=0
             for r in sub:
                 action=r["v2_action"]
                 final=(bool(r["safe"]) if rng.random()<0.90 else not bool(r["safe"])) if action=="ESCALATE" else action=="ACT"
-                acts+=int(final); unsafe+=int(final and not r["safe"])
-            review.append({"experiment":"2C","attack":attack,"seed":seed,"ICAR":unsafe/len(sub),"act_rate":acts/len(sub)})
+                acts+=int(final)
+                unsafe+=int(final and not r["safe"])
+                false_blocks+=int((not final) and r["safe"])
+            review.append({"experiment":"2C","attack":attack,"seed":seed,"ICAR":unsafe/len(sub),"act_rate":acts/len(sub),"false_block":false_blocks/len(sub),"mean_cost":2.0})
     write_csv(OUT/"exp2c_seed_results.csv",review)
-    write_csv(OUT/"exp2c_summary.csv",summarize_seed_runs([{**r,"false_block":0.0,"mean_cost":0.0} for r in review],["attack"]))
+    write_csv(OUT/"exp2c_summary.csv",summarize_seed_runs(review,["attack"]))
 
     # Experiment 2D: compromised signer can issue a valid signature over altered evidence.
     trust=[]
