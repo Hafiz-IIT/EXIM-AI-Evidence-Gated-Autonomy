@@ -45,9 +45,9 @@ A separately versioned reconstruction now exists:
 - Tests: `tests/test_reconstruction_v1.py`
 - Outputs: `results/reconstruction_v1/` (generated in CI and archived as the `ega-reconstruction-v1` artifact)
 
-It covers new versions of 1B, 1C, 1D, and 2B–2E using explicit parameters and 30 seeds per Monte Carlo condition. These outputs are **not** reproductions of the historical result tables. Experiment 1A's original downstream-resolution logic is also not recoverable from the committed source.
+It covers new versions of 1B, 1C, 1D, and 2B–2E using explicit parameters and 30 seeds per Monte Carlo condition. The verified run [43949299526](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43949299526) passed tests, benchmark integrity checks, the full reconstruction runner, historical-table loading, artifact upload and manuscript compilation. The output manifest is pinned at [manifest-43949299526.json](../results/reconstruction_v1/manifest-43949299526.json), with SHA-256 hashes for all 12 generated CSVs, source commit `b3e07190a6c365daec33ce83f92e53cf3019e7a5`, Python 3.11.18, and 21,500 synthetic signature records created across the repeated 2B–2E sweeps. These outputs are **not** reproductions of the historical result tables. Experiment 1A's original downstream-resolution logic is also not recoverable from the committed source.
 
-The first clean CI execution passed the regression tests, benchmark generation and integrity verification, reconstruction runner, historical table loading, artifact upload, and manuscript build. Later runner revisions must be revalidated on their own latest CI run before these outputs are treated as final.
+The verified CI execution above passed the regression tests, benchmark generation and integrity verification, reconstruction runner, historical table loading, artifact upload, and manuscript build. Later runner revisions must be revalidated on their own latest CI run before these outputs are treated as final.
 
 ## Required before submission
 
