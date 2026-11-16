@@ -143,4 +143,4 @@ These are **synthetic computational results under the documented experimental as
 python scripts/reproduce_all.py
 ```
 
-This runs benchmark generation, integrity verification and publication-table reproduction. Full manuscript compilation is additionally exercised by GitHub Actions.
+This regenerates the synthetic benchmark, checks benchmark integrity, and loads the existing publication result CSVs for display. It does **not** rerun the stochastic, OOD, provenance-attack, trust-root, or separation-of-duties simulations that produced those CSVs. Reconstructing those experiment runners is a required research task before claiming full computational reproducibility. Full manuscript compilation is additionally exercised by GitHub Actions.
