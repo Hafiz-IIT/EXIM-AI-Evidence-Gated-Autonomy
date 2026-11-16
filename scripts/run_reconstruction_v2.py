@@ -84,6 +84,52 @@ def run_sensitivity(cases):
     group_fields = ["experiment", "condition", "varied_parameter", "varied_value", "policy"]
     summary = base.summarize_seed_runs(raw, group_fields)
     base.write_csv(OUT / "sensitivity_summary.csv", summary)
+
+    # Paired per-seed deltas compare Evidence Gate with each baseline under the same condition.
+    indexed = {
+        (row["experiment"], row["condition"], row["seed"], row["policy"]): row
+        for row in raw
+    }
+    paired = []
+    for experiment, condition, seed, policy_name in sorted(
+        (key for key in indexed if key[3] == "B8_EvidenceGate"),
+        key=lambda x: (x[0], x[1], x[2]),
+    ):
+        ega = indexed[(experiment, condition, seed, policy_name)]
+        for comparator in ("B4_AlwaysVerify", "B7_RiskGate"):
+            baseline = indexed[(experiment, condition, seed, comparator)]
+            for metric in ("ICAR", "false_block", "mean_cost"):
+                paired.append({
+                    "experiment": experiment,
+                    "condition": condition,
+                    "seed": seed,
+                    "comparison": f"EvidenceGate_minus_{comparator}",
+                    "metric": metric,
+                    "difference": float(ega[metric]) - float(baseline[metric]),
+                })
+    base.write_csv(OUT / "sensitivity_paired_seed_differences.csv", paired)
+
+    paired_groups = {}
+    for row in paired:
+        key = (row["experiment"], row["condition"], row["comparison"], row["metric"])
+        paired_groups.setdefault(key, []).append(float(row["difference"]))
+    paired_summary = []
+    for key, values in sorted(paired_groups.items()):
+        mean = sum(values) / len(values)
+        sd = __import__("statistics").stdev(values) if len(values) > 1 else 0.0
+        half = 2.045 * sd / (len(values) ** 0.5) if len(values) > 1 else 0.0
+        paired_summary.append({
+            "experiment": key[0],
+            "condition": key[1],
+            "comparison": key[2],
+            "metric": key[3],
+            "mean_difference": round(mean, 8),
+            "sd_difference": round(sd, 8),
+            "ci95_low": round(mean - half, 8),
+            "ci95_high": round(mean + half, 8),
+            "seeds": len(values),
+        })
+    base.write_csv(OUT / "sensitivity_paired_summary.csv", paired_summary)
     return len(raw), len(summary)
 
 
