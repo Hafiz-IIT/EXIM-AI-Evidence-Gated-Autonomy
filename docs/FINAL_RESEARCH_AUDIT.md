@@ -76,16 +76,16 @@ Benchmark v0.4 is generated separately from v0.3 and preserves the historical da
 
 ### Reconstruction v2 execution
 
-The full v2 run [43951632081](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43951632081) passed tests, v0.3/v0.4 benchmark generation and integrity checks, v1/v2 reconstruction, historical-table loading, artifact uploads and LaTeX compilation. Its manifest is included in the `ega-reconstruction-v2-benchmark-v04` artifact. It records:
+The full v2 run [43952541323](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43952541323) passed regression tests (including the coherent-rewrite limitation test), v0.3/v0.4 benchmark generation and integrity checks, v1/v2 reconstruction, historical-table loading, artifact uploads, execution-status publication and LaTeX compilation. Its manifest is pinned at [manifest-43952541323.json](../results/reconstruction_v2/manifest-43952541323.json). It records:
 - 1,400 benchmark records / 700 HIGH-risk cases;
 - 30 Monte Carlo seeds per stochastic condition;
 - 25 sensitivity conditions and 2,250 per-seed sensitivity rows;
 - 75 sensitivity summary groups;
 - 30,100 synthetic signature records across the 2B–2E reconstruction;
 - SHA-256 hashes for all 16 CSV outputs;
-- source commit `ebe1b144e4495f0a97872cd0eafcaf28c398f3c4`, Python 3.11.18.
+- source commit `aa0c67e234f880c8cb10b50036d1d9c51f027b60`, Python 3.11.18.
 
-The later coherent-rewrite regression test was added after this numerical run. It does not change the experiment runner or generated outputs; it is being revalidated in a subsequent full CI run.
+The coherent-rewrite regression test passed in the same full CI run. It does not change the experiment runner or generated numerical outputs.
 
 ### Main v0.4 results
 
