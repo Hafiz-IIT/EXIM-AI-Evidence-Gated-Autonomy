@@ -68,11 +68,13 @@ Every scenario runs over the same 700 HIGH-risk cases.
 | S6 | Hidden shared cloud identity provider | Distinct gateways/admins, shared identity root |
 | S7 | Hidden shared KMS/key-management root | Distinct keys, common key custody root |
 | S8 | Hidden shared firmware/build pipeline | Distinct devices, common software supply chain |
-| S9 | Hidden shared acquisition gateway/upstream feed | Distinct witness labels, common measurement ancestry |
-| S10 | Incomplete dependency manifest | Verify fail-closed behavior for unknown ancestry |
-| S11 | Missing/cyclic graph node | Verify graph-integrity rejection |
-| S12 | Dependency-graph signature tampering | Verify graph authenticity |
-| S13 | Registry-root compromise | Test forged credentials and falsified dependency ancestry |
+| S9 | Hidden shared acquisition gateway | Distinct gateway labels, common acquisition ancestor |
+| S10 | Hidden shared physical measurement source | Distinct device labels, common physical source |
+| S11 | Hidden shared upstream feed | Distinct witness labels, common data-feed ancestor |
+| S12 | Incomplete dependency manifest | Verify fail-closed behavior for unknown ancestry |
+| S13 | Missing/cyclic graph node | Verify graph-integrity rejection |
+| S14 | Dependency-graph signature tampering | Verify graph authenticity |
+| S15 | Registry-root compromise | Test forged credentials and falsified dependency ancestry |
 
 The hidden-dependency scenarios make two compromised witnesses agree on the document-derived value in the C4 consistent-but-wrong family, while their direct identity fields remain distinct. The graph manifest reveals a shared ancestor. The registry-root compromise scenario isolates trust-anchor failure from full-roster compromise: w1 and w2 share a true parent and collude, w3 remains honest, but the compromised registry signs a graph that omits the shared parent and enrolls the witness credentials. The signed graph therefore appears disjoint. F3 should still reject because the honest third witness disagrees; G2 may be fooled because it cannot recover truth omitted by its compromised graph authority.
 
@@ -96,9 +98,9 @@ Counts are deterministic synthetic outcomes, not real-world probabilities. Compa
 - S1: K2/F2/G2 should tolerate one bad witness when two honest matching witnesses remain; F3 may lose availability if the bad witness dissents.
 - S2: K2/F2 can accept two matching compromised witnesses; F3/G2 should reject when the third honest witness disagrees.
 - S3: all policies may accept when all three witnesses are compromised and agree on the same false value, unless the graph independently exposes a shared ancestor.
-- S5–S9: K2 and F2/F3 may accept when direct labels are distinct; G2 should reject if the signed graph correctly records the shared ancestor.
-- S10–S12: G2 should fail closed; key-only and direct-field policies do not use the graph and may still authorize.
-- S13: K2/F2 and G2 may be fooled when two colluding witnesses share a true parent omitted by the compromised registry; F3 should reject because the third witness remains honest.
+- S5–S11: K2/F2 may accept two matching colluding witnesses when direct labels are distinct; F3 rejects because the third honest witness disagrees, and G2 rejects when the signed graph correctly records the shared ancestor.
+- S12–S14: G2 should fail closed; K2/F2 do not use the graph and may still authorize the two-witness C4 attack, while F3 rejects because it requires all three witnesses to match.
+- S15: K2/F2 and G2 may be fooled when two colluding witnesses share a true parent omitted by the compromised registry; F3 should reject because the third witness remains honest.
 
 Any deviation must be explained from the case-level output; do not change the hypotheses after inspecting results without recording a protocol amendment.
 
@@ -125,7 +127,7 @@ The experiment is complete only when:
 
 1. graph validation and cycle/missing-node tests pass;
 2. all compared policies run on the same benchmark cases and source assertions;
-3. all 14 scenarios produce complete case-level CSVs, summary CSVs and a hash manifest;
+3. all 16 scenarios produce complete case-level CSVs, summary CSVs and a hash manifest;
 4. expected fail-closed and residual-compromise cases are checked against the preregistered hypotheses;
 5. a results review records both security gains and availability costs;
 6. the full CI workflow and manuscript compilation pass;
