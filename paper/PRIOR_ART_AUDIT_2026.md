@@ -28,3 +28,10 @@ The defensible contribution is the **synthetic benchmark and experimental framin
 ## Submission requirement
 
 Before arXiv submission, perform one final literature search immediately before freezing v1 so the related-work section reflects the current state of the field.
+
+
+## Dependency-aware witness ancestry — v5 novelty boundary
+
+The v5 protocol cites He and Yu's *The Illusion of Independent Quorums: Epistemic Fault Domains and Correlated Cognitive Failures in Agentic Quorums* (arXiv:2609.02925), which introduces Epistemic Fault Domains, the Structural Epistemic Cut, and a Dependency-Aware Quorum Controller. It also cites Hillier's *Attestation Reconciliation Protocol* draft -06 (23 October 2026), which specifies witness quorum requirements including pairwise distinct operating-party identifiers and verification methods, and Kahn's 1998 work on independent corroboration.
+
+Accordingly, v5 must not claim invention of epistemic fault domains, structural cuts, dependency-aware quorum admission, or witness diversity. Its contribution is restricted to an EXIM-inspired deterministic benchmark comparison of key uniqueness, direct-field diversity, strict thresholding, and transitive-ancestry intersection, including measured security/availability costs and a registry-root omission attack. The graph-aware mechanism is a prototype implementation of a known design direction, not a new theory.

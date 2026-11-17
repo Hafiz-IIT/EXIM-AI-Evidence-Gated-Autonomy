@@ -52,6 +52,15 @@ These are currently claims cross-checked against stored result files, not indepe
 - [x] Benchmark generation and pair-integrity checks run in CI.
 - [x] Manuscript and claim boundary explicitly state that results are synthetic.
 
+## Additional synthetic extensions completed
+
+- [x] Evidence-Trust v3 authenticated witness-quorum runner, threat matrix, bounded-recovery checks and artifact-backed results review.
+- [x] Evidence-Provenance v4 claim-scoped evidence/action-binding runner, tests, threat matrix and artifact-backed results review.
+- [x] Dependency-Graph v5 four-policy comparison across 16 scenarios, 44,800 rows, integrity manifest, results review and full CI.
+- [x] Latest v5 full workflow [44169136135](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44169136135) passed all 30 job steps, including manuscript compilation.
+
+These later synthetic extensions do not recover the original frozen Experiment 2 source or missing dual_lineage_compromise.csv, and do not substitute for the real-model Experiment 3 evaluation. They must not be presented as historical reproduction of Experiments 2A–2E.
+
 ## Release decision
 
 Do not upload the current manuscript as a research preprint until every blocker above is closed. A successful LaTeX build or benchmark-generation workflow is not a substitute for rerunning the experiments.
