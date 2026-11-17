@@ -6,7 +6,8 @@ from src.evidence_trust_v3 import issue_witness_assertion
 from src.evidence_trust_v4 import (
     DEPENDENCY_LAYERS,
     issue_identity_credential_v4,
-    verify_identity_credential_v4,\n    verify_witness_quorum_v4,
+    verify_identity_credential_v4,
+    verify_witness_quorum_v4,
 )
 
 
