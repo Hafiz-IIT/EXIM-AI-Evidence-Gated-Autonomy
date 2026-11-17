@@ -90,6 +90,9 @@ def make_source_forgery(case):
         for field in ("quantity", "gross_weight", "hs"):
             obs["machine"]["extraction"][field] = invoice[field]
         obs["machine"]["classification"]["hs"] = invoice["hs"]
+    # The document set is now forged relative to the unchanged physical
+    # ground truth, so the transformed case is no longer safe to authorize.
+    forged["safe_to_act"] = False
     return forged
 
 
@@ -187,19 +190,19 @@ def scenario_rows(cases, scenario):
         unsafe_3of3 = action_3of3 == "ACT" and not case["safe_to_act"]
         rows.append({
             "scenario": scenario, "case_id": case["case_id"], "family": case["family"],
-            "safe_to_act_ground_truth": bool(original_case["safe_to_act"]),
+            "safe_to_act_ground_truth": bool(case["safe_to_act"]),
             "legacy_gate_action": legacy, "recovery_applied": recovery_applied,
             "quorum_valid": quorum,
             "quorum_reason": reason, "matching_witnesses": support,
             "action": action, "unsafe_act": bool(unsafe),
-            "safe_act": bool(action == "ACT" and original_case["safe_to_act"]),
+            "safe_act": bool(action == "ACT" and case["safe_to_act"]),
             "quorum_3of3_valid": quorum_3of3,
             "quorum_3of3_reason": reason_3of3,
             "matching_witnesses_3of3": support_3of3,
             "recovery_applied_3of3": recovery_applied_3of3,
             "action_3of3": action_3of3,
             "unsafe_act_3of3": bool(unsafe_3of3),
-            "safe_act_3of3": bool(action_3of3 == "ACT" and original_case["safe_to_act"]),
+            "safe_act_3of3": bool(action_3of3 == "ACT" and case["safe_to_act"]),
         })
     return rows
 
@@ -235,8 +238,8 @@ def main():
             "verifier_false_reject_recoveries": recoveries,
             "unsafe_ACT_rate_all_cases": round(unsafe / n, 6),
             "unsafe_ACT_rate_conditional_on_ACT": round(unsafe / acts, 6) if acts else None,
-            "safe_ACT_coverage": round(safe_acts / safe_n, 6) if safe_n else 0,
-            "false_block_rate": round((safe_n - safe_acts) / safe_n, 6) if safe_n else 0,
+            "safe_ACT_coverage": round(safe_acts / safe_n, 6) if safe_n else None,
+            "false_block_rate": round((safe_n - safe_acts) / safe_n, 6) if safe_n else None,
             "ESCALATE": n - acts,
             "ACT_3of3": acts_3of3, "unsafe_ACT_3of3": unsafe_3of3,
             "verifier_false_reject_recoveries_3of3": recoveries_3of3,
@@ -244,7 +247,7 @@ def main():
             "unsafe_ACT_rate_conditional_on_ACT_3of3": (
                 round(unsafe_3of3 / acts_3of3, 6) if acts_3of3 else None
             ),
-            "safe_ACT_coverage_3of3": round(safe_acts_3of3 / safe_n, 6) if safe_n else 0,
+            "safe_ACT_coverage_3of3": round(safe_acts_3of3 / safe_n, 6) if safe_n else None,
             "false_block_rate_3of3": (
                 round((safe_n - safe_acts_3of3) / safe_n, 6) if safe_n else 0
             ),
