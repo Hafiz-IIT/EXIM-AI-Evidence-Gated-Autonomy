@@ -50,6 +50,7 @@ The repository includes an inspectable synthetic research environment with:
 - separately versioned, executable reconstruction protocols for 1B, 1C, 1D and 2B–2E on both benchmark versions, plus parameter sensitivity sweeps
 - synthetic Ed25519 unsigned-tamper, trust-root and dual-lineage experiments under explicitly stated new assumptions
 - a document-root attestation protocol that signs raw document instances and normalized document slots, with tenant/case binding, expiry, revocation, rotation and replay tests
+- a four-authority Evidence-Trust v2 threat matrix covering all 15 non-empty compromise combinations plus source-forgery, shared-dependency and key-administration controls
 - preregistered protocols for future real-model and human-reviewer studies
 
 ## Results are separated from future work
@@ -126,13 +127,15 @@ The numerical and security claims in the manuscript are tied to the repository's
 
 | Evidence item | Result documented in the repository |
 |---|---|
-| Historical v0.3 synthetic cases | 500 unique evidence situations × low/high consequence = 1,000 cases |\n| Extended v0.4 synthetic cases | 700 unique evidence situations × low/high consequence = 1,400 cases |
+| Historical v0.3 synthetic cases | 500 unique evidence situations × low/high consequence = 1,000 cases |
+| Extended v0.4 synthetic cases | 700 unique evidence situations × low/high consequence = 1,400 cases |
 | Controlled failure families | 10 in v0.3; 14 in v0.4 |
 | Deterministic Evidence Gate | 0/500 unsafe high-consequence ACT in the reported setup |
 | Risk Gate / Always Verify | 50/500 in the reported deterministic comparison |
 | Stochastic high-risk incorrect-action rate | 1.86% optimistic; 6.10% moderate; 13.09% harsh |
 | Provenance attacks | Demonstrate that provenance mechanisms can fail under compromised trust assumptions |
 | Ed25519 experiments | Blocked direct unsafe ACT for several unsigned-metadata attacks; valid signatures over false claims remain dangerous under trust-root compromise |
+| Four-authority v2 | Witness-only compromise produced 50/700 unsafe ACT; capture+witness and key-admin trust-store poisoning produced 300/700; AA compromise produced 600/700 |
 
 These are **synthetic computational results under the documented experimental assumptions**, not evidence of deployed-system safety.
 
@@ -163,10 +166,34 @@ The v0.4 policy now requests missing required documents and escalates duplicate 
 
 **Security limitation discovered in v0.4:** the document-set SHA-256 is unkeyed. A test demonstrates that a coherent attacker rewrite followed by digest recomputation still passes the current gate. It detects mismatched/corrupted content, not a maliciously rewritten source. Authenticity requires a trusted signature/attestation bound to the raw document set and signer identity; v0.4 does not provide that.
 
-## Document-root attestation threat experiment\n\n- [Protocol](experiments/document_root_attestation/PROTOCOL.md)\n- [Verified results and family-level breakdown](experiments/document_root_attestation/RESULTS_REVIEW.md)\n- [Proposed v2 trust-domain architecture](experiments/document_root_attestation/ARCHITECTURE_V2.md) (design only; not implemented)\n- [Implementation](src/provenance.py) and [experiment runner](scripts/run_document_root_attestation.py)\n- [CI run 43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43955044311) with archived `ega-document-root-attestation-v1` artifact\n\nThe v1 attestation binds raw document instances and normalized document slots. Across 700 HIGH-risk v0.4 cases, raw tampering, unsigned coherent rewrite, revoked-key use, cross-tenant reuse and second-use nonce replay were rejected in all tested cases. Under the combined scenario of trusted-root signer compromise plus coordinated upstream rewrites, 300 of 700 cases (42.86%) resulted in unsafe ACT; 300 of 350 ACT decisions (85.71%) were unsafe. This is a conditional synthetic stress test, not a real-world risk estimate or a result about key theft alone. See the results review for assumptions and limitations.\n\n## One-command reproduction
+## Document-root attestation threat experiment
+
+- [Protocol](experiments/document_root_attestation/PROTOCOL.md)
+- [Verified results and family-level breakdown](experiments/document_root_attestation/RESULTS_REVIEW.md)
+- [Four-authority v2 architecture](experiments/document_root_attestation/ARCHITECTURE_V2.md) (synthetic experiment implementation; production controls not implemented)
+- [Implementation](src/provenance.py) and [experiment runner](scripts/run_document_root_attestation.py)
+- [CI run 43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43955044311) with archived `ega-document-root-attestation-v1` artifact
+
+## Four-authority Evidence-Trust v2 threat experiment
+
+- [Protocol and threat-capability matrix](experiments/evidence_trust_v2/PROTOCOL.md)
+- [Role-separated attestation primitives](src/evidence_trust_v2.py)
+- [15-combination runner](scripts/run_evidence_trust_v2.py)
+- [Regression tests](tests/test_evidence_trust_v2.py)
+- [Results review and family-level breakdown](experiments/evidence_trust_v2/RESULTS_REVIEW.md)
+- [Pinned output hashes and run manifest](results/evidence_trust_v2/manifest-44025577491.json)
+- [Artifact guide](results/evidence_trust_v2/README.md)
+- [Successful full CI run 44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491)
+- [Draft pull request #5](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/pull/5)
+
+The experiment tests all 15 non-empty combinations of capture, interpretation, witness and authorization authority compromise. It separately models source forgery before capture, a disclosed shared-source witness, and key-administration trust-store poisoning. Across 700 HIGH-risk v0.4 cases per scenario, witness-only compromise produced 50 unsafe ACT decisions; capture+witness and key-admin poisoning each produced 300; compromise of AA produced 600. These are deterministic synthetic outcomes, not real-world probabilities. The witness oracle and declared source/domain labels do not establish real-world independence or production security.
+
+The v1 attestation binds raw document instances and normalized document slots. Across 700 HIGH-risk v0.4 cases, raw tampering, unsigned coherent rewrite, revoked-key use, cross-tenant reuse and second-use nonce replay were rejected in all tested cases. Under the combined scenario of trusted-root signer compromise plus coordinated upstream rewrites, 300 of 700 cases (42.86%) resulted in unsafe ACT; 300 of 350 ACT decisions (85.71%) were unsafe. This is a conditional synthetic stress test, not a real-world risk estimate or a result about key theft alone. See the results review for assumptions and limitations.
+
+## One-command reproduction
 
 ```bash
 python scripts/reproduce_all.py
 ```
 
-This regenerates and verifies benchmark v0.3 and v0.4, runs both explicitly parameterized reconstruction suites, the v0.4 sensitivity sweeps and the document-root attestation threat experiment, and displays the historical result tables without overwriting them. Outputs are stored separately under `results/reconstruction_v1/` and `results/reconstruction_v2/`. Neither reconstruction reproduces the historical 1B–2E results. Experiment 1A's original downstream-resolution implementation also remains unrecovered. Full manuscript compilation is exercised by GitHub Actions.
+This regenerates and verifies benchmark v0.3 and v0.4, runs both explicitly parameterized reconstruction suites, the v0.4 sensitivity sweeps and the document-root attestation and four-authority evidence-trust v2 threat experiments, and displays the historical result tables without overwriting them. Outputs are stored separately under `results/reconstruction_v1/` and `results/reconstruction_v2/`. Neither reconstruction reproduces the historical 1B–2E results. Experiment 1A's original downstream-resolution implementation also remains unrecovered. Full manuscript compilation is exercised by GitHub Actions.

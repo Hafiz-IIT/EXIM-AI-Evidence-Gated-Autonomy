@@ -130,3 +130,32 @@ The full CI run [43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gate
 Under baseline, raw tampering, unsigned coherent rewrite, revoked-key, rotated-key, cross-tenant and nonce-replay tests, the expected attestation outcomes occurred for all 700 cases in each scenario. Under the combined trusted-root compromise plus coordinated upstream rewrite, 700/700 forged attestations verified; the downstream policy authorized ACT in 350 cases, 300 unsafe against benchmark ground truth (42.86% of all HIGH-risk cases; 85.71% of ACT decisions). The 300 unsafe ACTs occurred in C1, C2, C4, C6, C9 and C13, 50 per family.
 
 **Interpretation boundary:** this is a deliberately strong synthetic combined-compromise scenario, not an estimate of deployment risk and not evidence that private-key theft alone produces the same outcome. It demonstrates that a signature proves a trusted key signed a bound payload, not that the payload is semantically true. The prototype uses deterministic test keys and process-local replay state; it does not implement production KMS/HSM custody, independent signer enrollment, secure capture, distributed replay storage or operational key management. The manuscript must retain these qualifications.
+
+
+## Four-authority Evidence-Trust v2 threat experiment
+
+### Implementation and validation
+
+- Role-separated Ed25519 attestations: `src/evidence_trust_v2.py`
+- Threat-matrix runner: `scripts/run_evidence_trust_v2.py`
+- Regression tests: `tests/test_evidence_trust_v2.py`
+- Protocol: [experiments/evidence_trust_v2/PROTOCOL.md](../experiments/evidence_trust_v2/PROTOCOL.md)
+- Results review: [experiments/evidence_trust_v2/RESULTS_REVIEW.md](../experiments/evidence_trust_v2/RESULTS_REVIEW.md)
+- Pinned outputs: [results/evidence_trust_v2/manifest-44025577491.json](../results/evidence_trust_v2/manifest-44025577491.json)
+- Successful full CI run: [44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491)
+
+The runner evaluates all 15 non-empty compromise combinations of CA, IA, IWA and AA, plus an honest baseline, source forgery before capture, disclosed shared-source witness, and key-admin trust-store poisoning. It generates 13,300 case-scenario rows over 19 scenarios, each containing 700 HIGH-risk v0.4 cases. The successful run passed the full regression suite, both benchmark generators/verifiers, reconstruction and sensitivity runners, v1 document-root runner, v2 threat matrix, historical-table loading, artifact uploads and LaTeX compilation.
+
+### Main findings
+
+- Honest baseline: 0 unsafe ACT; 50 ACT, all safe; safe-ACT coverage 50%, false-block rate 50%.
+- IWA-only compromise: 50 unsafe ACT (7.14% of all HIGH-risk cases; 50% of ACT decisions), all in C4 consistent-but-wrong.
+- CA+IWA, CA+IA+IWA, and key-admin trust-store poisoning: 300 unsafe ACT each (42.86% overall; 85.71% of ACT decisions), across C1, C2, C4, C6, C9 and C13 (50 each).
+- Any compromise combination containing AA: 700 ACT, 600 unsafe (85.71% overall).
+- Source forgery before capture and disclosed shared-dependency witness: no ACT in this synthetic model.
+
+### Audit interpretation and remaining limitations
+
+The experiment demonstrates that role separation can contain some isolated capture/interpretation compromises, but the witness authority remains a critical trust dependency. A disclosed common source is rejected by comparing declared source/acquisition/administrative-domain labels; those labels are not externally authenticated. The ground-truth-derived witness is an idealized oracle, not a real independent measurement. Key-admin compromise is modeled as trust-store poisoning for CA/IA/IWA while AA remains honest. AA compromise is modeled as arbitrary authorization. These are deterministic synthetic outcomes, not deployment-risk estimates.
+
+The implementation does not include production KMS/HSM custody, authenticated signer enrollment, externally anchored trust registry, durable atomic replay storage, operational revocation, secure capture, or independent administrative-domain verification. The manuscript must retain these limitations and remain **not ready for arXiv submission** pending independent review, source-level reconciliation and further empirical work.

@@ -5,7 +5,7 @@
 - **Paper:** Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence
 - **Author:** Syed Hafiz Ali
 - **Repository:** https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy
-- **Version:** Historical v1 artifact plus separately versioned benchmark v0.4 / reconstruction v2
+- **Version:** Historical v1 artifact plus separately versioned benchmark v0.4, reconstruction v2, document-root attestation v1 and evidence-trust v2
 - **Historical benchmark v0.3:** 500 underlying evidence situations paired across LOW/HIGH consequence = 1,000 cases
 - **Extended benchmark v0.4:** 700 underlying evidence situations paired across LOW/HIGH consequence = 1,400 cases; 14 fault families
 - **Benchmark seed:** 42
@@ -15,12 +15,7 @@
 
 **Not ready for arXiv submission.** The result CSVs are version-controlled and the manuscript claims have been compared against them, but the repository does not yet contain all experiment-runner source needed to regenerate those results.
 
-The current `scripts/reproduce_all.py` command:
-1. regenerates the synthetic benchmark;
-2. verifies benchmark structure/pair integrity;
-3. loads and prints the existing result CSVs.
-
-It does **not** rerun the stochastic verification, OOD, provenance-attack, trust-root-compromise, or separation-of-duties simulations. The CI workflow therefore does not establish full computational reproducibility of Experiments 1B–2E.
+The current `scripts/reproduce_all.py` command regenerates and verifies v0.3/v0.4, runs the separately versioned reconstruction v1/v2 suites, the document-root attestation experiment, the four-authority evidence-trust v2 matrix, and loads historical result tables unchanged. The new runners use explicit newly documented assumptions; they do not reproduce the historical 1B–2E numbers. The original Experiment 1A downstream-resolution implementation also remains unrecovered.
 
 ## Known policy correction
 
@@ -69,7 +64,7 @@ The full v2 experiment execution with the coherent-rewrite regression test passe
 2. Compare the new reconstruction protocol against the historical result tables and explain all differences without parameter fitting.
 3. Review the new reconstruction's model assumptions and threats to validity independently.
 4. Freeze the exact policies, stochastic assumptions, seeds, cost matrix, and attack configurations.
-5. Expand document-root threat testing into independently varied capture, extraction, external-sensor and authorization trust-domain compromises; the first combined-compromise experiment is complete but synthetic.
+5. Extend the four-authority v2 matrix with independently authenticated source/admin-domain registries, multiple independent witnesses, partial sensor compromise, and more realistic key-administration/recovery workflows. The current role matrix and trust-store poisoning control remain synthetic.
 6. Redesign OOD transformations to test meaningful evidence-quality/dependency shifts.
 7. Expand sensitivity analysis beyond the current one-factor and selected two-factor sweeps.
 8. Reconcile all manuscript tables and claims against newly generated outputs.
@@ -97,3 +92,22 @@ The full workflow [43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Ga
 Across 700 HIGH-risk v0.4 cases, the verifier rejected raw tampering, unsigned coherent rewrites, revoked-key use, cross-tenant reuse and second-use nonce replay in all tested cases. Under the combined scenario of trusted document-root signer compromise plus coordinated upstream rewrites, the forged attestation verified in all 700 cases; the downstream gate authorized 350 ACT decisions, 300 unsafe against benchmark ground truth (42.86% of all HIGH-risk cases; 85.71% of ACT decisions). The 300 unsafe decisions occurred in C1, C2, C4, C6, C9 and C13 (50 each).
 
 This is a conditional synthetic attack outcome under coordinated compromise of the signing authority and upstream evidence channels. It is not a real-world probability or a result about signer-key theft alone. The implementation uses deterministic test keys and process-local replay state; production key custody, authenticated signer enrollment, secure capture, distributed replay protection and operational key management remain unimplemented. The manuscript remains **not ready for arXiv submission**.
+
+
+## Four-authority Evidence-Trust v2 extension (CI-verified)
+
+- Implementation: `src/evidence_trust_v2.py`
+- Runner: `scripts/run_evidence_trust_v2.py`
+- Tests: `tests/test_evidence_trust_v2.py`
+- Protocol: `experiments/evidence_trust_v2/PROTOCOL.md`
+- Results review: `experiments/evidence_trust_v2/RESULTS_REVIEW.md`
+- Output guide: `results/evidence_trust_v2/README.md`
+- Pinned manifest: `results/evidence_trust_v2/manifest-44025577491.json`
+- Verified full CI run: [44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491)
+
+The experiment evaluates 15 non-empty combinations of CA, IA, IWA and AA compromise, plus an honest baseline and three controls, across 700 HIGH-risk v0.4 cases per scenario. The archived artifact contains 13,300 case-scenario rows and 19 summaries. The full workflow passed tests, benchmark generation/verification, reconstruction and sensitivity runners, document-root v1, evidence-trust v2, historical-table loading, artifact uploads and LaTeX compilation.
+
+Key results: IWA-only compromise produced 50 unsafe ACT decisions (7.14% of all HIGH-risk cases); CA+IWA, CA+IA+IWA, and key-admin trust-store poisoning each produced 300 (42.86%); any scenario including AA produced 600 (85.71%). Source forgery before capture and a disclosed shared-dependency witness produced no ACT in this specific synthetic model.
+
+The witness is an idealized ground-truth-derived record; source and administrative-domain labels are not externally authenticated. The model uses deterministic test keys and does not implement production KMS/HSM custody, authenticated enrollment, durable replay storage, secure capture or operational revocation. The result does not establish real-world independence or production security.
+
