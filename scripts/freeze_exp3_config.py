@@ -59,7 +59,7 @@ def main():
         "extract_v1.txt": sha256_file(PROMPT_DIR / "extract_v1.txt"),
         "verify_v1.txt": sha256_file(PROMPT_DIR / "verify_v1.txt"),
     }
-    model_hash = sha256_bytes(canonical_json({"models": models, "conditions": conditions}))
+    model_hash = sha256_bytes(canonical_json({"models": models, "conditions": conditions, "settings": config["settings"]}))
     config["freeze"] = {
         "status": "frozen",
         "frozen_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
