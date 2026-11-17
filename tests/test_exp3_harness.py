@@ -4,6 +4,8 @@ import hashlib
 import tempfile
 import os
 import csv
+import subprocess
+import sys
 from pathlib import Path
 
 from experiments.exp3_real_models.harness import (
@@ -118,6 +120,43 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         normalized, valid = normalize_verifier({"accept": "yes", "confidence": 0.9})
         self.assertFalse(valid)
         self.assertFalse(normalized["accept"])
+
+    def test_freeze_binds_task_manifest_and_unique_holdout_family(self):
+        cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            benchmark = root / "cases.jsonl"
+            benchmark.write_text("".join(json.dumps(x) + "\n" for x in cases))
+            prepared = root / "prepared"
+            prepare_tasks(benchmark, prepared)
+            models = {}
+            for name, family, holdout in [
+                ("model_a", "family_a", False), ("model_b", "family_b", False),
+                ("model_c", "family_c", False), ("model_d", "family_d", True),
+            ]:
+                models[name] = {
+                    "provider": "mock", "base_url": "https://api.test/v1",
+                    "model": "mock-" + name, "family_id": family,
+                    "api_key_env": "EXP3_UNUSED_KEY", "holdout_only": holdout,
+                }
+            conditions = [
+                {"condition_id": "same_model", "extractor_model": "model_a", "verifier_models": ["model_a", "model_a"]},
+                {"condition_id": "cross_family", "extractor_model": "model_a", "verifier_models": ["model_b", "model_c"]},
+                {"condition_id": "family_holdout", "extractor_model": "model_a", "verifier_models": ["model_b", "model_d"], "holdout_only": True},
+            ]
+            config_path = root / "config.json"
+            config_path.write_text(json.dumps({"models": models, "conditions": conditions, "settings": {}}))
+            output = root / "frozen.json"
+            subprocess.run([
+                sys.executable, "scripts/freeze_exp3_config.py",
+                "--config", str(config_path), "--prepared-dir", str(prepared), "--output", str(output),
+            ], cwd=Path(__file__).resolve().parents[1], check=True, capture_output=True, text=True)
+            frozen = json.loads(output.read_text())["freeze"]
+            manifest_path = prepared / "public" / "task_manifest.json"
+            manifest = json.loads(manifest_path.read_text())
+            self.assertEqual(frozen["task_manifest_sha256"], hashlib.sha256(manifest_path.read_bytes()).hexdigest())
+            self.assertEqual(frozen["public_tasks_sha256"], manifest["public_tasks_sha256"])
+            self.assertEqual(frozen["task_id_salt_sha256"], manifest["task_id_salt_sha256"])
 
     def test_provider_failure_is_logged_and_forces_escalation(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
