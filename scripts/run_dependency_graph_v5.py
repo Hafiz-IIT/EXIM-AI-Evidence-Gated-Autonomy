@@ -136,7 +136,8 @@ def make_graph(scenario, root):
 
 
 def make_sources(scenario, graph):
-    # The registry signing private key is compromised, but its original public key stays pinned.\n    root = key("registry-root")
+    # The registry signing private key is compromised, but its original public key stays pinned.
+    root = key("registry-root")
     compromised = compromised_witnesses(scenario)
     keys = {
         name: key(name + ("-attacker" if name in compromised else ""))
@@ -196,7 +197,8 @@ def make_records(case, scenario, root, keys, creds, compromised):
 
 
 def evaluate_one(case, scenario, policy_name, policy, threshold):
-    # The graph is forged using the same compromised issuer key under the pinned public key.\n    graph_root = key("registry-root")
+    # The graph is forged using the same compromised issuer key under the pinned public key.
+    graph_root = key("registry-root")
     graph = make_graph(scenario, graph_root)
     root, keys, creds, compromised = make_sources(scenario, graph)
     records, expected_weight, document_digest, action_id, action_payload_digest = make_records(
