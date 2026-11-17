@@ -253,6 +253,38 @@ def main():
             ),
             "ESCALATE_3of3": n - acts_3of3,
         })
+    # Fail closed if the checked-in experiment no longer exhibits its
+    # pre-registered deterministic acceptance/rejection patterns. These
+    # assertions prevent stale or schema-incompatible artifacts from passing CI.
+    by_scenario = {item["scenario"]: item for item in summary}
+    expected = {
+        "honest_baseline": (100, 0, 100, 0),
+        "one_witness_compromised": (100, 0, 100, 0),
+        "two_witnesses_compromised": (150, 50, 100, 0),
+        "all_witnesses_compromised": (150, 50, 150, 50),
+        "forged_source_identity": (100, 0, 0, 0),
+        "source_forgery_before_capture": (0, 0, 0, 0),
+        "shared_administrative_domain": (0, 0, 0, 0),
+        "registry_root_compromise": (150, 50, 0, 0),
+    }
+    for scenario, (acts_2of3, unsafe_2of3, acts_3of3, unsafe_3of3) in expected.items():
+        actual = by_scenario[scenario]
+        observed = (
+            actual["ACT"], actual["unsafe_ACT"],
+            actual["ACT_3of3"], actual["unsafe_ACT_3of3"],
+        )
+        target = (acts_2of3, unsafe_2of3, acts_3of3, unsafe_3of3)
+        if observed != target:
+            raise AssertionError(
+                f"{scenario} acceptance profile changed: observed={observed}, expected={target}"
+            )
+    if by_scenario["honest_baseline"]["safe_ACT_coverage"] != 1.0:
+        raise AssertionError("honest 2-of-3 baseline must recover all benchmark-safe cases")
+    if by_scenario["two_witnesses_compromised"]["unsafe_ACT_3of3"] != 0:
+        raise AssertionError("3-of-3 sensitivity must reject two-witness collusion")
+    if by_scenario["all_witnesses_compromised"]["unsafe_ACT_3of3"] == 0:
+        raise AssertionError("3-of-3 must not be represented as safe under full-roster compromise")
+
     OUT.mkdir(parents=True, exist_ok=True)
     write_csv(OUT / "evidence_trust_v3_cases.csv", rows)
     write_csv(OUT / "evidence_trust_v3_summary.csv", summary)
