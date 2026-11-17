@@ -63,6 +63,17 @@ The output compares three policies on each scenario: field-only 2-of-3, dependen
 - Registry-root compromise remains a trust-anchor failure; dependency-root distinctness does not solve it.
 - All identities, measurements, dependency roots and attacks are synthetic. Deterministic counts are not real-world probabilities or production-security evidence.
 
+## Inspectable outputs
+
+The runner emits three CSV files plus a manifest:
+
+- evidence_trust_v4_cases.csv — one row per benchmark case and scenario, with all three policy decisions.
+- evidence_trust_v4_summary.csv — scenario-level security and availability metrics.
+- evidence_trust_v4_dependencies.csv — one row per witness and scenario, including the declared dependency-root sets, issuer ID, whether the credential verifies under that scenario's trusted root, and whether the witness is adversarial in that scenario.
+- manifest.json — scenario counts, dependency layers, software context, and SHA-256 hashes for all three CSVs.
+
+The dependency CSV is necessary to audit why a particular quorum was or was not considered independent; aggregate counts alone are insufficient.
+
 ## Metrics
 
 For each policy and scenario, report:
