@@ -1,0 +1,96 @@
+# Research Novelty Audit — Evidence-Gated Autonomy
+
+**Review date:** 2026-11-18  
+**Scope:** Public literature surfaced in the initial novelty review of Evidence-Trust v1–v3.  
+**Status:** Preliminary but material; expand before any manuscript submission.  
+**Purpose:** Prevent the project from claiming novelty for mechanisms already substantially described in prior work.
+
+## Executive finding
+
+The broad claim that independent agents/witnesses do not create independent assurance when they share upstream evidence, and that authorization should account for common-cause dependencies, is **not novel**. A directly overlapping paper was submitted to arXiv on 2026-08-24:
+
+- Jun He and Deying Yu, [The Illusion of Independent Quorums: Epistemic Fault Domains and Correlated Cognitive Failures in Agentic Quorums](https://arxiv.org/abs/2609.02925), arXiv:2609.02925 (2026).
+
+It introduces Epistemic Fault Domains, a Structural Epistemic Cut, a Semantic Compromise Cut, dependency-aware quorum selection and runtime admission, analytical/Monte Carlo mechanism studies, and a frozen 120-task operational benchmark. Its document-policy compliance category and separated evidence packages also overlap the broad setting of evidence-backed enterprise decisions.
+
+**Consequence:** Evidence-Trust v3's 2-of-3 authenticated witness quorum, source/admin-domain diversity checks, shared-dependency controls, and 2-of-3 versus 3-of-3 sensitivity must not be presented as a new quorum theory or a novel solution to correlated agent failures. They are best described as a domain-specific implementation/extension and a controlled synthetic replication of related failure mechanisms.
+
+## Comparison with the current repository
+
+| Current project element | Prior-work overlap | Safe characterization |
+|---|---|---|
+| Three witnesses, 2-of-3 and 3-of-3 | EFD paper evaluates 2-of-3 and 3-of-3, shared versus separated evidence paths, and quorum failure under common causes | Implementation-level threshold study; not novel quorum theory |
+| Distinct source, acquisition and administrative-domain labels | EFD formalizes shared epistemic ancestry and warns that false separation/fabricated lineage can inflate the structural cut | A credential-binding prototype; domain labels are claims, not proof of independence |
+| Registry-root compromise and forged identity credential | EFD explicitly discusses incomplete provenance and fabricated lineage metadata as limitations; PKI trust-root failure is established security territory | Threat-model extension in this synthetic document workflow |
+| Source forgery before capture | EFD's benchmark includes corrupted evidence roots and its theory distinguishes evidence ancestry from agent identity | Domain-specific pre-capture document-origin control |
+| Evidence-gated action and authorization chain | Overlap with runtime proof of execution, commit-time authorization, governed execution and proof-derived authority | Do not claim generic agent execution gating as novel |
+| Bounded recovery from isolated verifier false rejection | Related to selective prediction/reject-option research and prover-verifier deliberation; the exact combination with document evidence and witness-backed policy recovery remains to be audited | Candidate differentiator, not yet an established novelty claim |
+
+## High-priority related work
+
+1. **Jun He and Deying Yu (2026), [The Illusion of Independent Quorums](https://arxiv.org/abs/2609.02925), arXiv:2609.02925.** Direct overlap: common-cause evidence ancestry, quorum structural resilience, dependency-aware admission and external benchmark design.
+2. **Zihao Zheng, Baichuan Li, Junyi Yao and Jiayu Long (2026), [Engineering Reliable Commit Gates for Agentic AI: Cost-Aware Verification Portfolios under Common-Mode Data Failures](https://arxiv.org/abs/2609.10969), arXiv:2609.10969.** Direct overlap with verifier portfolios, shared versus independent evidence sources, cost-aware verification and commit gates. Their abstract reports a fixed-call 2×2 experiment separating model and evidence diversity.
+3. **Bo Wu, Lin Wang, Yong Zhang and Jiang Deng (2026), [From Intent to Execution Grant: An Execution-Boundary Conformance Profile for High-Risk AI Actions](https://arxiv.org/abs/2609.11596), arXiv:2609.11596.** Overlap with canonical action binding, evidence obligations, deterministic adjudication, decision derivation, execution grants and redemption-time checks.
+4. **Jason D. Rhodes and George Kang (2026), [Proof of Execution: Runtime Verification for Governed AI Agent Actions](https://arxiv.org/abs/2607.05397), arXiv:2607.05397.** Overlap with execution contracts, causal event streams, cryptographic attestations, authorization/effect/history binding and replay.
+5. **Igor Santos-Grueiro (2026), [Temporary Authority, Permanent Effects: Commit-Time Authorization for LLM Agents](https://arxiv.org/abs/2607.10487), arXiv:2607.10487.** Overlap with current justifications, exact-effect binding, revocation and atomic commit-time authorization.
+6. **Edward Y. Chang and Longling Geng (2026), [Mnemosyne: Agentic Transaction Processing for Validating and Repairing AI-generated Workflows](https://arxiv.org/abs/2607.00269), arXiv:2607.00269.** Overlap with deterministic admission, append-only transition logs, bounded repair and re-admission.
+7. **Jun He and Deying Yu (2026), [Verifiable Agentic Infrastructure: Proof-Derived Authorization for Sovereign AI Systems](https://arxiv.org/abs/2605.15228), arXiv:2605.15228.** Overlap with proof-derived execution authority and append-only evidence chains.
+8. **Jun He, Openkedge Io and Deying Yu (2026), [When AI Agents Commit: Cognitive Serializability Across Data, Evidence, Policy, and Authority](https://arxiv.org/abs/2609.20261), arXiv:2609.20261.** Overlap with stale evidence/policy/authority at commit time and witness-bound grants.
+9. **Elias Calboreanu (2026), [LATTICE: a governance-first architecture for authorized autonomous AI operations](https://doi.org/10.3389/frai.2026.1800407), Frontiers in Artificial Intelligence 9 (2026).** Overlap with separation of planning, execution and governance, deterministic policy gates, human escalation and cryptographic audit trails.
+10. **M. Llambí-Morillas and D. Fernández-Fernández (2026), [Cryptographically verifiable authorization for autonomous AI agents: a falsifiable hypothesis and proof of concept](https://doi.org/10.3389/fcomp.2026.XXXXX), Frontiers in Computer Science 8 (2026).** Related to cryptographic binding of agent principal, request, context and policy. DOI needs verification before formal citation; use the publisher record rather than the placeholder above.
+11. **João Sedoc, Baotong Zhang and Dean P. Foster (2026), [Trust but Verify: Prover-Verifier Deliberation for Selective LLM Prediction](https://arxiv.org/abs/2605.25133), arXiv:2605.25133.** Related to verifier challenge/accept/reject protocols and coverage–precision trade-offs.
+12. **Dekun Yang (2026), [Calibrated Selective Fact-Checking via Evidence Chain Evaluation](https://arxiv.org/abs/2607.18240), arXiv:2607.18240.** Related to evidence-chain evaluation, source metadata and abstention when evidence is weak or inconsistent.
+13. **Kilian Hendrickx, Lorenzo Perini, Dries Van der Plas, Wannes Meert and Jesse J. Davis (2024), [Machine learning with a reject option: a survey](https://doi.org/10.1007/s10994-024-06534-3), Machine Learning 113 (2024), 3073–3110.** Established foundations for reject-option/abstention and coverage–risk evaluation.
+
+## What the current experiment actually contributes
+
+The present v3 code is a deterministic, synthetic EXIM/document-evidence adaptation with:
+- registry-signed witness identity credentials;
+- case-scoped, signed measurement assertions;
+- explicit source, acquisition-domain, administrative-domain and key identifiers;
+- a distinction between pre-capture source forgery and credential tampering;
+- registry-root compromise and witness collusion controls;
+- a narrowly bounded recovery path for isolated verifier false rejection, requiring the other v1 evidence gates to pass;
+- explicit 2-of-3 versus 3-of-3 availability/safety sensitivity.
+
+These are useful engineering and experimental artifacts. They do **not** prove real-world source identity, operational independence, source truth, calibrated risk, or production security. The current benchmark's oracle-like witness is generated from synthetic ground truth, and the benchmark has only 700 HIGH-risk cases.
+
+## Candidate research reframing
+
+The strongest candidate direction is narrower and domain-specific:
+
+**Claim-level provenance and bounded recovery for document-driven, high-consequence workflows.**
+
+Candidate question:
+
+> Under what explicit evidence and threat assumptions can a document-driven autonomous workflow recover from an isolated verifier false rejection while preserving fail-closed behavior for semantic conflict, source forgery, stale evidence, compromised authorities, and correlated corroboration?
+
+This is not yet a novelty claim. It needs a systematic comparison against:
+- selective prediction and reject-option systems;
+- prover-verifier deliberation;
+- common-mode verifier portfolios (including VP-CONTROL);
+- evidence-chain fact checking;
+- commit-time authorization and execution-boundary contracts;
+- EFD/DAQC and agentic transaction processing.
+
+A possible differentiator is a claim-level EXIM evidence graph: each material claim (quantity, gross weight, HS/RITC classification, origin, party identity, shipment/container identity, authorization validity) is bound to its source artifact, acquisition event, transformation lineage, independent corroborator, conflict state, and action obligation. The controller should reason over claim-specific dependencies rather than a single document-level or witness-level pass/fail result. This must be tested against the above work before being described as novel.
+
+## Required next research work
+
+1. Complete a structured novelty matrix against the full texts and released artifacts of the highest-overlap papers, especially EFD, VP-CONTROL, EBL-Core, Proof of Execution, CTA and Mnemosyne.
+2. Inspect the EFD code and frozen benchmark; determine which current tests are reproductions, which are orthogonal, and whether any benchmark design is too similar to reuse without clear attribution.
+3. Re-run the latest v3 source commit and verify the newly added pre-registered 2-of-3/3-of-3 output assertions against the artifact. Do not cite the earlier artifact if its schema predates the recovery and sensitivity code.
+4. Report the bounded-recovery results separately from quorum results. Preserve all false-accept and false-reject cases in the confusion matrix.
+5. Design a claim-level EXIM benchmark with source, transformation, authority, time and cross-document conflict attacks. Keep synthetic and real data clearly separated.
+6. Only after those steps, choose whether to retain v3 as a reproducibility/engineering extension, create a new research branch for the claim-level contribution, or substantially revise the manuscript.
+
+## Claim discipline
+
+Do not claim:
+- a new quorum theory, EFD metric, or general solution to common-mode failure;
+- cryptographic signatures prove semantic truth or real-world independence;
+- zero observed unsafe actions imply a zero failure probability;
+- synthetic deterministic case counts are real-world probabilities;
+- production readiness or deployment safety.
+
+Any eventual novelty statement must be supported by a dated search, full-text comparison, exact baseline implementations, and a falsifiable experiment.
