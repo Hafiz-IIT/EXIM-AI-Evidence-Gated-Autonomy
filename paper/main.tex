@@ -195,6 +195,38 @@ These results identify both the value and limits of role separation. Capture-onl
 
 The complete protocol, threat assumptions and limitations are in \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/main/experiments/evidence_trust_v2/PROTOCOL.md}{the v2 protocol} and \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/main/experiments/evidence_trust_v2/RESULTS_REVIEW.md}{the results review}. Pinned output hashes are in \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/main/results/evidence_trust_v2/manifest-44025577491.json}{the run manifest}. CI run \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491}{44025577491} passed the full test suite, benchmark generation/verification, experiment runners, artifact uploads, historical table loading, and manuscript compilation. Production KMS/HSM custody, authenticated signer enrollment, durable replay storage, secure capture and operational revocation are not implemented. This is synthetic threat evidence only; the manuscript is not ready for arXiv submission.
 
+\section{Supplementary Experiment: Authenticated Witness Quorum and Bounded False-Reject Recovery (v3)}
+
+This subsequent synthetic experiment evaluates registry-authenticated witness identities and case-scoped signed measurement assertions on the 700 HIGH-risk cases of benchmark v0.4. Eight threat scenarios produce 5,600 case-scenario rows. The same assertions are evaluated under a primary 2-of-3 threshold and a strict 3-of-3 sensitivity condition. The experiment is an implementation-level study and is not presented as a new quorum theory; dependency-aware quorum analysis has been studied directly in EFD and VP-CONTROL \cite{he2026illusionquorums,zheng2026vpcontrol}.
+
+The v3 runner also adds a narrowly bounded recovery rule for an isolated verifier false rejection. Recovery is allowed only when the witness quorum is valid and the existing policy's other checks—document completeness and agreement, freshness, external consistency, extraction match, provenance integrity, document uniqueness, and verifier independence—already pass. This recovers the 50 safe C7 cases in the synthetic fixture; it does not override missing, stale, contradictory, or provenance-invalid evidence.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Scenario & 2-of-3 ACT & 2-of-3 unsafe & 3-of-3 ACT & 3-of-3 unsafe\\
+\midrule
+Honest baseline & 100 & 0 & 100 & 0\\
+One witness compromised & 100 & 0 & 100 & 0\\
+Two witnesses compromised & 150 & 50 & 100 & 0\\
+All witnesses compromised & 150 & 50 & 150 & 50\\
+Forged source identity & 100 & 0 & 0 & 0\\
+Source forgery before capture & 0 & 0 & 0 & 0\\
+Shared administrative domain & 0 & 0 & 0 & 0\\
+Registry-root compromise & 150 & 50 & 0 & 0\\
+\bottomrule
+\end{tabular}
+\caption{Evidence-Trust v3 outcomes across 700 HIGH-risk cases per scenario. ACT and unsafe ACT are deterministic counts, not probabilities.}
+\end{table}
+
+In the honest baseline, the recovery rule increases safe-action coverage from 50/100 in the pre-recovery runner to 100/100, with zero unsafe ACT. One compromised witness is tolerated in this fixture. Under two-witness compromise, 2-of-3 authorizes 50 unsafe C4 consistent-but-wrong cases; strict 3-of-3 rejects that attack in the same cases. However, when all three enrolled witnesses are compromised, both thresholds authorize the 50 C4 unsafe cases. Strict 3-of-3 therefore does not remove the full-roster trust assumption.
+
+The forged-source-identity and registry-root scenarios expose a safety/availability trade-off. The 2-of-3 threshold tolerates one invalid credential when two valid witnesses remain; the 3-of-3 threshold fails closed, producing zero ACT and blocking all safe cases in those scenarios. The shared-administrative-domain control also fails closed and blocks all safe cases. These outcomes must not be described as free security gains.
+
+All identities, keys, measurements and source records are synthetic. Witness values in the baseline are derived from benchmark ground truth, making the witness an idealized oracle rather than a real independent sensor. Registry signatures authenticate an issuer's credential but do not prove real-world source identity, operational independence, calibration, or semantic truth. Distinct domain labels are claims, not proof. No production PKI, KMS/HSM custody, hardware identity, trusted time, durable revocation, or secure acquisition is implemented. The complete protocol, regression tests, output hashes and limitations are in \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/research/evidence-trust-v3-witness-quorum/experiments/evidence_trust_v3/PROTOCOL.md}{the v3 protocol} and \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/research/evidence-trust-v3-witness-quorum/research/NOVELTY_AUDIT.md}{the preliminary novelty audit}. The validated run is \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44157745993}{CI run 44157745993}. This supplementary experiment is synthetic and does not establish deployment safety.
+
 \bibliographystyle{plain}
 \bibliography{references}
 \end{document}
