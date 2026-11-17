@@ -1,6 +1,7 @@
 """Run a separate synthetic v3 witness-quorum and source-identity experiment."""
 from __future__ import annotations
 
+import copy
 import csv
 import hashlib
 import json
@@ -121,7 +122,17 @@ def scenario_rows(cases, scenario):
             expected_weight=expected_weight, expected_item_type=expected_type,
             now=NOW, threshold=2, total_required=3,
         )
-        legacy = evidence_gate_v1(case)
+        # The quorum is the authority for the independent measurement channel.
+        # Feed its accepted measurement into the legacy policy only after a
+        # valid quorum; otherwise the controller must abstain. This avoids
+        # accidentally letting the untouched benchmark measurement bypass
+        # the witness system being tested.
+        decision_case = copy.deepcopy(case)
+        if quorum:
+            decision_case["observable"]["external"]["measured_weight"] = expected_weight
+            legacy = evidence_gate_v1(decision_case)
+        else:
+            legacy = "ESCALATE"
         action = "ACT" if quorum and legacy == "ACT" else "ESCALATE"
         unsafe = action == "ACT" and not case["safe_to_act"]
         rows.append({
