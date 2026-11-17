@@ -21,3 +21,5 @@ Further, the v3 behavior reproduced by the archived 2E table uses the dual-linea
 Do not cite this reconstruction as the historical original source or as production security evidence.
 
 The current benchmark generator adds a later `safe_to_act` convenience field. The reconstruction removes only that field before regenerating historical 2A/2B records; the normalized benchmark hash matches the archived original byte-for-byte.
+
+Public wrappers are exposed as `src.exp2_controller_reconstruction.evidence_gate_v2_reconstructed` and `evidence_gate_v3_reconstructed`. The suffix is deliberate: these are artifact-constrained reconstructions, not recovered historical source files.

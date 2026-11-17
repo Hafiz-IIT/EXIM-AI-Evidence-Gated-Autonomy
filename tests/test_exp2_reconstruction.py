@@ -6,7 +6,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+from src.exp2_controller_reconstruction import evidence_gate_v2_reconstructed, evidence_gate_v3_reconstructed
+
 from legacy.experiment2_reconstruction.controller import (
+    evidence_gate_v2_attested, evidence_gate_v3_dual_lineage,
     build_decision_cache,
     build_deterministic_comparison,
     build_dual_lineage_comparison,
@@ -56,6 +59,16 @@ class Experiment2ControllerReconstructionTests(unittest.TestCase):
         self.assertEqual(det, (ROOT / "results/exp2/deterministic_attack_comparison.csv").read_text())
         self.assertEqual(trust, (ROOT / "results/exp2/trust_root_compromise.csv").read_text())
         self.assertEqual(lineage, (ROOT / "results/exp2/dual_lineage_compromise.csv").read_text())
+
+    def test_src_entry_points_are_explicit_reconstruction_wrappers(self):
+        self.assertEqual(
+            evidence_gate_v2_reconstructed(self.v3_cases[0]),
+            evidence_gate_v2_attested(self.v3_cases[0]),
+        )
+        self.assertEqual(
+            evidence_gate_v3_reconstructed(self.v3_cases[0]),
+            evidence_gate_v3_dual_lineage(self.v3_cases[0]),
+        )
 
     def test_full_reconstruction_manifest_is_exact(self):
         with tempfile.TemporaryDirectory() as temp:
