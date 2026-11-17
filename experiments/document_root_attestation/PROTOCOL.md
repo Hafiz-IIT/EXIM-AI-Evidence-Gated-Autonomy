@@ -1,6 +1,6 @@
 # Document-Root Attestation Threat Experiment v1
 
-**Status:** Implementation and CI validation in progress. Synthetic protocol experiment only.
+**Status:** Implemented; CI run [43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43955044311) passed. Synthetic protocol experiment only. Results review: [RESULTS_REVIEW.md](RESULTS_REVIEW.md).
 
 ## Research question
 
@@ -40,6 +40,10 @@ The CSV distinguishes **attestation acceptance** from the downstream **policy ac
 - rotated new key: accept;
 - cross-tenant replay: reject;
 - first nonce use: accept; second use: reject.
+
+## Results summary
+
+Across 700 HIGH-risk v0.4 cases, the verifier rejected all tested raw tampering, unsigned coherent rewrites, revoked-key use, cross-tenant reuse and second-use nonce replays. It accepted valid baseline and rotated-key attestations. Under the combined trusted-root compromise plus coordinated upstream rewrite, the forged attestation was accepted in all 700 cases; the downstream policy issued 350 ACT decisions, 300 of which were unsafe against benchmark ground truth (42.86% of all HIGH-risk cases; 85.71% of ACT decisions). See [RESULTS_REVIEW.md](RESULTS_REVIEW.md) for the family breakdown, threat assumptions and interpretation. These rates are synthetic conditional attack outcomes, not real-world probabilities.
 
 ## Reproducibility
 
