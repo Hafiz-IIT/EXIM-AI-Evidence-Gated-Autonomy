@@ -126,28 +126,61 @@ def verify_witness_quorum(items: Iterable[tuple[dict, dict]], *,
                           expected_weight: float, expected_item_type: str,
                           now: int, threshold: int = 2, total_required: int = 3,
                           revoked_serials: frozenset[str] = frozenset()) -> tuple[bool, str, int]:
-    """Require a valid threshold of mutually independent, matching identities."""
-    if not isinstance(threshold, int) or not isinstance(total_required, int) or threshold < 1 or total_required < threshold:
+    """Require a matching threshold whose *supporters* are independently enrolled."""
+    if (not isinstance(threshold, int) or isinstance(threshold, bool)
+            or not isinstance(total_required, int) or isinstance(total_required, bool)
+            or threshold < 1 or total_required < threshold):
         return False, "invalid_quorum_configuration", 0
+
+    supplied = list(items)
+    # The configured witness roster must be present and distinct. Invalid
+    # credentials may still be tolerated up to the threshold boundary.
+    roster_ids = set()
+    for _, credential in supplied:
+        try:
+            witness_id = credential["body"]["witness_id"]
+        except (KeyError, TypeError):
+            continue
+        if isinstance(witness_id, str) and witness_id:
+            roster_ids.add(witness_id)
+    if len(roster_ids) != total_required:
+        return False, "incomplete_or_duplicate_witness_roster", 0
+
     accepted = []
-    for record, credential in items:
-        valid, reason, identity = verify_witness_assertion(
+    for record, credential in supplied:
+        valid, _, identity = verify_witness_assertion(
             record, credential, trusted_issuer_key=trusted_issuer_key,
             tenant_id=tenant_id, case_id=case_id, parent_digest=parent_digest,
             now=now, revoked_serials=revoked_serials)
         if valid:
             accepted.append((record["envelope"], identity))
-    if len(accepted) < threshold:
-        return False, "insufficient_valid_witnesses", 0
-    identities = [identity for _, identity in accepted]
-    for field in ("witness_id", "source_id", "acquisition_domain", "administrative_domain"):
-        if len({identity[field] for identity in identities}) < threshold:
-            return False, "insufficient_identity_independence:" + field, 0
-    support = sum(
-        abs(float(envelope["gross_weight"]) - float(expected_weight)) < 1e-9
-        and envelope["item_type"] == expected_item_type
-        for envelope, _ in accepted
-    )
-    if support < threshold:
-        return False, "quorum_disagreement", support
-    return True, "quorum_valid", support
+
+    # A quorum is a group of assertions that agree on the complete measurement.
+    # Independence must be checked within that matching group, not across all
+    # valid witnesses (a dissenting third witness cannot lend independence to
+    # two colluding supporters).
+    matching_groups = {}
+    for envelope, identity in accepted:
+        try:
+            measurement = (float(envelope["gross_weight"]), envelope["item_type"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if (abs(measurement[0] - float(expected_weight)) < 1e-9
+                and measurement[1] == expected_item_type):
+            matching_groups.setdefault(measurement, []).append(identity)
+
+    for supporters in matching_groups.values():
+        if len(supporters) < threshold:
+            continue
+        independent_fields = (
+            "witness_id", "key_id", "source_id",
+            "acquisition_domain", "administrative_domain",
+        )
+        if all(len({identity[field] for identity in supporters}) >= threshold
+               for field in independent_fields):
+            return True, "quorum_valid", len(supporters)
+
+    matching_count = max((len(group) for group in matching_groups.values()), default=0)
+    if matching_count < threshold:
+        return False, "quorum_disagreement", matching_count
+    return False, "insufficient_identity_independence", matching_count
