@@ -11,3 +11,9 @@
 The adapter supports OpenAI-compatible Chat Completions. It does not create API keys, select paid providers, or make calls in CI. No real-model results are claimed until actual provider responses and run artifacts exist.
 
 The CLI entry points explicitly add the repository root to Python's import path so they run both in GitHub Actions and when invoked from a shell. Each preparation run uses a fresh private salt for opaque task IDs; keep `results/exp3_real_models/private/` private. Final-holdout freeze hashes bind the exact task manifest and public task set. Provider or schema failures force ESCALATE and are logged separately from retry errors.
+
+Before setting API keys or running a model, estimate calls and a conservative upper-bound cost without network access:
+
+`python scripts/estimate_exp3_cost.py --config /path/to/private-model-config.json --prepared-dir results/exp3_real_models --splits development validation --output results/exp3_real_models/cost_estimate.json`
+
+Populate each model's input/output USD per 1K token prices. The estimator uses prompt characters/4 for input tokens and the configured `max_tokens` as an output upper bound; it is deliberately conservative and not a provider quote. Set `settings.max_estimated_cost_usd` in the private config to enforce the same preflight budget in the runner. The freeze hash binds all run settings.

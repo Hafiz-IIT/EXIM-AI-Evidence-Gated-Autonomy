@@ -12,6 +12,7 @@ from experiments.exp3_real_models.harness import (
     assert_public_task_blinded,
     assign_splits,
     evaluate_case,
+    estimate_condition_cost,
     prepare_tasks,
     run_condition,
     build_public_task,
@@ -79,6 +80,21 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             self.assertIn("task_id_salt_sha256", manifest)
             self.assertNotIn(private["task_id_salt"], public_text)
             self.assertEqual(manifest["public_task_count"], 12)
+
+    def test_cost_estimator_counts_three_roles_and_uses_configured_prices(self):
+        case = self.make_case("C0", "U-00-000")
+        task = build_public_task(case, "canonical", "cost-test-salt")
+        models = {
+            "extractor": {"family_id": "family_a", "input_usd_per_1k_tokens": 1.0, "output_usd_per_1k_tokens": 2.0},
+            "verifier_a": {"family_id": "family_b", "input_usd_per_1k_tokens": 1.0, "output_usd_per_1k_tokens": 2.0},
+            "verifier_b": {"family_id": "family_c", "input_usd_per_1k_tokens": 1.0, "output_usd_per_1k_tokens": 2.0},
+        }
+        config = {"models": models, "settings": {"max_tokens": 100}}
+        condition = {"extractor_model": "extractor", "verifier_models": ["verifier_a", "verifier_b"]}
+        estimate = estimate_condition_cost([task], condition, config)
+        self.assertEqual(estimate["api_call_count"], 3)
+        self.assertTrue(estimate["cost_known"])
+        self.assertGreater(estimate["upper_bound_cost_usd"], 0)
 
     def test_provider_or_schema_failures_force_escalation(self):
         case = self.make_case("C0", "U-00-000")

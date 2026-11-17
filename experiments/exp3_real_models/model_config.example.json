@@ -77,13 +77,17 @@
     "max_tokens": 500,
     "max_retries": 2,
     "timeout_seconds": 90,
-    "seed": 42
+    "seed": 42,
+    "max_estimated_cost_usd": null
   },
   "freeze": {
     "status": "not_frozen",
     "frozen_at": null,
     "benchmark_sha256": null,
     "prompt_sha256": null,
-    "model_config_sha256": null
+    "model_config_sha256": null,
+    "task_manifest_sha256": null,
+    "public_tasks_sha256": null,
+    "task_id_salt_sha256": null
   }
 }

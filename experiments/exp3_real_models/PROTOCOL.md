@@ -18,7 +18,7 @@ Harness and blinded task preparation implemented. **No external model/API experi
 
 ## Provider adapter
 
-The runner supports OpenAI-compatible Chat Completions endpoints. The freeze helper rejects placeholder model IDs, requires the holdout model family to be unique among configured families, and prevents a holdout-only model from appearing in development/validation conditions. Each model is configured with an exact provider, base URL, model/version string, family ID, and the name of an environment variable containing its API key. Secrets are never stored in the config or run manifest. Non-compatible providers require an explicit adapter; no provider is silently assumed.
+The runner supports OpenAI-compatible Chat Completions endpoints. The freeze helper rejects placeholder model IDs, requires the holdout model family to be unique among configured families, and prevents a holdout-only model from appearing in development/validation conditions. The optional cost estimator uses prompt-character/4 input-token approximations and max_tokens output bounds; set per-model token prices and a max_estimated_cost_usd budget to block a run before any API calls if its conservative estimate exceeds the budget. Each model is configured with an exact provider, base URL, model/version string, family ID, and the name of an environment variable containing its API key. Secrets are never stored in the config or run manifest. Run `scripts/estimate_exp3_cost.py` before provider calls; the runner repeats the configured budget check before making calls. Non-compatible providers require an explicit adapter; no provider is silently assumed.
 
 ## Required model-facing schemas
 
