@@ -322,7 +322,12 @@ def run_scenario(cases, name, compromised=(), control=None):
         unsafe = outcome["action"] == "ACT" and not original["safe_to_act"]
         rows.append({
             "scenario": name,
-            "compromised_authorities": "+".join(compromised) if compromised else "none",
+            "compromised_authorities": (
+                "key_admin_registry" if control == "key_admin_compromise"
+                else ("+".join(compromised) if compromised else "none")
+            ),
+            "forged_role_claims": "+".join(active_compromises) if active_compromises else "none",
+            "trust_registry_compromised": bool(control == "key_admin_compromise"),
             "case_id": original["case_id"],
             "family": original["family"],
             "safe_to_act_ground_truth": bool(original["safe_to_act"]),
