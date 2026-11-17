@@ -13,7 +13,7 @@ from experiments.exp3_real_models.harness import estimate_condition_cost, verify
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Estimate Experiment 3 API calls and conservative upper-bound cost without making model calls.")
+    parser = argparse.ArgumentParser(description="Estimate Experiment 3 API calls and a rough preflight cost without making model calls.")
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--prepared-dir", type=Path, default=Path("results/exp3_real_models"))
     parser.add_argument("--splits", nargs="+", default=["development", "validation"])
@@ -46,7 +46,7 @@ def main():
                 **estimate,
             })
             if estimate["cost_known"]:
-                total_cost += estimate["upper_bound_cost_usd"]
+                total_cost += estimate["preflight_estimated_cost_usd"]
             else:
                 all_priced = False
 
@@ -55,12 +55,12 @@ def main():
         "status": "estimated_no_model_calls",
         "splits": args.splits,
         "conditions": [c["condition_id"] for c in selected],
-        "estimate_method": "input tokens approximated as ceil(serialized prompt characters / 3); output tokens bounded by max_tokens per call",
+        "estimate_method": "rough estimate: ceil(serialized prompt characters / 3) input tokens plus configured max_tokens output cap; provider tokenization and actual usage may differ",
         "cost_known_for_all_selected_runs": all_priced,
-        "total_upper_bound_cost_usd": total_cost if all_priced else None,
+        "total_preflight_estimated_cost_usd": total_cost if all_priced else None,
         "max_budget_usd": args.max_budget_usd,
         "runs": estimates,
-        "warning": "This is a conservative planning estimate, not a quote. Provider tokenization, hidden message overhead, cached-input pricing and actual output length may differ.",
+        "warning": "This is a rough planning estimate, not a guaranteed upper bound or provider quote. Actual tokenization, hidden message overhead, cached-input pricing and output usage may differ. Reconcile against provider-reported usage and billing.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
@@ -69,7 +69,7 @@ def main():
         if not all_priced:
             raise SystemExit("budget check requires input/output token prices for every selected model")
         if total_cost > args.max_budget_usd:
-            raise SystemExit(f"estimated upper-bound cost USD {total_cost:.6f} exceeds budget USD {args.max_budget_usd:.6f}")
+            raise SystemExit(f"preflight estimated cost USD {total_cost:.6f} exceeds preflight budget USD {args.max_budget_usd:.6f}")
 
 
 if __name__ == "__main__":
