@@ -15,6 +15,7 @@ COMMANDS = [
     ("four-authority evidence-trust v2 threat matrix", [sys.executable, str(ROOT / "scripts/run_evidence_trust_v2.py")]),
     ("authenticated independent-witness quorum v3 experiment", [sys.executable, str(ROOT / "scripts/run_evidence_trust_v3.py")]),
     ("claim-scoped adversarial evidence provenance v4 experiment", [sys.executable, str(ROOT / "scripts/run_evidence_provenance_v4.py")]),
+    ("dependency-ancestry witness-independence v5 experiment", [sys.executable, str(ROOT / "scripts/run_dependency_graph_v5.py")]),
     ("loading existing historical publication tables", [sys.executable, str(ROOT / "scripts/reproduce_tables.py")]),
 ]
 
@@ -22,6 +23,6 @@ for label, command in COMMANDS:
     print(f"\n=== {label} ===")
     subprocess.run(command, cwd=ROOT, check=True)
 
-print("\nStructural checks completed: regression tests, v0.3 and v0.4 benchmark generation/verification, both reconstruction suites, sensitivity analysis, document-root attestation four-authority evidence-trust v2 and authenticated witness-quorum v3 threat experiments, and historical table loading.")
-print("Historical result CSVs are loaded unchanged. Reconstruction v1/v2 and evidence-trust v2/v3 and evidence provenance v4 outputs are stored separately.")
+print("\nStructural checks completed: regression tests, v0.3 and v0.4 benchmark generation/verification, both reconstruction suites, sensitivity analysis, document-root attestation four-authority evidence-trust v2 and authenticated witness-quorum v3 threat experiments, dependency-ancestry witness-independence v5 experiment, and historical table loading.")
+print("Historical result CSVs are loaded unchanged. Reconstruction v1/v2 and evidence-trust v2/v3 evidence provenance v4 and dependency-ancestry v5 outputs are stored separately.")
 print("Both reconstructions use newly stated assumptions and are not reproductions of the historical result tables.")
