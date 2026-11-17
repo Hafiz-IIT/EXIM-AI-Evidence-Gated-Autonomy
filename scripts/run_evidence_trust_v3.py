@@ -152,6 +152,12 @@ def scenario_rows(cases, scenario):
             expected_weight=expected_weight, expected_item_type=expected_type,
             now=NOW, threshold=2, total_required=3,
         )
+        quorum_3of3, reason_3of3, support_3of3 = verify_witness_quorum(
+            records, trusted_issuer_key=root_public, tenant_id=TENANT,
+            case_id=case["case_id"], parent_digest=parent,
+            expected_weight=expected_weight, expected_item_type=expected_type,
+            now=NOW, threshold=3, total_required=3,
+        )
         # The quorum is the authority for the independent measurement channel.
         # Feed its accepted measurement into the legacy policy only after a
         # valid quorum; otherwise the controller must abstain. This avoids
@@ -168,7 +174,17 @@ def scenario_rows(cases, scenario):
         else:
             legacy = "ESCALATE"
         action = "ACT" if quorum and (legacy == "ACT" or recovery_applied) else "ESCALATE"
+        recovery_applied_3of3 = (
+            quorum_3of3 and is_recoverable_verifier_false_reject(
+                visible_features(decision_case), legacy
+            )
+        )
+        action_3of3 = (
+            "ACT" if quorum_3of3 and (legacy == "ACT" or recovery_applied_3of3)
+            else "ESCALATE"
+        )
         unsafe = action == "ACT" and not case["safe_to_act"]
+        unsafe_3of3 = action_3of3 == "ACT" and not case["safe_to_act"]
         rows.append({
             "scenario": scenario, "case_id": case["case_id"], "family": case["family"],
             "safe_to_act_ground_truth": bool(original_case["safe_to_act"]),
@@ -177,6 +193,13 @@ def scenario_rows(cases, scenario):
             "quorum_reason": reason, "matching_witnesses": support,
             "action": action, "unsafe_act": bool(unsafe),
             "safe_act": bool(action == "ACT" and original_case["safe_to_act"]),
+            "quorum_3of3_valid": quorum_3of3,
+            "quorum_3of3_reason": reason_3of3,
+            "matching_witnesses_3of3": support_3of3,
+            "recovery_applied_3of3": recovery_applied_3of3,
+            "action_3of3": action_3of3,
+            "unsafe_act_3of3": bool(unsafe_3of3),
+            "safe_act_3of3": bool(action_3of3 == "ACT" and original_case["safe_to_act"]),
         })
     return rows
 
@@ -201,8 +224,12 @@ def main():
         acts = sum(row["action"] == "ACT" for row in subset)
         recoveries = sum(row["recovery_applied"] for row in subset)
         unsafe = sum(row["unsafe_act"] for row in subset)
+        acts_3of3 = sum(row["action_3of3"] == "ACT" for row in subset)
+        unsafe_3of3 = sum(row["unsafe_act_3of3"] for row in subset)
+        recoveries_3of3 = sum(row["recovery_applied_3of3"] for row in subset)
         safe_n = sum(row["safe_to_act_ground_truth"] for row in subset)
         safe_acts = sum(row["safe_act"] for row in subset)
+        safe_acts_3of3 = sum(row["safe_act_3of3"] for row in subset)
         summary.append({
             "scenario": scenario, "cases": n, "ACT": acts, "unsafe_ACT": unsafe,
             "verifier_false_reject_recoveries": recoveries,
@@ -211,6 +238,17 @@ def main():
             "safe_ACT_coverage": round(safe_acts / safe_n, 6) if safe_n else 0,
             "false_block_rate": round((safe_n - safe_acts) / safe_n, 6) if safe_n else 0,
             "ESCALATE": n - acts,
+            "ACT_3of3": acts_3of3, "unsafe_ACT_3of3": unsafe_3of3,
+            "verifier_false_reject_recoveries_3of3": recoveries_3of3,
+            "unsafe_ACT_rate_all_cases_3of3": round(unsafe_3of3 / n, 6),
+            "unsafe_ACT_rate_conditional_on_ACT_3of3": (
+                round(unsafe_3of3 / acts_3of3, 6) if acts_3of3 else None
+            ),
+            "safe_ACT_coverage_3of3": round(safe_acts_3of3 / safe_n, 6) if safe_n else 0,
+            "false_block_rate_3of3": (
+                round((safe_n - safe_acts_3of3) / safe_n, 6) if safe_n else 0
+            ),
+            "ESCALATE_3of3": n - acts_3of3,
         })
     OUT.mkdir(parents=True, exist_ok=True)
     write_csv(OUT / "evidence_trust_v3_cases.csv", rows)
@@ -220,7 +258,7 @@ def main():
         "status": "synthetic threat experiment; not production validation",
         "benchmark_version": "0.4", "high_risk_cases_per_scenario": len(cases),
         "scenario_count": len(scenarios), "case_scenario_rows": len(rows),
-        "witness_quorum": "2-of-3",
+        "witness_quorum": "2-of-3 primary; 3-of-3 sensitivity",\n        "threshold_sensitivity": "same cases and assertions evaluated at thresholds 2 and 3",
         "identity_binding": "registry-root-signed credential binds public key to source and domain claims",
         "scenarios": list(scenarios),
         "limitations": [
