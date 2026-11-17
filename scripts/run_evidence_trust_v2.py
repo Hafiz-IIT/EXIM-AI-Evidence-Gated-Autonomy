@@ -210,7 +210,9 @@ def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False
 
 def authorize(case, compromised, nonce_prefix, witness_dependency=False, key_admin_compromise=False):
     (keys, public_keys, scope_parent, raw_digest, capture, interpretation,
-     witness, witness_source_digest) = issue_role_records(\n        case, compromised, nonce_prefix, witness_dependency, key_admin_compromise\n    )
+     witness, witness_source_digest) = issue_role_records(
+        case, compromised, nonce_prefix, witness_dependency, key_admin_compromise
+    )
     obs = case["observable"]
     checks = {}
     checks["capture"] = verify_attestation(
