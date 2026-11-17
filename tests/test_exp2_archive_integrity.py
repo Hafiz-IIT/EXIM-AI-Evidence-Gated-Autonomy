@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
     "legacy/experiment2_original/src/core.py": "7ea9cf1e9bcf878fbbc2011faed4cd0f16483c3ecef2b184c09bcc4fac516eca",
     "legacy/experiment2_original/src/provenance.py": "e5d07e5a8f1420699f3f969760bd6c32cedb0c14dedc06d87d0ec2710abc75be",
+    "legacy/experiment2_original/2A_attestation/trust_roots.json": "2f134cf143bdd77cfba1cbde739513afb3e5d0371eeb363b1a77c6827b068c93",
+    "legacy/experiment2_original/2A_attestation/sample_attestation.json": "8ec68812efc6e5369662aff4f6f002951e47b3ddb965cd736f97155958ad2a5c",
     "results/exp2/dual_lineage_compromise.csv": "8eaa6f1989dd347bb5f88d230b5cb0fbe0e094b7f3841cca7f2bc7a0267a0394",
     "results/exp2/trust_root_compromise.csv": "d100aaed6237a4b622b6a83a39e8a54fa6581d5eaf17a3f95c0d6708d54e1984",
     "results/exp2/dual_lineage_stochastic_summary.csv": "d9448bc2a7307f8070a349b3709940a76cb5d5a6d048356806815dbbba0a5e63",

@@ -535,10 +535,12 @@ def reconstruct_experiment2(benchmark_path: Path, original_results_dir: Path, ou
     for name in table_names:
         expected_path = original_results_dir / name
         table_comparisons[name] = expected_path.exists() and (output_dir / name).read_bytes() == expected_path.read_bytes()
+    benchmark_hash = sha256_file(benchmark_path)
+    expected_benchmark_hash = "1d7890f861b874e6535b88340fe50d46b1c299b85a9517948ad39c3213fc0032"
     manifest = {
-        "status": "exact_reconstruction_verified" if generated_hashes == expected and all(table_comparisons.values()) else "reconstruction_mismatch",
-        "source_benchmark_sha256": sha256_file(benchmark_path),
-        "expected_source_benchmark_sha256": "1d7890f861b874e6535b88340fe50d46b1c299b85a9517948ad39c3213fc0032",
+        "status": "exact_reconstruction_verified" if benchmark_hash == expected_benchmark_hash and generated_hashes == expected and all(table_comparisons.values()) else "reconstruction_mismatch",
+        "source_benchmark_sha256": benchmark_hash,
+        "expected_source_benchmark_sha256": expected_benchmark_hash,
         "high_risk_cases": len(attested_v2),
         "v2_attested_cases_sha256": generated_hashes["attested_high_cases.jsonl"],
         "v3_dual_lineage_cases_sha256": generated_hashes["v3_dual_lineage_cases.jsonl"],

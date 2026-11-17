@@ -27,8 +27,8 @@ class Experiment2ControllerReconstructionTests(unittest.TestCase):
         import hashlib
         with tempfile.TemporaryDirectory() as temp:
             out = Path(temp)
-            (out / "v2.jsonl").write_text("".join(json.dumps(x) + "\\n" for x in self.v2_cases))
-            (out / "v3.jsonl").write_text("".join(json.dumps(x) + "\\n" for x in self.v3_cases))
+            (out / "v2.jsonl").write_text("".join(json.dumps(x) + "\n" for x in self.v2_cases))
+            (out / "v3.jsonl").write_text("".join(json.dumps(x) + "\n" for x in self.v3_cases))
             h2 = hashlib.sha256((out / "v2.jsonl").read_bytes()).hexdigest()
             h3 = hashlib.sha256((out / "v3.jsonl").read_bytes()).hexdigest()
         self.assertEqual(h2, "a8ca354e9186e77837605b824945144b688d050e6a16635d7cfa70340f82ad55")
