@@ -110,6 +110,41 @@ class EvidenceTrustV4Tests(unittest.TestCase):
             (False, "shared_dependency:parent_control", 0),
         )
 
+    def test_registry_root_compromise_can_enroll_two_attacker_witnesses(self):
+        attacker_root = Ed25519PrivateKey.from_private_bytes(bytes([9]) * 32)
+        credentials = self.credentials()
+        for index in (0, 1):
+            credentials[index] = issue_identity_credential_v4(
+                issuer_id="attacker-registry-root", witness_id=f"attacker-w{index+1}",
+                key_id=f"attacker-k{index+1}",
+                public_key=self.witnesses[index].public_key(),
+                source_id=f"attacker-source-{index+1}",
+                acquisition_domain=f"attacker-acq-{index+1}",
+                administrative_domain=f"attacker-admin-{index+1}",
+                tenant_id="tenant-A", dependency_roots=self.roots(index+1),
+                serial=f"attacker-serial-{index+1}", issued_at=100,
+                expires_at=300, issuer_private_key=attacker_root,
+            )
+        records = self.records(credentials)
+        self.assertEqual(
+            verify_witness_quorum_v4(
+                records, trusted_issuer_key=attacker_root.public_key(),
+                tenant_id="tenant-A", case_id="case-1", parent_digest="parent",
+                expected_weight=10.0, expected_item_type="machine", now=150,
+                threshold=2, total_required=3,
+            ),
+            (True, "quorum_valid", 2),
+        )
+        self.assertEqual(
+            verify_witness_quorum_v4(
+                records, trusted_issuer_key=attacker_root.public_key(),
+                tenant_id="tenant-A", case_id="case-1", parent_digest="parent",
+                expected_weight=10.0, expected_item_type="machine", now=150,
+                threshold=3, total_required=3,
+            ),
+            (False, "insufficient_valid_witnesses", 0),
+        )
+
     def test_missing_dependency_layer_is_rejected_at_issuance(self):
         roots = self.roots(1)
         roots.pop("measurement_source")
