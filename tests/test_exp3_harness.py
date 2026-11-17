@@ -174,6 +174,35 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             self.assertEqual(frozen["public_tasks_sha256"], manifest["public_tasks_sha256"])
             self.assertEqual(frozen["task_id_salt_sha256"], manifest["task_id_salt_sha256"])
 
+    def test_cost_budget_blocks_before_api_key_preflight(self):
+        cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            benchmark = root / "cases.jsonl"
+            benchmark.write_text("".join(json.dumps(x) + "\n" for x in cases))
+            prepared = root / "prepared"
+            prepare_tasks(benchmark, prepared)
+            models = {
+                name: {
+                    "model": "mock-" + name, "provider": "mock",
+                    "base_url": "https://example.invalid/v1", "family_id": family,
+                    "api_key_env": "EXP3_NEVER_SET", "input_usd_per_1k_tokens": 10.0,
+                    "output_usd_per_1k_tokens": 10.0,
+                }
+                for name, family in [("extractor", "family_a"), ("verifier_a", "family_b"), ("verifier_b", "family_c")]
+            }
+            condition = {"condition_id": "budget-test", "extractor_model": "extractor", "verifier_models": ["verifier_a", "verifier_b"]}
+            config = {
+                "models": models, "conditions": [condition],
+                "settings": {"max_tokens": 500, "max_estimated_cost_usd": 0.000001},
+            }
+            with self.assertRaisesRegex(RuntimeError, "exceeds configured budget"):
+                run_condition(
+                    config=config, condition=condition, split="development",
+                    prepared_dir=prepared, output_dir=root / "should-not-run", max_tasks=1,
+                )
+            self.assertFalse((root / "should-not-run").exists())
+
     def test_provider_failure_is_logged_and_forces_escalation(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
         with tempfile.TemporaryDirectory() as temp:
