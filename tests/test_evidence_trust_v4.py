@@ -6,7 +6,7 @@ from src.evidence_trust_v3 import issue_witness_assertion
 from src.evidence_trust_v4 import (
     DEPENDENCY_LAYERS,
     issue_identity_credential_v4,
-    verify_witness_quorum_v4,
+    verify_identity_credential_v4,\n    verify_witness_quorum_v4,
 )
 
 
@@ -161,11 +161,16 @@ class EvidenceTrustV4Tests(unittest.TestCase):
     def test_dependency_root_claims_are_covered_by_registry_signature(self):
         credential = self.credentials()[0]
         credential["body"]["dependency_roots"]["parent_control"] = ["attacker-root"]
-        records = self.records([credential, *self.credentials()[1:]])
-        self.assertEqual(
-            self.verify(records),
-            (False, "invalid_identity_credential", 0),
+        valid, reason, _, _ = verify_identity_credential_v4(
+            credential, trusted_issuer_key=self.root.public_key(),
+            expected_tenant_id="tenant-A", now=150,
         )
+        self.assertFalse(valid)
+        self.assertEqual(reason, "invalid_identity_credential")
+        # The other two correctly signed, independent credentials still form
+        # the configured 2-of-3 quorum.
+        records = self.records([credential, *self.credentials()[1:]])
+        self.assertEqual(self.verify(records), (True, "quorum_valid", 2))
 
 
 if __name__ == "__main__":
