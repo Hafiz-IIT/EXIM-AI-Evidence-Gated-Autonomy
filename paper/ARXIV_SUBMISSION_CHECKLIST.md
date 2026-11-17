@@ -64,6 +64,7 @@ These later synthetic extensions do not recover the original frozen Experiment 2
 ## Experiment 3 execution readiness
 
 - [x] Provider-neutral OpenAI-compatible harness implemented for Evidence Gate v1.
+- [x] Model-family holdout configuration is isolated to final-holdout conditions; a dedicated freeze helper pins model, prompt and benchmark hashes.
 - [x] Blinded task preparation, deterministic pair-level split, separate private evaluation map and prompt hashes.
 - [x] Development/validation/final-holdout and document-layout OOD conditions specified.
 - [x] CI verifies model-facing tasks contain no oracle labels and uploads only the public task package.

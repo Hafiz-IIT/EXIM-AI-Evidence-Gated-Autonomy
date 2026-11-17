@@ -196,7 +196,6 @@ def prepare_tasks(benchmark_path: Path, output_dir: Path) -> dict:
         "public_task_count": len(public_tasks),
         "split_counts": dict(sorted(counts.items())),
         "public_tasks_sha256": sha256_file(public_dir / "tasks.jsonl"),
-        "private_map_sha256": sha256_file(private_dir / "evaluation_map.jsonl"),
         "prompt_sha256": {
             name: sha256_file(PROMPT_DIR / name)
             for name in ("extract_v1.txt", "verify_v1.txt")
@@ -248,6 +247,8 @@ def parse_json_object(content: str) -> dict:
 
 def normalize_extraction(value: dict) -> tuple[dict, bool]:
     try:
+        if not {"quantity", "gross_weight", "hs", "confidence"}.issubset(value):
+            raise ValueError("missing required extraction keys")
         quantity = value.get("quantity")
         weight = value.get("gross_weight")
         hs = value.get("hs")
@@ -423,6 +424,8 @@ def run_condition(
     private_rows = [x for x in read_jsonl(prepared_dir / "private" / "evaluation_map.jsonl") if x["split"] == split]
     if condition.get("holdout_only") and not split.startswith("final_holdout"):
         raise ValueError("holdout-only model condition cannot run on development/validation")
+    if any(config["models"][name].get("holdout_only") for name in [condition["extractor_model"], *condition["verifier_models"]]) and not split.startswith("final_holdout"):
+        raise ValueError("a holdout-only model cannot run on development/validation")
     if max_tasks is not None:
         if split.startswith("final_holdout"):
             raise ValueError("partial final-holdout runs are prohibited")
@@ -454,22 +457,37 @@ def run_condition(
         if freeze.get("model_config_sha256") != expected_model_hash:
             raise ValueError("final holdout model/condition configuration differs from frozen value")
     output_dir.mkdir(parents=True, exist_ok=True)
+    run_started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     raw_path = output_dir / "raw_responses.jsonl"
     errors_path = output_dir / "retry_errors.jsonl"
     rows = []
     raw_records = []
     error_records = []
+    raw_path.write_text("", encoding="utf-8")
+    errors_path.write_text("", encoding="utf-8")
+
+    def persist_raw(record):
+        raw_records.append(record)
+        with raw_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\\n")
+
+    def persist_errors(records):
+        for record in records:
+            error_records.append(record)
+            with errors_path.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\\n")
     for private in private_rows:
         task = public_tasks[private["task_id"]]
+        assert_public_task_blinded(task)
         extractor_call = call_openai_compatible(extractor_spec, build_extraction_messages(task), config["settings"], transport)
-        raw_records.append({
+        persist_raw({
             "task_id": task["task_id"], "role": "extractor", "model_id": condition["extractor_model"],
             "family_id": extractor_spec["family_id"], "prompt_sha256": prompt_hashes["extract_v1.txt"],
             "content": extractor_call["content"], "raw_response": extractor_call["raw_response"],
             "usage": extractor_call["usage"], "latency_ms": extractor_call["latency_ms"],
             "estimated_cost_usd": extractor_call["estimated_cost_usd"], "attempts": extractor_call["attempts"],
         })
-        error_records.extend({"task_id": task["task_id"], "role": "extractor", **e} for e in extractor_call["errors"])
+        persist_errors([{"task_id": task["task_id"], "role": "extractor", **e} for e in extractor_call["errors"]])
         try:
             extraction_raw = parse_json_object(extractor_call["content"])
             extraction, extraction_ok = normalize_extraction(extraction_raw)
@@ -485,14 +503,14 @@ def run_condition(
                 normalized, verifier_ok = normalize_verifier({})
             result = {"model_id": model_name, "family_id": spec["family_id"], "normalized": normalized, "parse_ok": verifier_ok}
             verifier_results.append(result)
-            raw_records.append({
+            persist_raw({
                 "task_id": task["task_id"], "role": f"verifier_{index}", "model_id": model_name,
                 "family_id": spec["family_id"], "prompt_sha256": prompt_hashes["verify_v1.txt"],
                 "content": call["content"], "raw_response": call["raw_response"],
                 "usage": call["usage"], "latency_ms": call["latency_ms"],
                 "estimated_cost_usd": call["estimated_cost_usd"], "attempts": call["attempts"],
             })
-            error_records.extend({"task_id": task["task_id"], "role": f"verifier_{index}", **e} for e in call["errors"])
+            persist_errors([{"task_id": task["task_id"], "role": f"verifier_{index}", **e} for e in call["errors"]])
         metrics = evaluate_case(private, extraction, verifier_results)
         calls = [extractor_call]
         # The verifier calls are present in raw_records; recover their per-case metrics from raw records.
@@ -511,8 +529,6 @@ def run_condition(
             "verifier_families": ";".join(x["family_id"] for x in verifier_results),
             "total_latency_ms": total_latency, "estimated_cost_usd": total_cost,
         })
-    write_jsonl(raw_path, raw_records)
-    write_jsonl(errors_path, error_records)
     csv_path = output_dir / "case_results.csv"
     if rows:
         with csv_path.open("w", newline="", encoding="utf-8") as handle:
@@ -526,7 +542,7 @@ def run_condition(
     run_manifest = {
         "protocol": "exp3-real-models-v1",
         "status": "completed" if rows else "empty",
-        "started_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "started_at_utc": run_started_at,
         "benchmark_sha256": task_manifest["benchmark_sha256"],
         "task_manifest_sha256": sha256_file(prepared_dir / "public" / "task_manifest.json"),
         "prompt_sha256": prompt_hashes,

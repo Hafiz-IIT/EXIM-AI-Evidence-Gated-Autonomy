@@ -12,13 +12,13 @@ Harness and blinded task preparation implemented. **No external model/API experi
 - Model-facing data: only rendered source documents, visible external observations, authorization timing and action consequence. No family, severity, fault, oracle truth, safe_to_act, pair ID or original case ID is sent.
 - Layout conditions: canonical development, table validation, canonical final-holdout ID, and a distinct held-out OOD rendering of the same final-holdout cases.
 - Model roles: extractor, verifier A, verifier B.
-- Conditions: same-model self-verification, same-family multi-model verification where available, cross-family verification, and a model-family holdout condition. Each verifier's configured model ID and family label is preserved.
+- Conditions: same-model self-verification, same-family multi-model verification where available, cross-family verification, and a model-family holdout condition using a family reserved exclusively for final holdout. Each verifier's configured model ID and family label is preserved.
 - Controller: Evidence Gate v1 only until exact historical v2/v3 source is recovered. The v1 gate receives model-generated extraction and verifier results; source documents and external observations remain benchmark-visible.
 - Model family IDs are diversity labels, not proof of independent training, ownership, data, tools or infrastructure.
 
 ## Provider adapter
 
-The runner supports OpenAI-compatible Chat Completions endpoints. Each model is configured with an exact provider, base URL, model/version string, family ID, and the name of an environment variable containing its API key. Secrets are never stored in the config or run manifest. Non-compatible providers require an explicit adapter; no provider is silently assumed.
+The runner supports OpenAI-compatible Chat Completions endpoints. The freeze helper rejects placeholder model IDs and prevents a holdout-only model from appearing in development/validation conditions. Each model is configured with an exact provider, base URL, model/version string, family ID, and the name of an environment variable containing its API key. Secrets are never stored in the config or run manifest. Non-compatible providers require an explicit adapter; no provider is silently assumed.
 
 ## Required model-facing schemas
 

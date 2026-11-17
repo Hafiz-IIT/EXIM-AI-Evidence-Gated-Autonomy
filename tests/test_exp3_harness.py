@@ -76,6 +76,21 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         self.assertFalse(valid)
         self.assertFalse(normalized["accept"])
 
+    def test_v1_gate_uses_family_labels_as_dependency_groups(self):
+        from experiments.exp3_real_models.harness import evaluate_case
+        case = self.make_case("C0", "U-00-000")
+        extraction = {"quantity": 5, "gross_weight": 7.5, "hs": "8542", "confidence": 0.99}
+        same_family = [
+            {"model_id": "m1", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}},
+            {"model_id": "m2", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}},
+        ]
+        cross_family = [
+            {"model_id": "m1", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}},
+            {"model_id": "m2", "family_id": "family_b", "normalized": {"accept": True, "confidence": 0.9}},
+        ]
+        self.assertEqual(evaluate_case(case, extraction, same_family)["controller_action"], "ESCALATE")
+        self.assertEqual(evaluate_case(case, extraction, cross_family)["controller_action"], "ACT")
+
     def test_summary_uses_safe_case_denominator_for_false_block(self):
         rows = [
             {"safe_to_act": True, "controller_action": "ESCALATE", "unsafe_act": False, "false_block": True, "verifier_cofailure": False, "verifier_family_count": 1, "total_latency_ms": 10, "estimated_cost_usd": 0.1},
@@ -89,3 +104,4 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

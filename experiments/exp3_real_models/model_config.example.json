@@ -30,6 +30,17 @@
       "json_mode": true,
       "input_usd_per_1k_tokens": null,
       "output_usd_per_1k_tokens": null
+    },
+    "model_d": {
+      "provider": "OpenAI-compatible provider D",
+      "base_url": "https://api.provider-d.example/v1",
+      "model": "REPLACE_WITH_EXACT_VERSIONED_MODEL_ID",
+      "family_id": "family_d_holdout",
+      "api_key_env": "PROVIDER_D_API_KEY",
+      "json_mode": true,
+      "holdout_only": true,
+      "input_usd_per_1k_tokens": null,
+      "output_usd_per_1k_tokens": null
     }
   },
   "conditions": [
@@ -52,11 +63,11 @@
       "holdout_only": false
     },
     {
-      "condition_id": "family_c_holdout_verifier",
+      "condition_id": "family_d_holdout_verifier",
       "extractor_model": "model_a",
       "verifier_models": [
         "model_b",
-        "model_c"
+        "model_d"
       ],
       "holdout_only": true
     }
