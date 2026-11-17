@@ -4,6 +4,9 @@ on:
     paths: ["paper/**","scripts/**","src/**","tests/**","results/**","experiments/**","data/**",".github/workflows/manuscript-build.yml","README.md","docs/**"]
   pull_request:
     paths: ["paper/**","scripts/**","src/**","tests/**","results/**","experiments/**","data/**",".github/workflows/manuscript-build.yml"]
+concurrency:
+  group: manuscript-build-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
   statuses: write
