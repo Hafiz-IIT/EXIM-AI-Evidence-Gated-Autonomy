@@ -127,7 +127,7 @@ jobs:
           DOCUMENT_ROOT_OUTCOME: ${{ steps.document_root.outcome }}
           EVIDENCE_TRUST_V2_OUTCOME: ${{ steps.evidence_trust_v2.outcome }}
         run: |
-          if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
+          if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$EVIDENCE_TRUST_V2_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
           V1_STATUS="$RUNNER_OUTCOME"
           V2_STATUS="$RUNNER_V2_OUTCOME"
           case "$V1_STATUS" in success|failure|error) ;; *) V1_STATUS=failure ;; esac
