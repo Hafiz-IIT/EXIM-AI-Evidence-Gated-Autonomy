@@ -1,6 +1,6 @@
 # Evidence-Trust Architecture v2 — Threat Experiment Protocol
 
-**Status:** Implemented as a deterministic synthetic experiment; CI validation pending. No production trust infrastructure is implemented.
+**Status:** Deterministic synthetic experiment validated in [full CI run 44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491). Follow-up CI is being run for later documentation and regression-test refinements. No production trust infrastructure is implemented.
 
 ## 1. Research question
 
