@@ -121,6 +121,7 @@ def make_record(source_type, claim, value, case, scenario, root, keys, credentia
     subject_id = case["case_id"]
     action_id = "submit:" + case["case_id"]
     document_digest = canonical_sha256(case["observable"]["document_instances"])
+    action_payload_digest = canonical_sha256(case["action"])
     unit = {"gross_weight": "kg", "quantity": "items", "hs_code": "HS"}[claim]
     input_digest = document_digest
     observed_at, issued_at, expires_at = NOW - 10, NOW - 10, NOW + 100
@@ -149,6 +150,7 @@ def make_record(source_type, claim, value, case, scenario, root, keys, credentia
         credential=credential, source_private_key=keys[source_type],
         claim_type=claim, value=value, unit=unit,
         subject_id=subject_id, action_id=action_id,
+        action_payload_digest=action_payload_digest,
         document_digest=document_digest, input_digest=input_digest,
         output_digest=output_digest, transformation_id="transform-" + source_type,
         tool_version="synthetic-" + source_type + "-1.0",
@@ -222,7 +224,8 @@ def run_one(case, scenario):
         ok, reason, accepted = evaluate_claim(
             evidence[claim], trusted_issuer_key=root.public_key(), tenant_id=TENANT,
             claim_type=claim, expected_subject_id=subject_id,
-            expected_action_id=action_id, expected_document_digest=doc_digest,
+            expected_action_id=action_id, expected_action_payload_digest=canonical_sha256(case["action"]),
+            expected_document_digest=doc_digest,
             now=NOW, required_source_types=required,
             tolerance=0.01 if claim == "gross_weight" else 0.0,
         )
@@ -235,7 +238,8 @@ def run_one(case, scenario):
         for claim_records in evidence.values() for record, _ in claim_records
     ]
     binding = issue_action_binding(
-        action_id=action_id, subject_id=subject_id, document_digest=doc_digest,
+        action_id=action_id, action_payload_digest=action_payload_digest,
+        subject_id=subject_id, document_digest=doc_digest,
         policy_version=POLICY, required_claims=CLAIMS, evidence_digests=evidence_digests,
         issued_at=NOW - 10, expires_at=NOW + 100, private_key=authorizer,
     )
