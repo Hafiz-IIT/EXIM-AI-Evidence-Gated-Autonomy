@@ -34,6 +34,12 @@ def main():
         for field in ("provider", "base_url", "family_id", "api_key_env"):
             if not spec.get(field):
                 raise SystemExit(f"model {name} missing {field}")
+    holdout_family_ids = {spec["family_id"] for spec in models.values() if spec.get("holdout_only")}
+    if len(holdout_family_ids) != sum(1 for spec in models.values() if spec.get("holdout_only")):
+        raise SystemExit("holdout-only model families must be unique")
+    for name, spec in models.items():
+        if not spec.get("holdout_only") and spec["family_id"] in holdout_family_ids:
+            raise SystemExit(f"holdout-only family {spec['family_id']} is reused by non-holdout model {name}")
     used_holdout = set()
     for condition in conditions:
         if len(condition.get("verifier_models", [])) != 2:
@@ -58,6 +64,9 @@ def main():
         "status": "frozen",
         "frozen_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "benchmark_sha256": task_manifest["benchmark_sha256"],
+        "task_manifest_sha256": sha256_file(args.prepared_dir / "public" / "task_manifest.json"),
+        "public_tasks_sha256": task_manifest["public_tasks_sha256"],
+        "task_id_salt_sha256": task_manifest["task_id_salt_sha256"],
         "prompt_sha256": prompt_hashes,
         "model_config_sha256": model_hash,
     }
