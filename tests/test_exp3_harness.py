@@ -261,7 +261,7 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
                 "models": models, "conditions": [condition],
                 "settings": {"max_tokens": 500, "max_preflight_estimated_cost_usd": 0.000001},
             }
-            with self.assertRaisesRegex(RuntimeError, "exceeds configured budget"):
+            with self.assertRaisesRegex(RuntimeError, "exceeds configured preflight budget"):
                 run_condition(
                     config=config, condition=condition, split="development",
                     prepared_dir=prepared, output_dir=root / "should-not-run", max_tasks=1,
