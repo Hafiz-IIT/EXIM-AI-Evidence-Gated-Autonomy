@@ -100,6 +100,8 @@ def issue_graph_bound_source_credential(*, graph_digest: str, dependency_leaf_no
     credential = issue_source_credential(
         issuer_private_key=issuer_private_key, **credential_args)
     body = credential["body"]
+    if dependency_leaf_node != f"source:{body['source_id']}":
+        raise ValueError("dependency leaf must be bound to the credential source_id")
     body["dependency_graph_digest"] = graph_digest
     body["dependency_leaf_node"] = dependency_leaf_node
     body["dependency_manifest_complete"] = bool(dependency_manifest_complete)
@@ -154,6 +156,9 @@ def evaluate_quorum(records: Iterable[tuple[dict, dict]], *, policy: str, thresh
                 rejected_reasons.append("dependency_graph_binding_mismatch")
                 continue
             leaf = identity.get("dependency_leaf_node")
+            if leaf != f"source:{identity['source_id']}":
+                rejected_reasons.append("dependency_leaf_source_mismatch")
+                continue
             try:
                 ancestors = resolve_ancestors(graph_body["nodes"], leaf)
             except (ValueError, TypeError):
