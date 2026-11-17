@@ -324,7 +324,7 @@ def _endpoint(base_url: str) -> str:
 
 
 def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) -> dict:
-    """Conservative offline estimate: chars/3 input tokens and max_tokens output per call."""
+    """Rough offline preflight estimate; character-based token counts are not guaranteed bounds."""
     models = config["models"]
     settings = config["settings"]
     max_tokens = int(settings.get("max_tokens", 500))
@@ -362,7 +362,7 @@ def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) ->
             "family_id": spec["family_id"],
             "calls": len(tasks),
             "estimated_input_tokens": input_tokens,
-            "upper_bound_output_tokens": output_tokens,
+            "configured_output_token_cap": output_tokens,
             "estimated_cost_usd": role_cost,
         }
         total_input_tokens += input_tokens
@@ -371,10 +371,10 @@ def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) ->
         "task_count": len(tasks),
         "api_call_count": len(tasks) * len(role_specs),
         "estimated_input_tokens": total_input_tokens,
-        "upper_bound_output_tokens": total_output_tokens,
-        "upper_bound_cost_usd": total_cost if all_priced else None,
+        "configured_output_token_cap": total_output_tokens,
+        "preflight_estimated_cost_usd": total_cost if all_priced else None,
         "cost_known": all_priced,
-        "method": "input tokens approximated as ceil(serialized prompt characters / 3); output tokens bounded by max_tokens per call",
+        "method": "rough estimate: ceil(serialized prompt characters / 3) input tokens plus configured max_tokens output cap; provider tokenization and actual usage may differ",
         "roles": role_totals,
     }
 
@@ -548,14 +548,17 @@ def run_condition(
         raise ValueError("Experiment 3 requires exactly two verifier roles")
     estimate_tasks = [public_tasks[row["task_id"]] for row in private_rows]
     cost_estimate = estimate_condition_cost(estimate_tasks, condition, config)
-    budget_limit = config["settings"].get("max_estimated_cost_usd")
+    budget_limit = config["settings"].get("max_preflight_estimated_cost_usd")
+    if budget_limit is None:
+        # Backward compatibility for older private configs; this remains a soft preflight estimate.
+        budget_limit = config["settings"].get("max_estimated_cost_usd")
     if budget_limit is not None:
         if not cost_estimate["cost_known"]:
             raise ValueError("cost budget is set but one or more model token prices are missing")
-        if cost_estimate["upper_bound_cost_usd"] > float(budget_limit):
+        if cost_estimate["preflight_estimated_cost_usd"] > float(budget_limit):
             raise RuntimeError(
-                f"estimated upper-bound cost USD {cost_estimate['upper_bound_cost_usd']:.6f} "
-                f"exceeds configured budget USD {float(budget_limit):.6f}"
+                f"preflight estimated cost USD {cost_estimate['preflight_estimated_cost_usd']:.6f} "
+                f"exceeds configured preflight budget USD {float(budget_limit):.6f}; actual provider billing may differ"
             )
     required_models = [condition["extractor_model"], *condition["verifier_models"]]
     missing_env = [models[name]["api_key_env"] for name in required_models if not os.environ.get(models[name]["api_key_env"])]
