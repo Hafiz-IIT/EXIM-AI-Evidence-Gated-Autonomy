@@ -2,6 +2,8 @@ import csv
 import json
 import tempfile
 import unittest
+import subprocess
+import sys
 from pathlib import Path
 
 from legacy.experiment2_reconstruction.controller import (
@@ -20,7 +22,10 @@ ROOT = Path(__file__).resolve().parents[1]
 class Experiment2ControllerReconstructionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.benchmark = [json.loads(line) for line in (ROOT / "data/benchmark/cases.jsonl").read_text().splitlines() if line.strip()]
+        benchmark_path = ROOT / "data/benchmark/cases.jsonl"
+        if not benchmark_path.exists():
+            subprocess.run([sys.executable, "scripts/generate_benchmark.py"], cwd=ROOT, check=True)
+        cls.benchmark = [json.loads(line) for line in benchmark_path.read_text().splitlines() if line.strip()]
         cls.v2_cases, cls.v3_cases = generate_attested_cases(cls.benchmark)
 
     def test_generated_attestation_case_sets_match_archived_hashes(self):

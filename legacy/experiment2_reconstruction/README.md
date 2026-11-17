@@ -8,7 +8,7 @@ The original Experiment 2B/2D/2E runner was absent from both recovered archives.
 - the 16-branch per-case decision cache;
 - the 2B, 2D and 2E result tables.
 
-Run `python scripts/reconstruct_exp2.py`. The runner writes to `results/exp2_reconstruction/` and never overwrites archived results.
+First generate the benchmark with `python scripts/generate_benchmark.py`, then run `python scripts/reconstruct_exp2.py`. The runner writes to `results/exp2_reconstruction/` and never overwrites archived results.
 
 The tests require exact SHA-256 matches for the regenerated 2A/2B case files and decision cache, plus byte-for-byte matches for the 2B, 2D and 2E CSV tables.
 
