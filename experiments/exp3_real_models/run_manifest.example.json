@@ -1,0 +1,20 @@
+{
+  "protocol": "exp3-real-models-v1",
+  "status": "not_run",
+  "provider_model_versions": [],
+  "prompt_sha256": {},
+  "benchmark_sha256": null,
+  "task_manifest_sha256": null,
+  "settings": {
+    "temperature": 0,
+    "seed": 42,
+    "max_retries": 2
+  },
+  "artifacts": [
+    "raw_responses.jsonl",
+    "case_results.csv",
+    "summary.json",
+    "retry_errors.jsonl"
+  ],
+  "warning": "Template only. No real model run has occurred."
+}

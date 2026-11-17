@@ -61,6 +61,19 @@ These are currently claims cross-checked against stored result files, not indepe
 
 These later synthetic extensions do not recover the original frozen Experiment 2 source or missing dual_lineage_compromise.csv, and do not substitute for the real-model Experiment 3 evaluation. They must not be presented as historical reproduction of Experiments 2A–2E.
 
+## Experiment 3 execution readiness
+
+- [x] Provider-neutral OpenAI-compatible harness implemented for Evidence Gate v1.
+- [x] Blinded task preparation, deterministic pair-level split, separate private evaluation map and prompt hashes.
+- [x] Development/validation/final-holdout and document-layout OOD conditions specified.
+- [x] CI verifies model-facing tasks contain no oracle labels and uploads only the public task package.
+- [ ] Actual provider/model identities and API credentials configured.
+- [ ] Development pilot and validation run completed.
+- [ ] Frozen final-holdout run completed with raw responses, costs, latency and uncertainty intervals.
+- [ ] Provenance-aware v2/v3 model evaluation remains blocked on issue #3.
+
+No real-model Experiment 3 result is claimed until the unchecked execution items are completed.
+
 ## Release decision
 
 Do not upload the current manuscript as a research preprint until every blocker above is closed. A successful LaTeX build or benchmark-generation workflow is not a substitute for rerunning the experiments.

@@ -76,6 +76,20 @@ jobs:
           path: results/dependency_graph_v5/
           if-no-files-found: error
           retention-days: 90
+      - name: Prepare blinded Experiment 3 tasks (no model API calls)
+        id: exp3_prepare
+        run: python scripts/prepare_exp3_tasks.py --benchmark data/benchmark_v0.4/cases.jsonl --output results/exp3_real_models
+      - name: Verify Experiment 3 model-facing task blinding
+        id: exp3_blinding
+        run: python scripts/prepare_exp3_tasks.py --verify-only --output results/exp3_real_models
+      - name: Upload blinded Experiment 3 public tasks
+        if: always() && steps.exp3_prepare.outcome == 'success' && steps.exp3_blinding.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-exp3-blinded-public-tasks
+          path: results/exp3_real_models/public/
+          if-no-files-found: error
+          retention-days: 90
       - name: Run v0.4 reconstruction and sensitivity analysis
         id: runner_v2
         run: |
@@ -161,6 +175,8 @@ jobs:
           RUNNER_V2_OUTCOME: ${{ steps.runner_v2.outcome }}
           RUNNER_V2_ERROR: ${{ env.RUNNER_V2_ERROR }}
           DOCUMENT_ROOT_OUTCOME: ${{ steps.document_root.outcome }}
+          EXP3_PREPARE_OUTCOME: ${{ steps.exp3_prepare.outcome }}
+          EXP3_BLINDING_OUTCOME: ${{ steps.exp3_blinding.outcome }}
           EVIDENCE_TRUST_V2_OUTCOME: ${{ steps.evidence_trust_v2.outcome }}
           EVIDENCE_TRUST_V3_OUTCOME: ${{ steps.evidence_trust_v3.outcome }}
           EVIDENCE_PROVENANCE_V4_OUTCOME: ${{ steps.evidence_provenance_v4.outcome }}
