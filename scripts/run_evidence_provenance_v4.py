@@ -131,7 +131,7 @@ def make_record(source_type, claim, value, case, scenario, root, keys, credentia
     if source_type == "weighbridge":
         calibration_id, calibration_until = "scale-calibration-1", NOW + 1000
     if scenario == "stale_evidence" and source_type == "weighbridge":
-        observed_at, issued_at, expires_at = NOW - 1000, NOW - 1000, NOW - 1
+        observed_at, issued_at, expires_at = NOW - 20, NOW - 10, NOW - 1
     if scenario == "cross_subject_substitution" and source_type == "rfid_counter":
         subject_id = "different-shipment"
     if scenario == "parser_lineage_tampering" and source_type == "document_parser":
