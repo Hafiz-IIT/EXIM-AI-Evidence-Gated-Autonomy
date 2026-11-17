@@ -1,0 +1,10 @@
+{
+  "signer": "document_origin",
+  "payload": {
+    "kind": "document",
+    "name": "invoice",
+    "hash": "ff5ebbf6089e165d6883510341a2410ab0d4286610e0aae5f835d0e46aff9426",
+    "dependency_root": "doc_origin_cluster"
+  },
+  "signature_b64": "O/ZWu9lVpOmnMmA7CGKDVPo8qFyPmvFmpsvy/GI+UgLeipy4DOl3iEOc9/Afnv/n5QVGqf8Lq4Qct9BD89HMCA=="
+}
