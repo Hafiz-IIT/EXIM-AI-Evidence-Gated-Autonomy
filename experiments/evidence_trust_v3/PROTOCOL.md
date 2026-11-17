@@ -26,7 +26,7 @@ Can a threshold of multiple witnesses reduce the unsafe-authorization exposure o
 7. Disclosed shared administrative domain.
 8. Registry-root compromise, treated as a trust-anchor failure rather than a routine witness failure.
 
-The deterministic HIGH-risk benchmark v0.4 subset is reused. Outputs are a separate v3 result set and do not overwrite v2 artifacts or historical results.
+The deterministic HIGH-risk benchmark v0.4 subset is reused. Outputs are a separate v3 result set and do not overwrite v2 artifacts or historical results. In the pre-capture source-forgery scenario, the document set is changed relative to the unchanged physical ground truth and the transformed case is relabeled unsafe-to-authorize. Safe-action coverage and false-block rate are therefore undefined for that scenario; the relevant metric is whether the policy issues any unsafe ACT.
 
 ## Interpretation
 
