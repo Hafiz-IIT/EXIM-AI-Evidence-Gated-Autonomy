@@ -35,7 +35,7 @@ The runner evaluates all 15 non-empty subsets of the four roles: four single-rol
 Two deterministic controls are evaluated separately from key compromise:
 
 - **Source forgery before capture:** the source document is already forged when an otherwise honest capture authority receives it. IA processes the captured document and IWA retains the independent ground-truth value.
-- **Shared-dependency witness:** the witness is deliberately copied from the same forged document source and the external measurement is aligned to that source. This violates the independence assumption and tests whether false corroboration can pass.
+- **Shared-dependency witness:** the witness is deliberately copied from the same forged document source and the external measurement is aligned to that source. No signing key is compromised. The authorization gate compares the declared witness source identifier and acquisition domain with the capture source; a disclosed shared source must be rejected.
 
 The distinction matters: source forgery is not the same event as capture-key compromise. Likewise, a compromised IWA signing key is modeled as control over the IWA's signed measurement claim, not as automatic compromise of CA or IA.
 
@@ -52,7 +52,7 @@ For every HIGH-risk v0.4 case and every compromise combination:
 7. Have AA sign the resulting action; under AA compromise, model an arbitrary ACT decision.
 8. Compare ACT with the original `safe_to_act` label.
 
-The runner emits one row per case/scenario and a scenario summary. The deterministic matrix is not a Monte Carlo study and has no sampling-based confidence intervals.
+The runner emits one row per case/scenario and a scenario summary. The deterministic matrix is not a Monte Carlo study and has no sampling-based confidence intervals. The shared-dependency control is expected to fail the explicit independence check when the common source is truthfully declared; a compromised IWA can still falsify its signed source/measurement claims, which is a different threat.
 
 ## 6. Metrics
 
