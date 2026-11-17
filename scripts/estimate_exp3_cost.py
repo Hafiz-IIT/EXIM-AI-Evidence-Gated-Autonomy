@@ -58,7 +58,7 @@ def main():
         "estimate_method": "rough estimate: ceil(serialized prompt characters / 3) input tokens plus configured max_tokens output cap; provider tokenization and actual usage may differ",
         "cost_known_for_all_selected_runs": all_priced,
         "total_preflight_estimated_cost_usd": total_cost if all_priced else None,
-        "max_budget_usd": args.max_budget_usd,
+        "max_preflight_budget_usd": args.max_budget_usd,
         "runs": estimates,
         "warning": "This is a rough planning estimate, not a guaranteed upper bound or provider quote. Actual tokenization, hidden message overhead, cached-input pricing and output usage may differ. The preflight threshold is not a hard spend cap; reconcile against provider-reported usage and billing.",
     }
