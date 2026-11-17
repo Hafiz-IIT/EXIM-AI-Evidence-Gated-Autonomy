@@ -191,6 +191,17 @@ These results identify both the value and limits of role separation. Capture-onl
 
 The complete protocol, threat assumptions and limitations are in \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/main/experiments/evidence_trust_v2/PROTOCOL.md}{the v2 protocol} and \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/main/experiments/evidence_trust_v2/RESULTS_REVIEW.md}{the results review}. Pinned output hashes are in \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/blob/main/results/evidence_trust_v2/manifest-44025577491.json}{the run manifest}. CI run \href{https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491}{44025577491} passed the full test suite, benchmark generation/verification, experiment runners, artifact uploads, historical table loading, and manuscript compilation. Production KMS/HSM custody, authenticated signer enrollment, durable replay storage, secure capture and operational revocation are not implemented. This is synthetic threat evidence only; the manuscript is not ready for arXiv submission.
 
+
+\section{Supplementary Evidence-Trust and Provenance Experiments (v3--v5)}
+
+The v3 authenticated witness-quorum experiment compared 2-of-3 and 3-of-3 admission over eight synthetic threat scenarios. The 2-of-3 policy tolerated one compromised witness but admitted 50 unsafe C4 actions under two-witness collusion and full-roster compromise. Strict 3-of-3 blocked the two-witness case but could not prevent full-roster collusion. The v3 bounded recovery path admitted only isolated verifier false rejections after all other policy checks passed.
+
+The v4 claim-scoped evidence-provenance experiment bound evidence to the subject, claim, document, parser lineage, unit, freshness, calibration and exact action payload. It failed closed under replay, stale evidence, scope substitution and several integrity attacks, but incurred substantial availability costs in those scenarios. Source and trust-root compromise still produced unsafe actions in the modeled C4 or C8 families.
+
+The v5 experiment compared key uniqueness (K2), direct-field diversity (F2), strict 3-of-3 direct-field diversity (F3), and graph-aware 2-of-3 (G2) over 16 scenarios and 44,800 case-policy-scenario rows. Across 11,200 cases per policy, unsafe ACT counts were 700 (K2), 650 (F2), 50 (F3), and 150 (G2). Safe-ACT coverage was 100\%, 100\%, 93.75\%, and 87.5\%, respectively. G2 recorded 1,800 graph-validation rejections. It blocked declared transitive shared-dependency attacks that direct labels missed, but failed closed under malformed graph structure/signatures and was fooled when a compromised registry omitted a true shared ancestor.
+
+These extensions are deterministic synthetic experiments. They do not establish real-world probabilities, production security, or performance on real customs data. The v5 experiment does not claim a new quorum theory or structural-cut metric: prior work already formalizes epistemic fault domains and graph-aware quorum admission \cite{he2026illusionquorums}; ARP specifies operating-party and witness diversity requirements \cite{hillier2026arp}; independent corroboration has earlier systems-security treatment \cite{kahn1998corroboration}. The contribution is limited to an EXIM-inspired synthetic comparison of these policy variants and their security/availability trade-offs. Full protocols, result reviews and hashes are maintained in the repository.
+
 \bibliographystyle{plain}
 \bibliography{references}
 \end{document}

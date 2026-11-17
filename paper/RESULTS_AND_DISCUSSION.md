@@ -54,3 +54,19 @@ The honest baseline produced 50 ACT decisions, all safe, with 50% safe-ACT cover
 The source-forgery-before-capture control and disclosed shared-dependency-witness control produced no ACT decisions. The latter is rejected because the witness discloses the same source identifier and acquisition/administrative-domain labels as capture. These checks do not authenticate the labels: a compromised witness can sign false values and claim a separate source identity. The independent witness itself is simulated from benchmark ground truth; no real external source was used.
 
 The result therefore does not show that role separation eliminates trust-root risk. It shows that some isolated compromises are contained at the cost of coverage, while compromise of the witness authority, trust registry or final authorization boundary can still produce unsafe action. The complete scenario table, family-level breakdown, threat assumptions, output hashes and limitations are in [the v2 results review](../experiments/evidence_trust_v2/RESULTS_REVIEW.md). The successful CI execution is [run 44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491).
+
+
+## Supplementary dependency-aware witness ancestry experiment (v5)
+
+The v5 experiment compares four policies on the same 16 scenarios and 700 HIGH-risk cases per scenario: K2 key-unique 2-of-3, F2 direct-field-distinct 2-of-3, F3 direct-field-distinct 3-of-3, and G2 graph-aware 2-of-3. The four-policy experiment contains 44,800 case-policy-scenario rows.
+
+| Policy | Unsafe ACT across 11,200 cases | Safe-ACT coverage | Graph-validation rejections |
+|---|---:|---:|---:|
+| K2 key-unique | 700 | 100% | 0 |
+| F2 field-distinct | 650 | 100% | 0 |
+| F3 field-distinct | 50 | 93.75% | 0 |
+| G2 graph-aware | 150 | 87.5% | 1,800 |
+
+G2 blocks the modeled C4 false quorum in seven declared hidden-shared-dependency scenarios where K2 and F2 each authorize 50 unsafe actions despite distinct direct labels. It rejects incomplete ancestry when the incomplete witness is needed. The trade-off is availability: malformed or unresolved graph structure and invalid graph signatures fail closed across all 700 cases in each affected scenario, including safe cases. F3 blocks two-witness collusion but still permits 50 unsafe actions under full-roster compromise. G2 is also fooled by registry-root compromise when the compromised registry signs a graph that omits a true common parent.
+
+This is an EXIM-inspired empirical comparison, not a new quorum theory, structural-cut metric, or dependency-aware quorum algorithm. EFD/DAQC and ARP already cover the general concepts; the defensible result is the benchmark-specific comparison and its security/availability trade-offs. All graph data and attacks are synthetic; a signed graph authenticates registry assertions, not real-world completeness or truth. See the v5 protocol, results review, and pinned manifest.

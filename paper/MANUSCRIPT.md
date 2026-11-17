@@ -449,6 +449,49 @@ These results identify both the value and limits of role separation. Capture-onl
 
 The complete protocol, threat assumptions and limitations are in [experiments/evidence_trust_v2/PROTOCOL.md](../experiments/evidence_trust_v2/PROTOCOL.md). The full family-level review is in [experiments/evidence_trust_v2/RESULTS_REVIEW.md](../experiments/evidence_trust_v2/RESULTS_REVIEW.md), and pinned output hashes are in [results/evidence_trust_v2/manifest-44025577491.json](../results/evidence_trust_v2/manifest-44025577491.json). CI run [44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491) passed the full test suite, benchmark generation/verification, all experiment runners, artifact uploads, historical table loading and manuscript compilation. This is synthetic threat evidence only; production KMS/HSM custody, authenticated signer enrollment, durable replay storage, secure capture, and operational revocation are not implemented. The manuscript remains not ready for arXiv submission.
 
+
+## 23. Supplementary Experiment: Authenticated Witness Quorum (Evidence-Trust v3)
+
+Evidence-Trust v3 evaluates an authenticated 2-of-3 witness quorum and a strict 3-of-3 sensitivity condition on 700 HIGH-risk benchmark v0.4 cases across eight scenarios (5,600 case-scenario rows). Witness credentials bind keys to source and administrative claims; case-scoped signed assertions are checked before the controller receives a measurement. An invalid quorum forces escalation. A bounded recovery path admits only isolated verifier false rejections after all other v1 policy guards pass.
+
+| Scenario | 2-of-3 ACT | 2-of-3 unsafe ACT | 3-of-3 ACT | 3-of-3 unsafe ACT |
+|---|---:|---:|---:|---:|
+| Honest baseline | 100 | 0 | 100 | 0 |
+| One witness compromised | 100 | 0 | 100 | 0 |
+| Two witnesses compromised | 150 | 50 | 100 | 0 |
+| All witnesses compromised | 150 | 50 | 150 | 50 |
+| Forged source identity | 100 | 0 | 0 | 0 |
+| Source forgery before capture | 0 | 0 | 0 | 0 |
+| Shared administrative domain | 0 | 0 | 0 | 0 |
+| Registry-root compromise | 150 | 50 | 0 | 0 |
+
+The 2-of-3 policy tolerates one compromised witness in this fixture but admits 50 unsafe C4 consistent-but-wrong actions under two-witness collusion and full-roster compromise. Strict 3-of-3 blocks the two-witness case but cannot stop all three witnesses when they collude. The bounded recovery path recovers 50 safe C7 verifier-false-reject cases in the honest baseline. These are deterministic synthetic outcomes, not probabilities. The witness uses benchmark ground truth and is an idealized oracle, not an independent physical sensor.
+
+## 24. Supplementary Experiment: Claim-Scoped Evidence Provenance (Evidence-Provenance v4)
+
+Evidence-Provenance v4 evaluates 16 scenarios × 700 HIGH-risk cases (11,200 rows). Signed claim evidence is bound to the subject, action identifier, canonical action-payload digest, document digest, parser input/output lineage, claim type, unit, validity window, nonce, sequence and calibration metadata. Source competence and direct shared-administration/gateway exclusions are checked. A narrow recovery path remains limited to isolated verifier false rejection.
+
+The honest baseline authorizes 100 safe cases with no unsafe ACT. Pre-capture source forgery, replay, stale evidence, cross-subject/claim substitution, parser-lineage tampering, invalid calibration, shared administration, credential tampering and action substitution fail closed. A single compromised weighbridge, a compound tariff-registry plus independent false-accept-verifier scenario, all-source compromise, and registry signing-key compromise each produce 50 unsafe actions in their respective modeled attack family. The v4 runner recovers 300 safe C7 actions across six scenarios; this is a deterministic fixture count, not an estimated recovery rate.
+
+The experiment is a hybrid synthetic controller, not a deployed system. Signatures authenticate enrolled keys and signed bytes, not semantic truth. Calibration and administrative-domain fields are assertions rather than hardware-backed evidence; replay state is caller-managed; no atomic external action commit is implemented.
+
+## 25. Supplementary Experiment: Dependency-Aware Witness Ancestry (v5)
+
+The v5 experiment compares four policies on the same 16 scenarios and 700 HIGH-risk cases per scenario: K2 key-unique 2-of-3, F2 direct-field-distinct 2-of-3, F3 direct-field-distinct 3-of-3, and G2 graph-aware 2-of-3. The four-policy experiment contains 44,800 case-policy-scenario rows.
+
+| Policy | Unsafe ACT across 11,200 cases | Safe-ACT coverage | Graph-validation rejections |
+|---|---:|---:|---:|
+| K2 key-unique | 700 | 100% | 0 |
+| F2 field-distinct | 650 | 100% | 0 |
+| F3 field-distinct | 50 | 93.75% | 0 |
+| G2 graph-aware | 150 | 87.5% | 1,800 |
+
+G2 blocks the modeled C4 false quorum in seven declared hidden-shared-dependency scenarios where K2 and F2 each authorize 50 unsafe actions despite distinct direct labels. It also rejects incomplete ancestry when the incomplete witness is needed. The trade-off is availability: malformed or unresolved graph structure and invalid graph signatures fail closed across all 700 cases in each affected scenario, including safe cases. F3 blocks two-witness collusion but still permits 50 unsafe actions under full-roster compromise. G2 is also fooled by registry-root compromise when the compromised registry signs a graph that omits a true common parent.
+
+This is an EXIM-inspired empirical comparison, not a new quorum theory, structural-cut metric, or dependency-aware quorum algorithm. Epistemic Fault Domains and the Dependency-Aware Quorum Controller already address correlated epistemic dependencies and graph-aware admission; the Attestation Reconciliation Protocol also specifies witness diversity and distinct operating-party requirements. The defensible result here is narrower: in this synthetic benchmark, transitive ancestry checks detect declared shared dependencies that key uniqueness and direct-field labels miss, while graph integrity and registry completeness remain trust assumptions.
+
+All v3–v5 identities, credentials, graphs, source values and attacks are synthetic. The graph authenticates the registry's assertion, not its completeness or truth. Distinct graph nodes do not prove independent ownership, operation, hardware or data. None of these experiments validates production security or real customs workflows. See the v5 protocol, results review, and pinned run manifest.
+
 ## References
 
 [1] Ryan Greenblatt, Buck Shlegeris, Kshitij Sachan, and Fabien Roger. *AI Control: Improving Safety Despite Intentional Subversion*. arXiv:2312.06942, 2023.
