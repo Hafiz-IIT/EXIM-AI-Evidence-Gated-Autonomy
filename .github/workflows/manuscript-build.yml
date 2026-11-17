@@ -17,6 +17,15 @@ jobs:
           python-version: "3.11"
       - name: Install pinned project dependencies
         run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+      - name: Generate benchmark
+        id: generate
+        run: python scripts/generate_benchmark.py
+      - name: Verify benchmark integrity
+        id: verify
+        run: python scripts/verify_benchmark.py
+      - name: Run policy and reconstruction regression tests
+        id: tests
+        run: python -m unittest discover -s tests -v
       - name: Reconstruct archived Experiment 2B/2D/2E outputs
         id: exp2_reconstruction
         run: python scripts/reconstruct_exp2.py --benchmark data/benchmark/cases.jsonl --original-results results/exp2 --output results/exp2_reconstruction
@@ -28,15 +37,6 @@ jobs:
           path: results/exp2_reconstruction/
           if-no-files-found: error
           retention-days: 90
-      - name: Generate benchmark
-        id: generate
-        run: python scripts/generate_benchmark.py
-      - name: Verify benchmark integrity
-        id: verify
-        run: python scripts/verify_benchmark.py
-      - name: Run policy and reconstruction regression tests
-        id: tests
-        run: python -m unittest discover -s tests -v
       - name: Run new transparent reconstruction experiments
         id: runner
         run: |
