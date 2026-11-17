@@ -1,0 +1,53 @@
+{
+  "protocol": "ega-evidence-trust-architecture-v2",
+  "status": "synthetic threat experiment; not production validation",
+  "benchmark_version": "0.4",
+  "high_risk_cases_per_scenario": 700,
+  "authority_roles": ["capture", "interpretation", "witness", "authorization"],
+  "compromise_combinations": [
+    ["capture"],
+    ["interpretation"],
+    ["witness"],
+    ["authorization"],
+    ["capture", "interpretation"],
+    ["capture", "witness"],
+    ["capture", "authorization"],
+    ["interpretation", "witness"],
+    ["interpretation", "authorization"],
+    ["witness", "authorization"],
+    ["capture", "interpretation", "witness"],
+    ["capture", "interpretation", "authorization"],
+    ["capture", "witness", "authorization"],
+    ["interpretation", "witness", "authorization"],
+    ["capture", "interpretation", "witness", "authorization"]
+  ],
+  "additional_controls": [
+    "honest_baseline",
+    "source_forgery_before_capture",
+    "shared_dependency_witness",
+    "key_admin_compromise_trust_store_poisoning"
+  ],
+  "scenario_count": 19,
+  "case_scenario_rows": 13300,
+  "test_keys": "deterministic Ed25519 keys derived from fixed role labels; test-only",
+  "independent_witness_model": "synthetic independent scale/inspection record sourced from ground_truth; witness-role compromise can falsify its signed fields",
+  "authorization_model": "honest AA enforces signatures, parent links, witness agreement and evidence_gate_v1; compromised AA can issue ACT directly",
+  "source_forgery_model": "forged source documents are present before honest capture; honest witness remains ground-truth-derived unless the shared-dependency control is selected",
+  "limitations": [
+    "Synthetic benchmark and authority model; no real external source or signer was used.",
+    "The experiment does not implement KMS/HSM, authenticated enrollment, durable replay state, distributed transactions, operational revocation or secure capture.",
+    "A compromised authority key is modeled as control over that role's signed claims only; the named role capabilities are explicit in the runner.",
+    "Monte Carlo uncertainty is not estimated; this is a deterministic benchmark stress test."
+  ],
+  "source_commit": "69a25ef9970c27b1932494d29df3a7704806f727",
+  "workflow_run_id": "44025577491",
+  "python_version": "3.11.18",
+  "generated_files": [
+    "evidence_trust_v2_cases.csv",
+    "evidence_trust_v2_summary.csv"
+  ],
+  "outputs_sha256": {
+    "evidence_trust_v2_cases.csv": "0fe5c636ce1d66c3159bff97932652142b48a183d8ad32067460f43c5a6d7ea4",
+    "evidence_trust_v2_summary.csv": "d25e8441bedc713663d2ad7f1175c3cfdbefd73b69aa05250270efddde3c9677"
+  }
+}
