@@ -135,6 +135,7 @@ def evaluate_quorum(records: Iterable[tuple[dict, dict]], *, policy: str, thresh
             return False, graph_reason, []
 
     verified = []
+    rejected_reasons = []
     nonces = consumed_nonces if consumed_nonces is not None else set()
     sequences = last_sequences if last_sequences is not None else {}
     for record, credential in supplied:
@@ -142,18 +143,22 @@ def evaluate_quorum(records: Iterable[tuple[dict, dict]], *, policy: str, thresh
             credential, trusted_issuer_key=trusted_registry_key,
             tenant_id=tenant_id, now=now)
         if not ok:
-            return False, reason, []
+            rejected_reasons.append(reason)
+            continue
         ancestors = frozenset()
         if policy == "graph_aware":
             if not identity.get("dependency_manifest_complete", False):
-                return False, "dependency_manifest_incomplete", []
+                rejected_reasons.append("dependency_manifest_incomplete")
+                continue
             if identity.get("dependency_graph_digest") != graph_body["graph_digest"]:
-                return False, "dependency_graph_binding_mismatch", []
+                rejected_reasons.append("dependency_graph_binding_mismatch")
+                continue
             leaf = identity.get("dependency_leaf_node")
             try:
                 ancestors = resolve_ancestors(graph_body["nodes"], leaf)
             except (ValueError, TypeError):
-                return False, "dependency_ancestry_unresolvable", []
+                rejected_reasons.append("dependency_ancestry_unresolvable")
+                continue
         ok, reason, evidence = verify_claim_evidence(
             record, credential, trusted_issuer_key=trusted_registry_key,
             tenant_id=tenant_id, expected_claim=claim_type,
@@ -162,7 +167,8 @@ def evaluate_quorum(records: Iterable[tuple[dict, dict]], *, policy: str, thresh
             expected_document_digest=expected_document_digest, expected_unit=expected_unit,
             now=now, consumed_nonces=nonces, last_sequences=sequences)
         if not ok:
-            return False, reason, []
+            rejected_reasons.append(reason)
+            continue
         evidence["dependency_leaf_node"] = identity.get("dependency_leaf_node")
         evidence["dependency_ancestors"] = sorted(ancestors)
         verified.append(evidence)
@@ -176,7 +182,7 @@ def evaluate_quorum(records: Iterable[tuple[dict, dict]], *, policy: str, thresh
                 if item["claim_type"] == claim_type and item["unit"] == expected_unit
                 and agrees(item["value"])]
     if len(matching) < threshold:
-        return False, "quorum_disagreement", verified
+        return False, (rejected_reasons[0] if rejected_reasons else "quorum_disagreement"), verified
 
     key_fields = ("source_id", "key_id")
     field_fields = ("source_id", "key_id", "acquisition_domain",
