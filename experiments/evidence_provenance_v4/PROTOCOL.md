@@ -160,12 +160,12 @@ Each hypothesis must be supported by an executable test and a counterexample tes
 - Rhodes and Kang, [Proof of Execution](https://arxiv.org/abs/2607.05397), 2026.
 - Santos-Grueiro, [Temporary Authority, Permanent Effects](https://arxiv.org/abs/2607.10487), 2026.
 - Chang and Geng, [Mnemosyne](https://arxiv.org/abs/2607.00269), 2026.
-- Faraj, Megías and García-Alfaro, [Security Approaches for Data Provenance in the Internet of Things: A Systematic Literature Review](https://doi.org/10.1145/3708993), *ACM Computing Surveys* 57 (2025).
+- Faraj, Megías and García-Alfaro, [Security Approaches for Data Provenance in the Internet of Things: A Systematic Literature Review](https://doi.org/10.1145/3718735), *ACM Computing Surveys* 57 (2025).
 - Dirin, Oliver and Laine, [A Security Framework for Increasing Data and Device Integrity in Internet of Things Systems](https://doi.org/10.3390/s23177532), *Sensors* 23 (2023).
-- Pan, Stakhanova and Ray, [Data Provenance in Security and Privacy](https://doi.org/10.1145/3543507), *ACM Computing Surveys* 55 (2023).
-- Brito et al., [Decentralized Proof-Of-Location for Content Provenance: Towards Capture-Time Authenticity](https://doi.org/10.1109/ICSA-C.2026.00034), IEEE ICSA-C (2026); DOI to be checked against publisher metadata before formal citation.
-- Triepels, Daniels and Feelders, [Data-driven fraud detection in international shipping](https://doi.org/10.1016/j.eswa.2017.12.048), *Expert Systems with Applications* 99 (2018).
-- Chen et al., [The use of machine learning to identify the correctness of HS Code for the customs import declarations](https://doi.org/10.1109/DSAA.2021.00052), DSAA (2021).
+- Pan, Stakhanova and Ray, [Data Provenance in Security and Privacy](https://doi.org/10.1145/3593294), *ACM Computing Surveys* 55 (2023).
+- Brito et al., [Decentralized Proof-Of-Location for Content Provenance: Towards Capture-Time Authenticity](https://arxiv.org/abs/2603.27883), IEEE ICSA-C (2026); DOI to be checked against publisher metadata before formal citation.
+- Triepels, Daniels and Feelders, [Data-driven fraud detection in international shipping](https://doi.org/10.1016/j.eswa.2018.01.007), *Expert Systems with Applications* 99 (2018).
+- Chen et al., [The use of machine learning to identify the correctness of HS Code for the customs import declarations](https://doi.org/10.1109/DSAA53316.2021.9564203), DSAA (2021).
 
 ## 12. Exit criteria for v4
 
