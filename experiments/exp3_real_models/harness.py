@@ -287,6 +287,62 @@ def _endpoint(base_url: str) -> str:
     return value if value.endswith("/chat/completions") else value + "/chat/completions"
 
 
+def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) -> dict:
+    """Conservative offline estimate: chars/4 input tokens and max_tokens output per call."""
+    models = config["models"]
+    settings = config["settings"]
+    max_tokens = int(settings.get("max_tokens", 500))
+    extractor_name = condition["extractor_model"]
+    verifier_names = condition["verifier_models"]
+    role_specs = [("extractor", extractor_name, build_extraction_messages)]
+    placeholder_extraction = {"quantity": 100, "gross_weight": 108.0, "hs": "8542", "confidence": 0.9}
+    role_specs.extend(
+        (f"verifier_{index}", name, lambda task, extraction=placeholder_extraction: build_verifier_messages(task, extraction))
+        for index, name in enumerate(verifier_names, start=1)
+    )
+    role_totals = {}
+    all_priced = True
+    total_cost = 0.0
+    total_input_tokens = 0
+    total_output_tokens = 0
+    for role, model_name, message_builder in role_specs:
+        spec = models[model_name]
+        input_tokens = 0
+        for task in tasks:
+            messages = message_builder(task)
+            serialized = json.dumps(messages, ensure_ascii=False, separators=(",", ":"))
+            input_tokens += math.ceil(len(serialized) / 4)
+        output_tokens = len(tasks) * max_tokens
+        in_price = spec.get("input_usd_per_1k_tokens")
+        out_price = spec.get("output_usd_per_1k_tokens")
+        if in_price is None or out_price is None:
+            role_cost = None
+            all_priced = False
+        else:
+            role_cost = (input_tokens * float(in_price) + output_tokens * float(out_price)) / 1000.0
+            total_cost += role_cost
+        role_totals[role] = {
+            "model": model_name,
+            "family_id": spec["family_id"],
+            "calls": len(tasks),
+            "estimated_input_tokens": input_tokens,
+            "upper_bound_output_tokens": output_tokens,
+            "estimated_cost_usd": role_cost,
+        }
+        total_input_tokens += input_tokens
+        total_output_tokens += output_tokens
+    return {
+        "task_count": len(tasks),
+        "api_call_count": len(tasks) * len(role_specs),
+        "estimated_input_tokens": total_input_tokens,
+        "upper_bound_output_tokens": total_output_tokens,
+        "upper_bound_cost_usd": total_cost if all_priced else None,
+        "cost_known": all_priced,
+        "method": "input tokens approximated as ceil(serialized prompt characters / 4); output tokens bounded by max_tokens per call",
+        "roles": role_totals,
+    }
+
+
 def call_openai_compatible(
     model_spec: dict,
     messages: list[dict],
