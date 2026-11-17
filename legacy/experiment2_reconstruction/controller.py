@@ -191,6 +191,9 @@ def generate_attested_cases(cases: list[dict]) -> tuple[list[dict], list[dict]]:
     attested_v2, attested_v3 = [], []
     for original in high:
         case = copy.deepcopy(original)
+        # The archived 0.3 benchmark predates the later-added convenience
+        # field. Strip it to reproduce the exact historical schema.
+        case.pop("safe_to_act", None)
         observable = case["observable"]
         attestations = []
         for name, document in observable["documents"].items():
@@ -536,11 +539,20 @@ def reconstruct_experiment2(benchmark_path: Path, original_results_dir: Path, ou
         expected_path = original_results_dir / name
         table_comparisons[name] = expected_path.exists() and (output_dir / name).read_bytes() == expected_path.read_bytes()
     benchmark_hash = sha256_file(benchmark_path)
+    normalized_rows = []
+    for line in benchmark_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        row.pop("safe_to_act", None)
+        normalized_rows.append(json.dumps(row) + "\\n")
+    normalized_benchmark_hash = sha256_bytes("".join(normalized_rows).encode("utf-8"))
     expected_benchmark_hash = "1d7890f861b874e6535b88340fe50d46b1c299b85a9517948ad39c3213fc0032"
     manifest = {
-        "status": "exact_reconstruction_verified" if benchmark_hash == expected_benchmark_hash and generated_hashes == expected and all(table_comparisons.values()) else "reconstruction_mismatch",
+        "status": "exact_reconstruction_verified" if normalized_benchmark_hash == expected_benchmark_hash and generated_hashes == expected and all(table_comparisons.values()) else "reconstruction_mismatch",
         "source_benchmark_sha256": benchmark_hash,
-        "expected_source_benchmark_sha256": expected_benchmark_hash,
+        "normalized_historical_benchmark_sha256": normalized_benchmark_hash,
+        "expected_normalized_historical_benchmark_sha256": expected_benchmark_hash,
         "high_risk_cases": len(attested_v2),
         "v2_attested_cases_sha256": generated_hashes["attested_high_cases.jsonl"],
         "v3_dual_lineage_cases_sha256": generated_hashes["v3_dual_lineage_cases.jsonl"],

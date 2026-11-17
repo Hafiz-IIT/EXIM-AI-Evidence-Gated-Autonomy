@@ -19,3 +19,5 @@ The archived v3 lineages are signed by lineage_A and lineage_B, but these signer
 Further, the v3 behavior reproduced by the archived 2E table uses the dual-lineage attestations as the authoritative dependency-group claim but does not bind that claim to the dependency-group field in the verifier's signed attestation. Consequently, collusion of both lineage authorities can make a false dependency group appear valid and yields 50 unsafe ACTs in the 500-case synthetic benchmark. This is not proof that the original source had exactly this implementation; it is the minimal clearly labeled reconstruction consistent with the archived case records and result tables.
 
 Do not cite this reconstruction as the historical original source or as production security evidence.
+
+The current benchmark generator adds a later `safe_to_act` convenience field. The reconstruction removes only that field before regenerating historical 2A/2B records; the normalized benchmark hash matches the archived original byte-for-byte.

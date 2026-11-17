@@ -34,3 +34,6 @@ All cases, keys, identities, signatures and attacks are synthetic. The determini
 
 
 The manuscript-build workflow now executes `scripts/reconstruct_exp2.py` and uploads the generated case sets, decision cache, reconstructed 2B/2D/2E tables and reconstruction manifest as a CI artifact. This makes the byte-for-byte recovery checks part of the repeatable CI path.
+
+
+The current benchmark generator adds a later convenience field, `safe_to_act`, that was absent from the archived 0.3 JSONL. The reconstruction strips only that field before generating historical 2A/2B records; the normalized full benchmark then matches the archived 0.3 SHA-256 exactly.
