@@ -98,6 +98,17 @@ jobs:
           path: results/evidence_trust_v3/
           if-no-files-found: error
           retention-days: 90
+      - name: Run v4 dependency-root-aware witness experiment
+        id: evidence_trust_v4
+        run: python scripts/run_evidence_trust_v4.py
+      - name: Upload evidence-trust v4 outputs
+        if: always() && steps.evidence_trust_v4.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-evidence-trust-v4
+          path: results/evidence_trust_v4_dependency_graph/
+          if-no-files-found: error
+          retention-days: 90
       - name: Reproduce publication tables from checked-in historical result files
         id: tables
         run: python scripts/reproduce_tables.py
@@ -141,15 +152,16 @@ jobs:
           DOCUMENT_ROOT_OUTCOME: ${{ steps.document_root.outcome }}
           EVIDENCE_TRUST_V2_OUTCOME: ${{ steps.evidence_trust_v2.outcome }}
           EVIDENCE_TRUST_V3_OUTCOME: ${{ steps.evidence_trust_v3.outcome }}
+          EVIDENCE_TRUST_V4_OUTCOME: ${{ steps.evidence_trust_v4.outcome }}
         run: |
-          if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$EVIDENCE_TRUST_V2_OUTCOME" = "success" ] && [ "$EVIDENCE_TRUST_V3_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
+          if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$EVIDENCE_TRUST_V2_OUTCOME" = "success" ] && [ "$EVIDENCE_TRUST_V3_OUTCOME" = "success" ] && [ "$EVIDENCE_TRUST_V4_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
           V1_STATUS="$RUNNER_OUTCOME"
           V2_STATUS="$RUNNER_V2_OUTCOME"
           case "$V1_STATUS" in success|failure|error) ;; *) V1_STATUS=failure ;; esac
           case "$V2_STATUS" in success|failure|error) ;; *) V2_STATUS=failure ;; esac
-          curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$STATE\",\"context\":\"portfolio/benchmark-integrity-and-manuscript-build\",\"description\":\"Tests, v0.3/v0.4 benchmark integrity, reconstruction, sensitivity, evidence-trust v2/v3, historical tables and LaTeX compilation\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
+          curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$STATE\",\"context\":\"portfolio/benchmark-integrity-and-manuscript-build\",\"description\":\"Tests, v0.3/v0.4 benchmark integrity, reconstruction, sensitivity, evidence-trust v2/v3/v4, historical tables and LaTeX compilation\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
           curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$V1_STATUS\",\"context\":\"portfolio/reconstruction-v1-diagnostic\",\"description\":\"${RUNNER_ERROR:-runner-passed}\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
           curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$V2_STATUS\",\"context\":\"portfolio/reconstruction-v2-sensitivity\",\"description\":\"${RUNNER_V2_ERROR:-v04-runner-passed}\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
       - name: Fail workflow when verification fails
-        if: steps.tests.outcome != 'success' || steps.generate.outcome != 'success' || steps.verify.outcome != 'success' || steps.runner.outcome != 'success' || steps.v04_generate.outcome != 'success' || steps.v04_verify.outcome != 'success' || steps.runner_v2.outcome != 'success' || steps.document_root.outcome != 'success' || steps.evidence_trust_v2.outcome != 'success' || steps.evidence_trust_v3.outcome != 'success' || steps.tables.outcome != 'success' || steps.latex.outcome != 'success'
+        if: steps.tests.outcome != 'success' || steps.generate.outcome != 'success' || steps.verify.outcome != 'success' || steps.runner.outcome != 'success' || steps.v04_generate.outcome != 'success' || steps.v04_verify.outcome != 'success' || steps.runner_v2.outcome != 'success' || steps.document_root.outcome != 'success' || steps.evidence_trust_v2.outcome != 'success' || steps.evidence_trust_v3.outcome != 'success' || steps.evidence_trust_v4.outcome != 'success' || steps.tables.outcome != 'success' || steps.latex.outcome != 'success'
         run: exit 1
