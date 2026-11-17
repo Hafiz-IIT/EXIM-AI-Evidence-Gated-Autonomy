@@ -510,6 +510,17 @@ def run_condition(
     verifier_specs = [models[name] for name in condition["verifier_models"]]
     if len(verifier_specs) != 2:
         raise ValueError("Experiment 3 requires exactly two verifier roles")
+    estimate_tasks = [public_tasks[row["task_id"]] for row in private_rows]
+    cost_estimate = estimate_condition_cost(estimate_tasks, condition, config)
+    budget_limit = config["settings"].get("max_estimated_cost_usd")
+    if budget_limit is not None:
+        if not cost_estimate["cost_known"]:
+            raise ValueError("cost budget is set but one or more model token prices are missing")
+        if cost_estimate["upper_bound_cost_usd"] > float(budget_limit):
+            raise RuntimeError(
+                f"estimated upper-bound cost USD {cost_estimate['upper_bound_cost_usd']:.6f} "
+                f"exceeds configured budget USD {float(budget_limit):.6f}"
+            )
     required_models = [condition["extractor_model"], *condition["verifier_models"]]
     missing_env = [models[name]["api_key_env"] for name in required_models if not os.environ.get(models[name]["api_key_env"])]
     if missing_env:
@@ -523,7 +534,7 @@ def run_condition(
         "verifiers": condition["verifier_models"],
         "families": [extractor_spec["family_id"]] + [x["family_id"] for x in verifier_specs],
     }
-    model_hash = sha256_bytes(canonical_json({"models": models, "conditions": config["conditions"]}))
+    model_hash = sha256_bytes(canonical_json({"models": models, "conditions": config["conditions"], "settings": config["settings"]}))
     if split.startswith("final_holdout"):
         freeze = config.get("freeze", {})
         if freeze.get("status") != "frozen" or not freeze.get("frozen_at"):
@@ -655,6 +666,7 @@ def run_condition(
         "provider_error_count": len(provider_errors),
         "provider_error_rate": len(provider_errors) / len(raw_records) if raw_records else 0.0,
         "schema_failure_count": schema_failure_count,
+        "cost_estimate": cost_estimate,
     })
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     run_manifest = {
@@ -667,6 +679,8 @@ def run_condition(
         "task_id_salt_sha256": task_manifest["task_id_salt_sha256"],
         "prompt_sha256": prompt_hashes,
         "model_config_sha256": model_hash,
+        "cost_estimate": cost_estimate,
+        "configured_budget_limit_usd": budget_limit,
         "model_identity": model_identity,
         "model_specs": {name: {k: v for k, v in spec.items() if k != "api_key"} for name, spec in models.items()},
         "settings": config["settings"],
