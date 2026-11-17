@@ -98,6 +98,93 @@ class EvidenceTrustV3Tests(unittest.TestCase):
         )
         self.assertEqual(result, (True, "quorum_valid", 3))
 
+    def five_witness_records(self, weights=(10.0, 10.0, 10.0, 10.0, 10.0), credentials=None):
+        witnesses = self.witnesses + [
+            Ed25519PrivateKey.from_private_bytes(bytes([i]) * 32) for i in (4, 5)
+        ]
+        if credentials is None:
+            credentials = [
+                issue_identity_credential(
+                    issuer_id="research-root", witness_id=f"w{i}", key_id=f"k{i}",
+                    public_key=key.public_key(), source_id=f"source-{i}",
+                    acquisition_domain=f"acquisition-{i}", administrative_domain=f"admin-{i}",
+                    tenant_id="tenant-A", serial=f"serial-{i}", issued_at=100,
+                    expires_at=300, issuer_private_key=self.root,
+                )
+                for i, key in enumerate(witnesses, 1)
+            ]
+        return [
+            (issue_witness_assertion(
+                credential=credential, witness_private_key=key,
+                tenant_id="tenant-A", case_id="case-1", parent_digest="root",
+                gross_weight=weight, item_type="machine", nonce=f"five-n{i}",
+                issued_at=110, expires_at=200,
+            ), credential)
+            for i, (key, credential, weight) in enumerate(zip(witnesses, credentials, weights), 1)
+        ]
+
+    def verify_five(self, items):
+        return verify_witness_quorum(
+            items, trusted_issuer_key=self.root.public_key(), tenant_id="tenant-A",
+            case_id="case-1", parent_digest="root", expected_weight=10.0,
+            expected_item_type="machine", now=150, threshold=3, total_required=5,
+        )
+
+    def test_three_of_five_blocks_two_colluding_witnesses(self):
+        self.assertEqual(
+            self.verify_five(self.five_witness_records((99.0, 99.0, 10.0, 10.0, 10.0))),
+            (True, "quorum_valid", 3),
+        )
+
+    def test_three_of_five_tolerates_one_invalid_identity_credential(self):
+        credentials = [
+            issue_identity_credential(
+                issuer_id="research-root", witness_id=f"w{i}", key_id=f"k{i}",
+                public_key=key.public_key(), source_id=f"source-{i}",
+                acquisition_domain=f"acquisition-{i}", administrative_domain=f"admin-{i}",
+                tenant_id="tenant-A", serial=f"serial-{i}", issued_at=100,
+                expires_at=300, issuer_private_key=self.root,
+            )
+            for i, key in enumerate(self.witnesses + [
+                Ed25519PrivateKey.from_private_bytes(bytes([i]) * 32) for i in (4, 5)
+            ], 1)
+        ]
+        credentials[0] = dict(credentials[0])
+        credentials[0]["body"] = dict(credentials[0]["body"], source_id="forged-source")
+        self.assertEqual(self.verify_five(self.five_witness_records(credentials=credentials)),
+                         (True, "quorum_valid", 4))
+
+    def test_three_of_five_fails_closed_with_two_compromised_and_one_invalid_credential(self):
+        credentials = [
+            issue_identity_credential(
+                issuer_id="research-root", witness_id=f"w{i}", key_id=f"k{i}",
+                public_key=key.public_key(), source_id=f"source-{i}",
+                acquisition_domain=f"acquisition-{i}", administrative_domain=f"admin-{i}",
+                tenant_id="tenant-A", serial=f"serial-{i}", issued_at=100,
+                expires_at=300, issuer_private_key=self.root,
+            )
+            for i, key in enumerate(self.witnesses + [
+                Ed25519PrivateKey.from_private_bytes(bytes([i]) * 32) for i in (4, 5)
+            ], 1)
+        ]
+        credentials[2] = dict(credentials[2])
+        credentials[2]["body"] = dict(credentials[2]["body"], source_id="forged-source")
+        self.assertEqual(
+            self.verify_five(self.five_witness_records((99.0, 99.0, 10.0, 10.0, 10.0), credentials)),
+            (False, "quorum_disagreement", 2),
+        )
+
+    def test_three_of_five_does_not_defeat_full_roster_compromise(self):
+        self.assertEqual(
+            verify_witness_quorum(
+                self.five_witness_records((99.0, 99.0, 99.0, 99.0, 99.0)),
+                trusted_issuer_key=self.root.public_key(), tenant_id="tenant-A",
+                case_id="case-1", parent_digest="root", expected_weight=99.0,
+                expected_item_type="machine", now=150, threshold=3, total_required=5,
+            ),
+            (True, "quorum_valid", 5),
+        )
+
     def test_all_witnesses_must_have_distinct_admin_domains(self):
         credentials = []
         for i, key in enumerate(self.witnesses, 1):
