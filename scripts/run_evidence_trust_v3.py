@@ -66,6 +66,32 @@ def make_credentials(root_private, shared_admin=False):
     return private_keys, credentials
 
 
+def make_source_forgery(case):
+    """Forge source documents before capture, then model an honest parser."""
+    forged = copy.deepcopy(case)
+    obs = forged["observable"]
+    source = next((doc for doc in obs["documents"].values() if doc is not None),
+                  obs["machine"]["extraction"])
+    fields = {
+        "quantity": int(source["quantity"]) + 7,
+        "gross_weight": round(float(source["gross_weight"]) + 11.25, 2),
+        "hs": "9999",
+    }
+    for document in obs["documents"].values():
+        if document is not None:
+            document.update(fields)
+    for instance in obs["document_instances"]:
+        instance["fields"].update(fields)
+    obs["provenance"]["integrity_status"] = "valid"
+    obs["provenance"]["document_set_sha256"] = canonical_sha256(obs["document_instances"])
+    invoice = obs["documents"].get("invoice")
+    if invoice is not None:
+        for field in ("quantity", "gross_weight", "hs"):
+            obs["machine"]["extraction"][field] = invoice[field]
+        obs["machine"]["classification"]["hs"] = invoice["hs"]
+    return forged
+
+
 def scenario_rows(cases, scenario):
     root_private = key("registry-root")
     root_public = root_private.public_key()
@@ -93,7 +119,10 @@ def scenario_rows(cases, scenario):
                 expires_at=NOW + 10000, issuer_private_key=attacker_root,
             )
     rows = []
-    for index, case in enumerate(cases):
+    for index, original_case in enumerate(cases):
+        case = (make_source_forgery(original_case)
+                if scenario == "source_forgery_before_capture"
+                else copy.deepcopy(original_case))
         observable = case["observable"]
         interpreted = observable["machine"]["extraction"]
         expected_weight = float(interpreted["gross_weight"])
@@ -137,11 +166,11 @@ def scenario_rows(cases, scenario):
         unsafe = action == "ACT" and not case["safe_to_act"]
         rows.append({
             "scenario": scenario, "case_id": case["case_id"], "family": case["family"],
-            "safe_to_act_ground_truth": bool(case["safe_to_act"]),
+            "safe_to_act_ground_truth": bool(original_case["safe_to_act"]),
             "legacy_gate_action": legacy, "quorum_valid": quorum,
             "quorum_reason": reason, "matching_witnesses": support,
             "action": action, "unsafe_act": bool(unsafe),
-            "safe_act": bool(action == "ACT" and case["safe_to_act"]),
+            "safe_act": bool(action == "ACT" and original_case["safe_to_act"]),
         })
     return rows
 
@@ -153,7 +182,8 @@ def main():
     scenarios = (
         "honest_baseline", "one_witness_compromised", "two_witnesses_compromised",
         "all_witnesses_compromised", "forged_source_identity",
-        "shared_administrative_domain", "registry_root_compromise",
+        "source_forgery_before_capture", "shared_administrative_domain",
+        "registry_root_compromise",
     )
     rows = []
     for scenario in scenarios:
