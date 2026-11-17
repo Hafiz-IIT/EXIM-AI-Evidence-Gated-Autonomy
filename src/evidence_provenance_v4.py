@@ -135,6 +135,8 @@ def verify_claim_evidence(record: dict, credential: dict, *,
             return False, "subject_mismatch", None
         if env.get("action_id") != expected_action_id:
             return False, "action_scope_mismatch", None
+        if env.get("action_payload_digest") != expected_action_payload_digest:
+            return False, "action_payload_mismatch", None
         if env.get("document_digest") != expected_document_digest:
             return False, "document_binding_mismatch", None
         if not isinstance(now, int) or now < env["issued_at"] or now >= env["expires_at"]:
@@ -185,7 +187,7 @@ def _values_agree(values: list, tolerance: float) -> bool:
 def evaluate_claim(records: Iterable[tuple[dict, dict]], *,
                    trusted_issuer_key: Ed25519PublicKey, tenant_id: str,
                    claim_type: str, expected_subject_id: str, expected_action_id: str,
-                   expected_document_digest: str, now: int,
+                   expected_action_payload_digest: str, expected_document_digest: str, now: int,
                    required_source_types: frozenset[str],
                    tolerance: float = 0.0) -> tuple[bool, str, list[dict]]:
     """Require competent, valid, matching, independently administered evidence."""
@@ -197,6 +199,7 @@ def evaluate_claim(records: Iterable[tuple[dict, dict]], *,
             record, credential, trusted_issuer_key=trusted_issuer_key,
             tenant_id=tenant_id, expected_claim=claim_type,
             expected_subject_id=expected_subject_id, expected_action_id=expected_action_id,
+            expected_action_payload_digest=expected_action_payload_digest,
             expected_document_digest=expected_document_digest, now=now,
             consumed_nonces=nonces, last_sequences=sequences)
         if not ok:
@@ -233,8 +236,8 @@ def issue_action_binding(*, action_id: str, action_payload_digest: str, subject_
 
 
 def verify_action_binding(binding: dict, *, trusted_authorizer_key: Ed25519PublicKey,
-                          action_id: str, subject_id: str, document_digest: str,
-                          policy_version: str, required_claims: Iterable[str],
+                          action_id: str, action_payload_digest: str, subject_id: str,
+                          document_digest: str, policy_version: str, required_claims: Iterable[str],
                           evidence_digests: Iterable[str], now: int) -> tuple[bool, str]:
     try:
         payload = binding["payload"]
