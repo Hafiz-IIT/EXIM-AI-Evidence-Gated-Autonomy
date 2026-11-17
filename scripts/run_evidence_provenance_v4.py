@@ -244,9 +244,13 @@ def run_one(case, scenario):
         issued_at=NOW - 10, expires_at=NOW + 100, private_key=authorizer,
     )
     redeem_action = action_id + ":substituted" if scenario == "action_substitution" else action_id
+    redeem_payload = dict(case["action"])
+    if scenario == "action_substitution":
+        redeem_payload["name"] = "substituted-action"
     binding_ok, binding_reason = verify_action_binding(
         binding, trusted_authorizer_key=authorizer.public_key(),
-        action_id=redeem_action, subject_id=subject_id, document_digest=doc_digest,
+        action_id=redeem_action, action_payload_digest=canonical_sha256(redeem_payload),
+        subject_id=subject_id, document_digest=doc_digest,
         policy_version=POLICY, required_claims=CLAIMS,
         evidence_digests=evidence_digests, now=NOW,
     )
