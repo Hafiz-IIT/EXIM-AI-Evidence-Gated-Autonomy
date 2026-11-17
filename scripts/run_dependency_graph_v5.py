@@ -343,6 +343,21 @@ def main():
         raise AssertionError("strict 3-of-3 should reject two colluding witnesses when the third remains honest")
     if metric("registry_root_compromise", "G2_graph_aware", "unsafe_ACT") <= 0:
         raise AssertionError("compromised registry root should expose graph-trust residual")
+    root_rows = [row for row in rows if row["scenario"] == "registry_root_compromise"]
+    if not all(
+        row["ground_truth_shared_dependency_id"] == "parent:common-control"
+        and row["ground_truth_common_dependency"]
+        and not row["signed_graph_contains_true_shared_dependency"]
+        and row["registry_graph_omits_true_common_parent"]
+        for row in root_rows
+    ):
+        raise AssertionError("registry-root scenario must distinguish true ancestry from the forged signed graph")
+    for scenario in ("hidden_shared_parent", "hidden_shared_idp", "hidden_shared_kms",
+                     "hidden_shared_firmware", "hidden_shared_gateway",
+                     "hidden_shared_physical", "hidden_shared_upstream"):
+        scenario_rows = [row for row in rows if row["scenario"] == scenario]
+        if not all(row["signed_graph_contains_true_shared_dependency"] for row in scenario_rows):
+            raise AssertionError(f"{scenario} must declare the shared ancestor in the signed graph")
 
     OUT.mkdir(parents=True, exist_ok=True)
     write_csv(OUT / "dependency_graph_v5_cases.csv", rows)
