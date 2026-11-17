@@ -38,6 +38,12 @@ A registry signature proves that the pinned issuer signed a credential binding a
 
 The verifier enforces the configured witness roster size and distinct witness IDs. It then groups only assertions that match the controller's expected measurement and checks witness ID, key ID, source ID, acquisition domain, and administrative domain independence within each matching group. A dissenting or non-matching witness cannot contribute an independence claim to the supporters. Invalid credentials can be excluded, but the remaining matching supporters must still satisfy the threshold and all independence checks.
 
+## Bounded recovery from verifier false rejection
+
+The v3 controller may recover an isolated machine-verifier false rejection only after a valid 2-of-3 witness quorum confirms the interpreted measurement. Recovery is allowed only when every earlier v1 guard passes: complete documents, present and fresh authorization, cross-document agreement, no external measurement conflict, extraction matching the invoice, valid provenance, no duplicate document kind, and at least two independent machine-verifier dependency groups. The only overridden condition is one or more machine verifiers rejecting despite those other checks passing. This is not a general override for verifier disagreement and cannot bypass missing evidence, stale authorization, provenance failures, document conflicts, extraction mismatch, or a failed witness quorum.
+
+The recovery policy is tested against all eight v3 threat scenarios. Results report the number of recoveries separately. Because the benchmark's C7 family is deliberately labeled as a false-reject case, any improved coverage there is a benchmark-specific result, not evidence that real-world verifier rejections are generally safe to override.
+
 ## Claim boundary
 
 All keys, identities, measurements and source records are synthetic. Deterministic benchmark counts are not real-world probabilities. The implementation does not provide production CA governance, KMS/HSM custody, hardware-backed device identity, secure enrollment, trusted time, durable distributed revocation, or proof of operational independence. Results must not be described as production security validation.
