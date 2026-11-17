@@ -57,7 +57,7 @@ def make_credentials(root_private, shared_admin=False):
             key_id=f"{name}-key", public_key=private.public_key(),
             source_id=f"independent-source-{index}",
             acquisition_domain=f"acquisition-domain-{index}",
-            administrative_domain=("shared-admin" if shared_admin and index == 2
+            administrative_domain=("shared-admin" if shared_admin
                                    else f"administrative-domain-{index}"),
             tenant_id=TENANT, serial=f"credential-{index}", issued_at=NOW - 100,
             expires_at=NOW + 10000, issuer_private_key=root_private,
@@ -95,8 +95,8 @@ def scenario_rows(cases, scenario):
     for index, case in enumerate(cases):
         observable = case["observable"]
         interpreted = observable["machine"]["extraction"]
-        expected_weight = float(case["ground_truth"]["gross_weight"])
-        expected_type = case["ground_truth"]["item_type"]
+        expected_weight = float(interpreted["gross_weight"])
+        expected_type = observable["external"]["inspection_item_type"]
         parent = canonical_sha256({"tenant": TENANT, "case": case["case_id"],
                                    "documents": observable["document_instances"]})
         records = []
@@ -105,8 +105,8 @@ def scenario_rows(cases, scenario):
                 weight = float(interpreted["gross_weight"])
                 item_type = expected_type
             else:
-                weight = expected_weight
-                item_type = expected_type
+                weight = float(case["ground_truth"]["gross_weight"])
+                item_type = case["ground_truth"]["item_type"]
             record = issue_witness_assertion(
                 credential=credential, witness_private_key=private, tenant_id=TENANT,
                 case_id=case["case_id"], parent_digest=parent,
