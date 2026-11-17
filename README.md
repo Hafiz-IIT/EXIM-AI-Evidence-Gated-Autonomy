@@ -50,6 +50,7 @@ The repository includes an inspectable synthetic research environment with:
 - separately versioned, executable reconstruction protocols for 1B, 1C, 1D and 2B–2E on both benchmark versions, plus parameter sensitivity sweeps
 - synthetic Ed25519 unsigned-tamper, trust-root and dual-lineage experiments under explicitly stated new assumptions
 - a document-root attestation protocol that signs raw document instances and normalized document slots, with tenant/case binding, expiry, revocation, rotation and replay tests
+- a four-authority Evidence-Trust v2 threat matrix covering all 15 non-empty compromise combinations plus source-forgery, shared-dependency and key-administration controls
 - preregistered protocols for future real-model and human-reviewer studies
 
 ## Results are separated from future work
@@ -134,6 +135,7 @@ The numerical and security claims in the manuscript are tied to the repository's
 | Stochastic high-risk incorrect-action rate | 1.86% optimistic; 6.10% moderate; 13.09% harsh |
 | Provenance attacks | Demonstrate that provenance mechanisms can fail under compromised trust assumptions |
 | Ed25519 experiments | Blocked direct unsafe ACT for several unsigned-metadata attacks; valid signatures over false claims remain dangerous under trust-root compromise |
+| Four-authority v2 | Witness-only compromise produced 50/700 unsafe ACT; capture+witness and key-admin trust-store poisoning produced 300/700; AA compromise produced 600/700 |
 
 These are **synthetic computational results under the documented experimental assumptions**, not evidence of deployed-system safety.
 
@@ -178,9 +180,13 @@ The v0.4 policy now requests missing required documents and escalates duplicate 
 - [Role-separated attestation primitives](src/evidence_trust_v2.py)
 - [15-combination runner](scripts/run_evidence_trust_v2.py)
 - [Regression tests](tests/test_evidence_trust_v2.py)
+- [Results review and family-level breakdown](experiments/evidence_trust_v2/RESULTS_REVIEW.md)
+- [Pinned output hashes and run manifest](results/evidence_trust_v2/manifest-44025577491.json)
+- [Artifact guide](results/evidence_trust_v2/README.md)
+- [Successful full CI run 44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491)
 - [Draft pull request #5](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/pull/5)
 
-The experiment tests all 15 non-empty combinations of capture, interpretation, witness and authorization authority compromise. It separately models source forgery before capture and a witness that shares the source's upstream dependency. Results and output hashes will be added only after the full CI run completes. This is a deterministic synthetic threat experiment; its witness oracle and role capabilities do not establish real-world independence or production security.
+The experiment tests all 15 non-empty combinations of capture, interpretation, witness and authorization authority compromise. It separately models source forgery before capture, a disclosed shared-source witness, and key-administration trust-store poisoning. Across 700 HIGH-risk v0.4 cases per scenario, witness-only compromise produced 50 unsafe ACT decisions; capture+witness and key-admin poisoning each produced 300; compromise of AA produced 600. These are deterministic synthetic outcomes, not real-world probabilities. The witness oracle and declared source/domain labels do not establish real-world independence or production security.
 
 The v1 attestation binds raw document instances and normalized document slots. Across 700 HIGH-risk v0.4 cases, raw tampering, unsigned coherent rewrite, revoked-key use, cross-tenant reuse and second-use nonce replay were rejected in all tested cases. Under the combined scenario of trusted-root signer compromise plus coordinated upstream rewrites, 300 of 700 cases (42.86%) resulted in unsafe ACT; 300 of 350 ACT decisions (85.71%) were unsafe. This is a conditional synthetic stress test, not a real-world risk estimate or a result about key theft alone. See the results review for assumptions and limitations.
 
