@@ -74,7 +74,7 @@ Every scenario runs over the same 700 HIGH-risk cases.
 | S12 | Dependency-graph signature tampering | Verify graph authenticity |
 | S13 | Registry-root compromise | Test forged credentials and falsified dependency ancestry |
 
-The hidden-dependency scenarios make two compromised witnesses agree on the document-derived value in the C4 consistent-but-wrong family, while their direct identity fields remain distinct. The graph manifest reveals a shared ancestor. The graph-root compromise scenario signs a graph that omits that ancestor to model a compromised trust anchor.
+The hidden-dependency scenarios make two compromised witnesses agree on the document-derived value in the C4 consistent-but-wrong family, while their direct identity fields remain distinct. The graph manifest reveals a shared ancestor. The registry-root compromise scenario isolates trust-anchor failure from full-roster compromise: w1 and w2 share a true parent and collude, w3 remains honest, but the compromised registry signs a graph that omits the shared parent and enrolls the witness credentials. The signed graph therefore appears disjoint. F3 should still reject because the honest third witness disagrees; G2 may be fooled because it cannot recover truth omitted by its compromised graph authority.
 
 ## 6. Outcome measures
 
@@ -98,7 +98,7 @@ Counts are deterministic synthetic outcomes, not real-world probabilities. Compa
 - S3: all policies may accept when all three witnesses are compromised and agree on the same false value, unless the graph independently exposes a shared ancestor.
 - S5–S9: K2 and F2/F3 may accept when direct labels are distinct; G2 should reject if the signed graph correctly records the shared ancestor.
 - S10–S12: G2 should fail closed; key-only and direct-field policies do not use the graph and may still authorize.
-- S13: G2 may be fooled if the compromised trust root signs a graph that omits the true shared dependency.
+- S13: K2/F2 and G2 may be fooled when two colluding witnesses share a true parent omitted by the compromised registry; F3 should reject because the third witness remains honest.
 
 Any deviation must be explained from the case-level output; do not change the hypotheses after inspecting results without recording a protocol amendment.
 
@@ -107,7 +107,7 @@ Any deviation must be explained from the case-level output; do not change the hy
 - All identities, graphs, source values, signatures and attacks are synthetic.
 - A signed dependency graph authenticates the registry's assertion, not the truth or completeness of the dependency relationships.
 - Distinct graph nodes do not prove independent ownership, operation, hardware, software, or data.
-- Registry-root compromise can falsify credentials and graph ancestry.
+- Registry-root compromise can falsify credentials and graph ancestry. In S13, the compromised registry signs a graph that hides a true shared parent while only two of three witnesses collude; this is distinct from S3 full-roster compromise.
 - No production PKI, KMS/HSM custody, hardware attestation, cloud-provider audit, supply-chain SBOM verification, trusted time or atomic action commit is implemented.
 - No new EFD/structural-cut metric is claimed. The experiment uses pairwise transitive-ancestor intersection as a transparent operational check.
 - Results do not establish production security or real-world risk probabilities.
