@@ -42,6 +42,8 @@ SCENARIOS = (
     "hidden_shared_idp",
     "hidden_shared_kms",
     "hidden_shared_firmware",
+    "hidden_shared_gateway",
+    "hidden_shared_physical",
     "hidden_shared_upstream",
     "incomplete_dependency_manifest",
     "graph_structure_attack",
@@ -82,6 +84,8 @@ def compromised_witnesses(scenario):
         "hidden_shared_idp": {"w1", "w2"},
         "hidden_shared_kms": {"w1", "w2"},
         "hidden_shared_firmware": {"w1", "w2"},
+        "hidden_shared_gateway": {"w1", "w2"},
+        "hidden_shared_physical": {"w1", "w2"},
         "hidden_shared_upstream": {"w1", "w2"},
         "incomplete_dependency_manifest": {"w1", "w2"},
         "graph_structure_attack": {"w1", "w2"},
@@ -103,6 +107,8 @@ def make_graph(scenario, root):
         "hidden_shared_idp": ("idp", "idp:shared-tenant"),
         "hidden_shared_kms": ("kms", "kms:shared-vault"),
         "hidden_shared_firmware": ("firmware", "firmware:shared-build"),
+        "hidden_shared_gateway": ("acquisition", "gateway:shared-acquisition"),
+        "hidden_shared_physical": ("physical", "scale:shared-source"),
         "hidden_shared_upstream": ("upstream", "feed:shared-aggregator"),
     }.get(scenario)
     if shared_kind:
@@ -223,7 +229,8 @@ def evaluate_one(case, scenario, policy_name, policy, threshold):
         "family": case["family"], "safe_to_act_ground_truth": safe,
         "ground_truth_common_dependency": scenario in {
             "direct_shared_admin", "hidden_shared_parent", "hidden_shared_idp",
-            "hidden_shared_kms", "hidden_shared_firmware", "hidden_shared_upstream",
+            "hidden_shared_kms", "hidden_shared_firmware", "hidden_shared_gateway",
+            "hidden_shared_physical", "hidden_shared_upstream",
             "registry_root_compromise",
         },
         "registry_graph_omits_true_common_parent": scenario == "registry_root_compromise",
@@ -298,7 +305,8 @@ def main():
     if metric("two_witnesses_compromised", "G2_graph_aware", "unsafe_ACT") <= 0:
         raise AssertionError("graph-aware policy should not hide independent two-witness collusion")
     for scenario in ("hidden_shared_parent", "hidden_shared_idp", "hidden_shared_kms",
-                     "hidden_shared_firmware", "hidden_shared_upstream"):
+                     "hidden_shared_firmware", "hidden_shared_gateway",
+                     "hidden_shared_physical", "hidden_shared_upstream"):
         if metric(scenario, "F2_field_distinct", "unsafe_ACT") <= 0:
             raise AssertionError(f"flat-field policy did not expose {scenario}")
         if metric(scenario, "G2_graph_aware", "unsafe_ACT") != 0:
