@@ -25,7 +25,7 @@ A graph manifest is a signed, tenant-scoped, time-bounded object:
 
 `G = (V, E, graph_id, version, tenant, issued_at, expires_at)`
 
-Each node is an entity or dependency. Directed edges `u -> v` mean that `u` depends on `v`. A witness credential binds its source identity to a leaf node and the digest of the signed graph manifest.
+Each node is an entity or dependency. Directed edges `u -> v` mean that `u` depends on `v`. A witness credential binds its source identity to a leaf node and the digest of the signed graph manifest. The leaf identifier is deterministically bound to the credential's `source_id` (the graph leaf is `source:{source_id}`), preventing a credential from selecting an unrelated dependency branch.
 
 Threat-relevant node classes include:
 
