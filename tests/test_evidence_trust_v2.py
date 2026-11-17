@@ -108,6 +108,15 @@ class EvidenceTrustV2Tests(unittest.TestCase):
         )
         self.assertNotEqual(result["action"], "ACT")
 
+    def test_key_admin_compromise_can_enroll_forged_upstream_authorities(self):
+        upstream = ("capture", "interpretation", "witness")
+        mutated = apply_compromise_capabilities(self.case, upstream)
+        result = authorize(
+            mutated, upstream, "test-key-admin-compromise",
+            key_admin_compromise=True,
+        )
+        self.assertEqual(result["action"], "ACT")
+
     def test_authorization_authority_compromise_can_bypass_policy(self):
         result = authorize(self.case, ("authorization",), "test-aa-compromise")
         self.assertEqual(result["action"], "ACT")
