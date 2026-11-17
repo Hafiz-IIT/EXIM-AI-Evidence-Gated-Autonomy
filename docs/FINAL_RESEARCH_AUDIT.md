@@ -111,11 +111,22 @@ Paired differences are Evidence Gate minus Risk Gate ICAR, in percentage points,
 
 ### Remaining research blockers
 
-1. Add a dedicated document-root signer covering raw document instances and normalized documents; test coherent rewrites, signer compromise, revocation/rotation and replay.
+1. Analyze independent and combined trust-domain compromises in the new document-root attestation protocol; its first synthetic results are now available.
 2. Improve OOD shifts and expand sensitivity beyond one-factor and selected two-factor sweeps.
-3. Inspect false accepts/false blocks by family and severity.
+3. Inspect false accepts/false blocks by family and severity beyond the first document-root family breakdown.
 4. Recover or retire the historical 1A downstream-resolution comparison.
 5. Reconcile manuscript claims against the new results without fitting parameters to historical values.
 6. Complete an independent literature/novelty and methods review.
 
 The v0.4 outputs are new synthetic evidence, not historical reproductions, production security evidence, real customs performance, real-model evaluation or human-subject validation. The manuscript remains **not ready for arXiv submission**.
+
+
+## Document-root attestation threat experiment v1 (CI-verified)
+
+The dedicated document-root signer prototype binds raw document instances and normalized document slots using Ed25519, with tenant/case binding, expiry, key revocation, key rotation and nonce replay checks. Protocol: [experiments/document_root_attestation/PROTOCOL.md](../experiments/document_root_attestation/PROTOCOL.md). Results review: [experiments/document_root_attestation/RESULTS_REVIEW.md](../experiments/document_root_attestation/RESULTS_REVIEW.md).
+
+The full CI run [43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43955044311) passed tests, benchmark generation/verification, v1/v2 reconstruction, document-root threat runner, artifact uploads, historical-table loading and manuscript compilation. The document-root artifact contains 6,300 case-scenario rows across nine scenarios and 700 HIGH-risk v0.4 cases.
+
+Under baseline, raw tampering, unsigned coherent rewrite, revoked-key, rotated-key, cross-tenant and nonce-replay tests, the expected attestation outcomes occurred for all 700 cases in each scenario. Under the combined trusted-root compromise plus coordinated upstream rewrite, 700/700 forged attestations verified; the downstream policy authorized ACT in 350 cases, 300 unsafe against benchmark ground truth (42.86% of all HIGH-risk cases; 85.71% of ACT decisions). The 300 unsafe ACTs occurred in C1, C2, C4, C6, C9 and C13, 50 per family.
+
+**Interpretation boundary:** this is a deliberately strong synthetic combined-compromise scenario, not an estimate of deployment risk and not evidence that private-key theft alone produces the same outcome. It demonstrates that a signature proves a trusted key signed a bound payload, not that the payload is semantically true. The prototype uses deterministic test keys and process-local replay state; it does not implement production KMS/HSM custody, independent signer enrollment, secure capture, distributed replay storage or operational key management. The manuscript must retain these qualifications.
