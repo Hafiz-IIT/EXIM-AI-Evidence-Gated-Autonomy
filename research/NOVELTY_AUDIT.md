@@ -37,7 +37,7 @@ It introduces Epistemic Fault Domains, a Structural Epistemic Cut, a Semantic Co
 7. **Jun He and Deying Yu (2026), [Verifiable Agentic Infrastructure: Proof-Derived Authorization for Sovereign AI Systems](https://arxiv.org/abs/2605.15228), arXiv:2605.15228.** Overlap with proof-derived execution authority and append-only evidence chains.
 8. **Jun He, Openkedge Io and Deying Yu (2026), [When AI Agents Commit: Cognitive Serializability Across Data, Evidence, Policy, and Authority](https://arxiv.org/abs/2609.20261), arXiv:2609.20261.** Overlap with stale evidence/policy/authority at commit time and witness-bound grants.
 9. **Elias Calboreanu (2026), [LATTICE: a governance-first architecture for authorized autonomous AI operations](https://doi.org/10.3389/frai.2026.1800407), Frontiers in Artificial Intelligence 9 (2026).** Overlap with separation of planning, execution and governance, deterministic policy gates, human escalation and cryptographic audit trails.
-10. **M. Llambí-Morillas and D. Fernández-Fernández (2026), [Cryptographically verifiable authorization for autonomous AI agents: a falsifiable hypothesis and proof of concept](https://doi.org/10.3389/fcomp.2026.XXXXX), Frontiers in Computer Science 8 (2026).** Related to cryptographic binding of agent principal, request, context and policy. DOI needs verification before formal citation; use the publisher record rather than the placeholder above.
+10. **M. Llambí-Morillas and D. Fernández-Fernández (2026), [Cryptographically verifiable authorization for autonomous AI agents: a falsifiable hypothesis and proof of concept](https://doi.org/10.3389/fcomp.2026.1966725), Frontiers in Computer Science 8 (2026).** Related to cryptographic binding of agent principal, request, context and policy. DOI needs verification before formal citation; use the publisher record rather than the placeholder above.
 11. **João Sedoc, Baotong Zhang and Dean P. Foster (2026), [Trust but Verify: Prover-Verifier Deliberation for Selective LLM Prediction](https://arxiv.org/abs/2605.25133), arXiv:2605.25133.** Related to verifier challenge/accept/reject protocols and coverage–precision trade-offs.
 12. **Dekun Yang (2026), [Calibrated Selective Fact-Checking via Evidence Chain Evaluation](https://arxiv.org/abs/2607.18240), arXiv:2607.18240.** Related to evidence-chain evaluation, source metadata and abstention when evidence is weak or inconsistent.
 13. **Kilian Hendrickx, Lorenzo Perini, Dries Van der Plas, Wannes Meert and Jesse J. Davis (2024), [Machine learning with a reject option: a survey](https://doi.org/10.1007/s10994-024-06534-3), Machine Learning 113 (2024), 3073–3110.** Established foundations for reject-option/abstention and coverage–risk evaluation.
@@ -55,25 +55,25 @@ The present v3 code is a deterministic, synthetic EXIM/document-evidence adaptat
 
 These are useful engineering and experimental artifacts. They do **not** prove real-world source identity, operational independence, source truth, calibrated risk, or production security. The current benchmark's oracle-like witness is generated from synthetic ground truth, and the benchmark has only 700 HIGH-risk cases.
 
+14. **Meitong Chen et al. (2026), [TradeSense-EQA: Artificial Intelligence-Driven Sensing of Cross-Border Trade Risks Through Declaration-to-Physical-Fact Alignment and Evidence-Grounded Question Answering](https://doi.org/10.3390/s26165272), *Sensors* 26(16), 5272.** Direct overlap with the EXIM application: trade documents, GPS/AIS, RFID, electronic seals, port weighing, environmental sensors, evidence chains, cross-modal anomaly detection, and abstention. The paper explicitly notes that reliability weighting cannot fully exclude deliberate sensor manipulation or simultaneous sensor failures. Its data availability statement says data are available on request; no public code/data repository is linked from the article page.
+15. **Omair Faraj, David Megías and Joaquín García-Alfaro (2025), [Security Approaches for Data Provenance in the Internet of Things: A Systematic Literature Review](https://doi.org/10.1145/3718735), *ACM Computing Surveys* 57(10), Article 261.** Broad prior work on provenance security, IoT attacks, trustworthiness, integrity, confidentiality and availability.
+16. **Bofeng Pan, Natalia Stakhanova and Suprio Ray (2023), [Data Provenance in Security and Privacy](https://doi.org/10.1145/3593294), *ACM Computing Surveys* 55(14s), Article 323.** Foundational survey of secure provenance and threat provenance; rules out claiming generic cryptographic provenance as novel.
+17. **Amir Dirin, Ian Oliver and Teemu H. Laine (2023), [A Security Framework for Increasing Data and Device Integrity in Internet of Things Systems](https://doi.org/10.3390/s23177532), *Sensors* 23, 7532.** IoTAttest uses TPM 2.0 and remote attestation for device, data and control-plane integrity.
+18. **Eduardo Brito et al. (2026), [Decentralized Proof-of-Location for Content Provenance: Towards Capture-Time Authenticity](https://arxiv.org/abs/2603.27883), arXiv:2603.27883.** Related to multi-observer physical-event validation and capture-time authenticity; device signatures alone are not enough.
+19. **Ron Triepels, Hennie Daniels and Ad Feelders (2018), [Data-driven fraud detection in international shipping](https://doi.org/10.1016/j.eswa.2018.01.007), *Expert Systems with Applications* 99, 193–202.** Prior work on document manipulation, miscoding and smuggling using shipment data.
+20. **Hao Chen et al. (2021), [The use of machine learning to identify the correctness of HS Code for the customs import declarations](https://doi.org/10.1109/DSAA53316.2021.9564203), IEEE DSAA.** Prior work on HS-code correctness using customs ground-truth data.
+
 ## Candidate research reframing
 
-The strongest candidate direction is narrower and domain-specific:
+The broad directions of generic quorum reliability, trade anomaly detection, evidence chains, cryptographic provenance and execution-time authorization are already occupied by substantial prior work. The current evidence does not justify a novelty claim for any of those ideas in isolation.
 
-**Claim-level provenance and bounded recovery for document-driven, high-consequence workflows.**
+The narrower candidate is an **adversarial security evaluation of provenance-to-action binding in document-driven trade workflows**:
 
-Candidate question:
+> Can a controller distinguish content integrity, signer authenticity, evidence freshness, subject applicability, claim/source competence, transformation lineage, calibration assurance, dependency separation, and exact-action binding—and which combinations are necessary to prevent a signed but stale, misbound, semantically inapplicable, or compromised evidence item from authorizing a high-consequence trade action?
 
-> Under what explicit evidence and threat assumptions can a document-driven autonomous workflow recover from an isolated verifier false rejection while preserving fail-closed behavior for semantic conflict, source forgery, stale evidence, compromised authorities, and correlated corroboration?
+This is not yet a novelty claim. It must be compared against EFD/DAQC, VP-CONTROL, TradeSense-EQA, commit-time authorization, execution-boundary contracts, runtime proof of execution, IoT provenance/remote attestation, and capture-time authenticity research.
 
-This is not yet a novelty claim. It needs a systematic comparison against:
-- selective prediction and reject-option systems;
-- prover-verifier deliberation;
-- common-mode verifier portfolios (including VP-CONTROL);
-- evidence-chain fact checking;
-- commit-time authorization and execution-boundary contracts;
-- EFD/DAQC and agentic transaction processing.
-
-A possible differentiator is a claim-level EXIM evidence graph: each material claim (quantity, gross weight, HS/RITC classification, origin, party identity, shipment/container identity, authorization validity) is bound to its source artifact, acquisition event, transformation lineage, independent corroborator, conflict state, and action obligation. The controller should reason over claim-specific dependencies rather than a single document-level or witness-level pass/fail result. This must be tested against the above work before being described as novel.
+A possible contribution is a reproducible EXIM-focused adversarial benchmark that attacks the *assurance properties* of evidence objects and their binding to specific claims and actions, rather than proposing another generic quorum or anomaly detector. For example, a signed weighbridge record may support gross weight but must not be accepted as evidence for HS classification; a fresh measurement for another container must not satisfy the current shipment; a valid signature over a stale measurement must not authorize a current filing; and a valid capture receipt must not imply that a source document was truthful before capture. This would be an empirical security evaluation with explicit assumptions, not a new cryptographic primitive or general theory.
 
 ## Required next research work
 
