@@ -111,3 +111,36 @@ Do not claim:
 - production readiness or deployment safety.
 
 Any eventual novelty statement must be supported by a dated search, full-text comparison, exact baseline implementations, and a falsifiable experiment.
+
+
+## Additional literature recovered on 18 November 2026
+
+This targeted follow-up adds several direct overlaps that materially narrow the novelty claim. The sources were checked against arXiv records, full-text pages or publisher/standards records; this is not a systematic review.
+
+| Work | Direct overlap with EGA | Implication |
+|---|---|---|
+| He and Yu, [The Honest Quorum Problem: Epistemic Byzantine Fault Tolerance for Agentic Infrastructure](https://arxiv.org/abs/2607.16109) (2026) | Authenticated, protocol-compliant validators can still endorse semantically invalid transitions due to correlated evidence/model/tool dependencies; derives safety and liveness threshold conditions | Do not claim epistemic quorum failure or a general quorum threshold theory |
+| Mazzocchetti, [Aegis: Runtime Governance for Agentic AI](https://arxiv.org/abs/2608.16891) (2026) | Trusted provenance-aware runtime action boundary, fail-closed behavior and Senate-style quorum; 6,300-row sandbox evaluation | Runtime action gating and provenance-aware execution are not novel in isolation |
+| Zhou, [CATP: Design and Evaluation of Local Agent Authorization and Audit Evidence](https://arxiv.org/abs/2609.38223) (2026) | Signed authorization records bind enforcement-time policy and normalized action; durable pre-execution evidence, offline receipt verification, replay and substitution tests | EGA's action/evidence binding is an applied profile, not a new authorization primitive |
+| Zhu and Wang, [Explanation-Bound Tool Execution for AI Agents](https://arxiv.org/abs/2607.25364) (2026) | Server-verifies typed action claims against intent, policy, payload, tool, risk, provenance and freshness; 136 conformance scenarios | Direct overlap with claim-scoped evidence and fail-closed action eligibility |
+| Liu Yanglet, Wang and Capponi, [No Certificate, No Execution](https://arxiv.org/abs/2605.24462) (2026) | Proposal--Certification--Execution formalism; execution conditional on certificates for whole traces | Do not claim the general principle of certified execution |
+| Kainan and Hershman, [Agentic Process Evidence](https://arxiv.org/abs/2610.40071) (2026) | Signed, tamper-evident process attestations linked to outcomes and in-toto-style provenance | Agent-process attestation is prior art |
+| Wang et al., [From Agent Traces to Trust](https://arxiv.org/abs/2606.04990) (2026) | Survey of typed execution provenance graphs, evidence tracing, trace assurance and end-to-end provenance benchmarks | EGA's graph representation is a narrow domain-specific schema, not a new general provenance graph |
+| Zhai et al., [Heading Off Correlated Failures through Independence-as-a-Service](https://doi.org/10.5555/2685048.2685073), EuroSys 2014 | Proactive collection of multi-layer dependencies and graph-based auditing of hidden common dependencies across network, hardware and software | The v5 graph experiment is an EXIM-inspired application of established dependency auditing, not a new graph-independence algorithm |
+| Choi, [Identifying Trade Mis-Invoicing Through Customs Data Analysis](https://doi.org/10.55596/001c.116214), *World Customs Journal* 13(2), 59--76 (2019) | Uses actual customs data, abnormal unit-price filters and mirror-trade discrepancies, validated against customs interventions | Customs-data fraud screening is established; EGA's distinct question is evidence-to-action authorization under synthetic attacks |
+
+### Revised research contribution
+
+The strongest defensible contribution is a **reproducible, EXIM-inspired synthetic threat-matrix and comparative systems evaluation** of how cross-document evidence, independent-source claims, capture integrity, claim-scoped provenance, action binding and transitive dependency metadata interact before a consequential action.
+
+The work does not establish a new theory or primitive for quorum safety, runtime action-boundary governance, signed authorization records, certified traces, cryptographic provenance, graph-based independence auditing, customs fraud detection or multimodal trade sensing.
+
+The v4/v5 experiments improve the controlled threat model, but all outcomes remain synthetic. The project has not established operational error rates, true source independence, or production safety. A credible stronger empirical contribution would require independently adjudicated and consented EXIM cases, or a clearly scoped benchmark contribution with an external replication.
+
+### Trust-root threat-model correction
+
+All registry-root scenarios must be described precisely. The current v3/v4/v5 code models compromise of the existing registry signing private key while retaining the original public key as the verifier's trust anchor. This is distinct from replacing the trust anchor itself. The v4 scenario additionally assumes the compromised issuer can enroll attacker-controlled keys across all evidence roles; the v5 scenario uses two colluding witnesses and an honest third witness while the compromised issuer signs a graph that omits their true shared dependency.
+
+### Submission boundary
+
+The current work should be presented as a synthetic systems/benchmark study, not as a validated safety mechanism. The arXiv gate remains **NOT READY** until v3/v4/v5 runs and hashes are pinned, the manuscript separates historical reported outputs from new reproductions, the latest literature is integrated, a clean-checkout reproduction is recorded, and an independent technical review is completed.
