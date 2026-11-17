@@ -6,6 +6,7 @@ from src.evidence_provenance_v4 import (
     evaluate_claim, issue_action_binding, verify_action_binding,
 )
 from src.provenance import canonical_sha256
+from scripts.run_evidence_provenance_v4 import make_source_forgery
 
 
 class EvidenceProvenanceV4Tests(unittest.TestCase):
@@ -308,6 +309,43 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
         ok, reason, _ = self.verify((pair[0], credential), "gross_weight")
         self.assertFalse(ok)
         self.assertEqual(reason, "invalid_source_credential")
+
+
+    def test_pre_capture_source_forgery_changes_documents_but_not_physical_ground_truth(self):
+        case = {
+            "case_id": "forgery-test",
+            "safe_to_act": True,
+            "ground_truth": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+            "observable": {
+                "documents": {
+                    "invoice": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                    "packing_list": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                    "declaration": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                },
+                "document_instances": [
+                    {"kind": kind, "fields": {
+                        "quantity": 10, "gross_weight": 20.0, "hs": "1234",
+                    }}
+                    for kind in ("invoice", "packing_list", "declaration")
+                ],
+                "provenance": {"integrity_status": "valid", "document_set_sha256": ""},
+                "machine": {
+                    "extraction": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                    "classification": {"hs": "1234"},
+                },
+            },
+        }
+        forged = make_source_forgery(case)
+        self.assertFalse(forged["safe_to_act"])
+        self.assertTrue(case["safe_to_act"])
+        self.assertEqual(forged["ground_truth"], case["ground_truth"])
+        self.assertEqual(forged["observable"]["machine"]["extraction"]["quantity"], 17)
+        self.assertEqual(forged["observable"]["machine"]["extraction"]["gross_weight"], 31.25)
+        self.assertEqual(forged["observable"]["machine"]["classification"]["hs"], "9999")
+        self.assertEqual(
+            forged["observable"]["provenance"]["document_set_sha256"],
+            canonical_sha256(forged["observable"]["document_instances"]),
+        )
 
 
 if __name__ == "__main__":
