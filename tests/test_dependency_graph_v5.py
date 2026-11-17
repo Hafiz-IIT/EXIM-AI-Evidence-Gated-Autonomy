@@ -92,6 +92,20 @@ class DependencyGraphV5Tests(unittest.TestCase):
             expected_document_digest=self.doc_digest, now=self.now,
         )
 
+    def test_source_credential_leaf_must_match_source_id(self):
+        with self.assertRaises(ValueError):
+            issue_graph_bound_source_credential(
+                graph_digest=self.graph["body"]["graph_digest"],
+                dependency_leaf_node="source:other-witness",
+                issuer_id="synthetic-registry", source_id="source-w1",
+                source_type="weighbridge", key_id="key-w1",
+                public_key=self.keys["w1"].public_key(), allowed_claims=["gross_weight"],
+                acquisition_domain="acq-w1", administrative_domain="admin-w1",
+                gateway_id="gateway-w1", key_admin_domain="kms-admin-w1",
+                tenant_id=self.tenant, serial="serial-bad",
+                issued_at=100, expires_at=400, issuer_private_key=self.root,
+            )
+
     def test_graph_signature_and_transitive_ancestor_resolution(self):
         ok, reason, body = verify_dependency_graph(
             self.graph, trusted_registry_key=self.root.public_key(),
