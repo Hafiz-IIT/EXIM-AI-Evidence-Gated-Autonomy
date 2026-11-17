@@ -10,4 +10,4 @@
 
 The adapter supports OpenAI-compatible Chat Completions. It does not create API keys, select paid providers, or make calls in CI. No real-model results are claimed until actual provider responses and run artifacts exist.
 
-The CLI entry points explicitly add the repository root to Python's import path so they run both in GitHub Actions and when invoked from a shell.
+The CLI entry points explicitly add the repository root to Python's import path so they run both in GitHub Actions and when invoked from a shell. Each preparation run uses a fresh private salt for opaque task IDs; keep `results/exp3_real_models/private/` private. Final-holdout freeze hashes bind the exact task manifest and public task set. Provider or schema failures force ESCALATE and are logged separately from retry errors.
