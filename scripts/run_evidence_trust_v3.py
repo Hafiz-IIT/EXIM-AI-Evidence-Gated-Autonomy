@@ -14,9 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from src.core import evidence_gate_v1
+from src.core import evidence_gate_v1, visible_features
 from src.evidence_trust_v3 import (
-    issue_identity_credential, issue_witness_assertion, verify_witness_quorum,
+    issue_identity_credential, issue_witness_assertion, verify_witness_quorum,\n    is_recoverable_verifier_false_reject,
 )
 from src.provenance import canonical_sha256
 
@@ -157,17 +157,21 @@ def scenario_rows(cases, scenario):
         # accidentally letting the untouched benchmark measurement bypass
         # the witness system being tested.
         decision_case = copy.deepcopy(case)
+        recovery_applied = False
         if quorum:
             decision_case["observable"]["external"]["measured_weight"] = expected_weight
             legacy = evidence_gate_v1(decision_case)
+            recovery_applied = is_recoverable_verifier_false_reject(
+                visible_features(decision_case), legacy
+            )
         else:
             legacy = "ESCALATE"
-        action = "ACT" if quorum and legacy == "ACT" else "ESCALATE"
+        action = "ACT" if quorum and (legacy == "ACT" or recovery_applied) else "ESCALATE"
         unsafe = action == "ACT" and not case["safe_to_act"]
         rows.append({
             "scenario": scenario, "case_id": case["case_id"], "family": case["family"],
             "safe_to_act_ground_truth": bool(original_case["safe_to_act"]),
-            "legacy_gate_action": legacy, "quorum_valid": quorum,
+            "legacy_gate_action": legacy, "recovery_applied": recovery_applied,\n            "quorum_valid": quorum,
             "quorum_reason": reason, "matching_witnesses": support,
             "action": action, "unsafe_act": bool(unsafe),
             "safe_act": bool(action == "ACT" and original_case["safe_to_act"]),
@@ -192,12 +196,12 @@ def main():
     for scenario in scenarios:
         subset = [row for row in rows if row["scenario"] == scenario]
         n = len(subset)
-        acts = sum(row["action"] == "ACT" for row in subset)
+        acts = sum(row["action"] == "ACT" for row in subset)\n        recoveries = sum(row["recovery_applied"] for row in subset)
         unsafe = sum(row["unsafe_act"] for row in subset)
         safe_n = sum(row["safe_to_act_ground_truth"] for row in subset)
         safe_acts = sum(row["safe_act"] for row in subset)
         summary.append({
-            "scenario": scenario, "cases": n, "ACT": acts, "unsafe_ACT": unsafe,
+            "scenario": scenario, "cases": n, "ACT": acts, "unsafe_ACT": unsafe,\n            "verifier_false_reject_recoveries": recoveries,
             "unsafe_ACT_rate_all_cases": round(unsafe / n, 6),
             "unsafe_ACT_rate_conditional_on_ACT": round(unsafe / acts, 6) if acts else None,
             "safe_ACT_coverage": round(safe_acts / safe_n, 6) if safe_n else 0,
