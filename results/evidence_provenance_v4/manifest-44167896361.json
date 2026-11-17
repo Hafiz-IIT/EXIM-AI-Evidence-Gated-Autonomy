@@ -1,0 +1,41 @@
+{
+  "protocol": "ega-evidence-provenance-v4",
+  "status": "synthetic adversarial evidence-to-action experiment; not production validation",
+  "benchmark_version": "0.4",
+  "high_risk_cases_per_scenario": 700,
+  "scenario_count": 16,
+  "case_scenario_rows": 11200,
+  "scenarios": [
+    "honest_baseline",
+    "source_forgery_before_capture",
+    "replay_attack",
+    "stale_evidence",
+    "cross_subject_substitution",
+    "cross_claim_substitution",
+    "parser_lineage_tampering",
+    "invalid_calibration",
+    "shared_admin_gateway",
+    "credential_tampering",
+    "action_substitution",
+    "single_weighbridge_compromise",
+    "single_tariff_registry_compromise",
+    "tariff_compromise_with_independent_false_accept",
+    "all_sources_compromised",
+    "registry_root_compromise"
+  ],
+  "source_commit": "c785028f6aa3b761af727f99df616430bee0142b",
+  "workflow_run_id": "44167896361",
+  "python_version": "3.11.18",
+  "outputs_sha256": {
+    "evidence_provenance_v4_cases.csv": "94e9ddba2319cf1c066cea54490c1fa3e9991357d92d065b5b1ce612029443d8",
+    "evidence_provenance_v4_summary.csv": "2b6c2bf9fd94aa0d320184f0578eddcf4c9fa5922817b3f94250a4bcb4aa633a"
+  },
+  "limitations": [
+    "All identities, source credentials, evidence values and attacks are synthetic.",
+    "Signatures authenticate enrolled keys and signed bytes, not semantic truth.",
+    "Calibration and administrative-domain status are asserted test fields, not hardware-backed evidence.",
+    "A compromised source can sign false but correctly scoped evidence.",
+    "The registry signing private key is assumed compromised in the registry_root_compromise scenario; the original public key remains pinned, and attacker-controlled source keys are enrolled across all evidence roles.",
+    "Deterministic counts are not real-world probabilities."
+  ]
+}
