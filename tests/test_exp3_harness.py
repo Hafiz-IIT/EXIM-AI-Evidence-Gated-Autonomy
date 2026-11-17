@@ -207,6 +207,38 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             private_meta = json.loads((prepared / "private" / "private_metadata.json").read_text())
             self.assertEqual(frozen["private_evaluation_map_sha256"], private_meta["private_evaluation_map_sha256"])
 
+    def test_cost_estimator_cli_writes_report_without_api_keys(self):
+        cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            benchmark = root / "cases.jsonl"
+            benchmark.write_text("".join(json.dumps(x) + "\n" for x in cases))
+            prepared = root / "prepared"
+            prepare_tasks(benchmark, prepared)
+            models = {
+                name: {
+                    "model": "mock-" + name, "provider": "mock",
+                    "base_url": "https://api.test/v1", "family_id": family,
+                    "api_key_env": "EXP3_NOT_REQUIRED_FOR_ESTIMATE",
+                    "input_usd_per_1k_tokens": 0.5, "output_usd_per_1k_tokens": 1.0,
+                }
+                for name, family in [("extractor", "family_a"), ("verifier_a", "family_b"), ("verifier_b", "family_c")]
+            }
+            condition = {"condition_id": "same_model", "extractor_model": "extractor", "verifier_models": ["verifier_a", "verifier_b"]}
+            config_path = root / "config.json"
+            config_path.write_text(json.dumps({"models": models, "conditions": [condition], "settings": {"max_tokens": 100}}))
+            output = root / "estimate.json"
+            subprocess.run([
+                sys.executable, "scripts/estimate_exp3_cost.py",
+                "--config", str(config_path), "--prepared-dir", str(prepared),
+                "--splits", "development", "--conditions", "same_model",
+                "--output", str(output),
+            ], cwd=Path(__file__).resolve().parents[1], check=True, capture_output=True, text=True)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["status"], "estimated_no_model_calls")
+            self.assertEqual(report["runs"][0]["api_call_count"], 18)
+            self.assertGreater(report["total_upper_bound_cost_usd"], 0)
+
     def test_cost_budget_blocks_before_api_key_preflight(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
         with tempfile.TemporaryDirectory() as temp:
