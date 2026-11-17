@@ -216,6 +216,22 @@ class DependencyGraphV5Tests(unittest.TestCase):
         )
         self.assertEqual((ok, reason), (True, "quorum_valid"))
 
+    def test_one_incomplete_member_can_be_excluded_when_two_complete_remain(self):
+        creds = self.make_credentials(self.root, self.graph, self.names, incomplete=("w1",))
+        records = [(self.record(n, 42.0, creds[n]), creds[n]) for n in self.names]
+        self.assertTrue(self.evaluate(records, "graph_aware", threshold=2)[0])
+        ok, reason, _ = self.evaluate(records, "graph_aware", threshold=3)
+        self.assertFalse(ok)
+        self.assertEqual(reason, "dependency_manifest_incomplete")
+
+    def test_key_unique_is_weaker_than_direct_field_diversity(self):
+        creds = self.make_credentials(self.root, self.graph, self.names, shared_direct=("w1", "w2"))
+        records = [(self.record(n, 42.0, creds[n]), creds[n]) for n in ("w1", "w2")]
+        self.assertTrue(self.evaluate(records, "key_unique")[0])
+        ok, reason, _ = self.evaluate(records, "field_distinct")
+        self.assertFalse(ok)
+        self.assertEqual(reason, "insufficient_identity_independence")
+
     def test_graph_root_compromise_can_hide_a_shared_parent(self):
         attacker_root = Ed25519PrivateKey.generate()
         # The real deployment would share a parent; the compromised registry
