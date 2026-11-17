@@ -63,6 +63,8 @@ def resolve_ancestors(nodes: dict[str, list[str]], leaf: str) -> frozenset[str]:
     memo: dict[str, set[str]] = {}
 
     def walk(node: str) -> set[str]:
+        if not isinstance(node, str) or not node:
+            raise ValueError("dependency_node_missing_or_malformed")
         if node in visiting:
             raise ValueError("dependency_cycle")
         if node in memo:
