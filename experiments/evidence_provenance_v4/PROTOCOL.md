@@ -98,6 +98,7 @@ The benchmark will distinguish attacks that the earlier v2/v3 experiments partia
 | A14 | Isolated model-verifier false rejection with independently sufficient evidence | Bounded recovery |
 | A15 | False-accepting verifier plus internally consistent but wrong documents | Semantic false acceptance |
 | A16 | Full compromise of every enrolled evidence source | Explicit residual trust boundary |
+| A17 | Compromised tariff registry plus two independent false-accepting verifiers | Residual semantic false-accept path even when verifier dependency labels are distinct |
 
 The adversary capabilities will be stated per attack. Compromise of a source key does not silently imply compromise of other authorities; registry compromise does not silently imply hardware compromise; a forged source document before capture is not the same as a forged capture signature.
 
@@ -112,7 +113,11 @@ The adversary capabilities will be stated per attack. Compromise of a source key
 
 The EFD structural-cut metric and VP-CONTROL portfolio ideas are related baselines to discuss and, where feasible, reproduce or adapt with attribution. v4 will not claim to supersede them.
 
-## 8. Outcomes
+## 8A. Scenario interpretation
+
+The runner includes separate cases for isolated tariff-registry compromise and a compound tariff-registry compromise plus two independently labeled false-accepting verifiers. The isolated attack is expected to be contained by the existing verifier-dependency guard in the C8 correlated-verifier family. The compound scenario changes the verifier dependency labels to distinct values while preserving their false-accept decisions; this is deliberately a stronger counterexample showing that declared diversity is not equivalent to correctness. The two scenarios must not be conflated in reporting.
+
+## 9. Outcomes
 
 Primary outcomes, reported per attack family and overall:
 
@@ -130,7 +135,7 @@ Primary outcomes, reported per attack family and overall:
 
 If a probabilistic simulation is added, its probabilities must be explicitly labeled as programmed assumptions, not fitted real-world rates. Deterministic scenario counts must never be described as probabilities.
 
-## 9. Falsifiable hypotheses
+## 10. Falsifiable hypotheses
 
 - **H1:** Signature verification alone rejects post-signature tampering but does not reject a forged source document honestly signed at capture.
 - **H2:** Freshness and subject binding reject replay and cross-shipment substitution that remain possible under signature-only evidence.
@@ -142,7 +147,7 @@ If a probabilistic simulation is added, its probabilities must be explicitly lab
 
 Each hypothesis must be supported by an executable test and a counterexample test.
 
-## 10. Claim boundaries
+## 11. Claim boundaries
 
 - All v4 records are synthetic unless a separately approved, privacy-reviewed dataset is later introduced.
 - Ed25519 signatures authenticate enrolled keys and signed bytes; they do not prove physical truth, lawful authority, calibration correctness, or operational independence.
@@ -151,7 +156,7 @@ Each hypothesis must be supported by an executable test and a counterexample tes
 - No production-readiness, real-world probability, or deployment-safety claim is permitted.
 - This protocol is a research design, not a customs compliance recommendation.
 
-## 11. Related work to compare before claiming novelty
+## 12. Related work to compare before claiming novelty
 
 - He and Yu, [The Illusion of Independent Quorums](https://arxiv.org/abs/2609.02925), 2026.
 - Zheng et al., [Engineering Reliable Commit Gates for Agentic AI (VP-CONTROL)](https://arxiv.org/abs/2609.10969), 2026.
@@ -167,7 +172,7 @@ Each hypothesis must be supported by an executable test and a counterexample tes
 - Triepels, Daniels and Feelders, [Data-driven fraud detection in international shipping](https://doi.org/10.1016/j.eswa.2018.01.007), *Expert Systems with Applications* 99 (2018).
 - Chen et al., [The use of machine learning to identify the correctness of HS Code for the customs import declarations](https://doi.org/10.1109/DSAA53316.2021.9564203), DSAA (2021).
 
-## 12. Exit criteria for v4
+## 13. Exit criteria for v4
 
 Do not open a v4 PR or claim a research result until:
 1. the attack matrix and evidence schema are implemented;
