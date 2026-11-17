@@ -109,8 +109,8 @@ def issue_claim_evidence(*, credential: dict, source_private_key: Ed25519Private
 def verify_claim_evidence(record: dict, credential: dict, *,
                           trusted_issuer_key: Ed25519PublicKey, tenant_id: str,
                           expected_claim: str, expected_subject_id: str,
-                          expected_action_id: str, expected_action_payload_digest: str, expected_document_digest: str,
-                          now: int, consumed_nonces: MutableSet[str] | None = None,
+                          expected_action_id: str, expected_action_payload_digest: str,
+                          expected_document_digest: str, expected_unit: str, now: int, consumed_nonces: MutableSet[str] | None = None,
                           last_sequences: dict[str, int] | None = None,
                           revoked_serials: frozenset[str] = frozenset()
                           ) -> tuple[bool, str, dict | None]:
@@ -150,7 +150,7 @@ def verify_claim_evidence(record: dict, credential: dict, *,
                 or env["issued_at"] >= identity["expires_at"]
                 or env["expires_at"] > identity["expires_at"]):
             return False, "evidence_outside_credential_window", None
-        if env["nonce"] in (consumed_nonces or set()):
+        if consumed_nonces is not None and env["nonce"] in consumed_nonces:
             return False, "replay", None
         previous = (last_sequences or {}).get(identity["source_id"], 0)
         if env["sequence_number"] <= previous:
@@ -194,9 +194,10 @@ def _values_agree(values: list, tolerance: float) -> bool:
 def evaluate_claim(records: Iterable[tuple[dict, dict]], *,
                    trusted_issuer_key: Ed25519PublicKey, tenant_id: str,
                    claim_type: str, expected_subject_id: str, expected_action_id: str,
-                   expected_action_payload_digest: str, expected_document_digest: str, now: int,
-                   required_source_types: frozenset[str],
-                   tolerance: float = 0.0) -> tuple[bool, str, list[dict]]:
+                   expected_action_payload_digest: str, expected_document_digest: str,
+                   expected_unit: str, now: int, required_source_types: frozenset[str],
+                   tolerance: float = 0.0, consumed_nonces: MutableSet[str] | None = None,
+                   last_sequences: dict[str, int] | None = None) -> tuple[bool, str, list[dict]]:
     """Require competent, valid, matching, independently administered evidence."""
     verified = []
     nonces = consumed_nonces if consumed_nonces is not None else set()
