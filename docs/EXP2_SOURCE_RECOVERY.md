@@ -31,3 +31,6 @@ The restored 2D 30-seed per-seed CSV recomputes its summary exactly. The 2C stoc
 ## Claim boundaries
 
 All cases, keys, identities, signatures and attacks are synthetic. The deterministic keys are test fixtures, not production cryptography. These counts are not real-world probabilities or deployment-security evidence. The reconstructed controllers must not be cited as original historical source.
+
+
+The manuscript-build workflow now executes `scripts/reconstruct_exp2.py` and uploads the generated case sets, decision cache, reconstructed 2B/2D/2E tables and reconstruction manifest as a CI artifact. This makes the byte-for-byte recovery checks part of the repeatable CI path.
