@@ -68,3 +68,44 @@ The next witness-independence study should compare:
 It should include distinct identifiers with a shared ancestor, incomplete dependency manifests, and compromised trust-root metadata. EFD and ARP already cover the general theory; this should be an EXIM-specific empirical comparison, not a new structural-cut metric.
 
 **Submission decision remains NOT READY.** The original historical 1B–2E result runners and complete parameter configurations are still absent; the new reconstruction runners are new simulations, not historical reproductions. v3/v4 supplementary runners are separate experiments. A final full-text novelty audit, clean-checkout rerun, and manuscript/security review remain required.
+
+
+### Additional direct overlaps verified on 18 November 2026
+
+The following sources were checked against their arXiv records, full-text pages or publisher/standards records. This is a targeted source review, not a systematic review.
+
+- He and Yu, [The Honest Quorum Problem: Epistemic Byzantine Fault Tolerance for Agentic Infrastructure](https://arxiv.org/abs/2607.16109) (2026), explicitly models authenticated, responsive, protocol-compliant validators that can nevertheless endorse semantically invalid transitions because of correlated evidence, model, prompt, retrieval, toolchain or infrastructure dependencies. It derives semantic-safety and liveness threshold conditions. This is a direct theoretical overlap with the EGA quorum motivation; EGA must not claim to introduce epistemic quorum failure or a general quorum threshold theory.
+- Mazzocchetti, [Runtime Governance for Agentic AI: Action-Boundary Control with Trusted Provenance and Fail-Closed Execution](https://arxiv.org/abs/2608.16891) (Aegis, 2026), places a trusted runtime decision layer before tool side effects, resolves provenance server-side, fails closed and uses a Senate-style quorum path. Its sandbox evaluation reports 6,300 rows. This is a close systems-level overlap with EGA's action boundary and provenance gate.
+- Zhou, [CATP: Design and Evaluation of Local Agent Authorization and Audit Evidence](https://arxiv.org/abs/2609.38223) (2026), binds local pre-execution authorization evidence to the enforcement-time policy and adapter-normalized action, persists evidence before permission is returned, and verifies receipts offline. It tests tampering, substitution, replay, concurrency and persistence. EGA's action-payload binding and audit evidence are not novel in isolation.
+- Zhu and Wang, [Explanation-Bound Tool Execution for AI Agents: Server-Verified Action Claims Without Trusting Model Rationales](https://arxiv.org/abs/2607.25364) (EBTE, 2026), converts decision-relevant rationales into typed action claims and checks them against server-held intent, policy, payload, tool, risk, provenance and freshness. Its conformance suite includes 136 scenarios and hard contradictions. This directly overlaps with EGA's claim-scoped evidence checks and fail-closed action eligibility.
+- Liu Yanglet, Wang and Capponi, [No Certificate, No Execution: Certified Traces as a Foundation for Trustworthy AI Agents](https://arxiv.org/abs/2605.24462) (2026), formalizes Proposal--Certification--Execution and requires a checkable certificate for an entire proposed execution trace. This overlaps with the broad principle of evidence-conditioned execution.
+- Kainan and Hershman, [Agentic Process Evidence: Process-Aware Logging for Agentic Governance](https://arxiv.org/abs/2610.40071) (2026), proposes signed, tamper-evident, machine-readable process attestations linked to outcomes and aligned with in-toto-style supply-chain attestations. Generic agent-process provenance is therefore not an EGA novelty claim.
+- Wang et al., [From Agent Traces to Trust: A Survey of Evidence Tracing and Execution Provenance in LLM Agents](https://arxiv.org/abs/2606.04990) (2026), defines typed execution provenance graphs and evidence-tracing relations, including trace assurance and provenance origin. It identifies gaps in integrated trust functions and end-to-end provenance benchmarks. EGA's graph representation is deliberately narrower and domain-specific, not a new general trace schema.
+- Zhai et al., [Heading Off Correlated Failures through Independence-as-a-Service](https://doi.org/10.5555/2685048.2685073), EuroSys 2014, proactively collects multi-layer network, hardware and software dependencies and audits hidden common dependencies. This is direct prior art for the v5 dependency-graph experiment. The v5 result is an application-specific comparison in an EXIM-inspired threat matrix, not a new graph-independence algorithm.
+- Choi, [Identifying Trade Mis-Invoicing Through Customs Data Analysis](https://doi.org/10.55596/001c.116214), *World Customs Journal* 13(2), 59--76 (2019), uses actual customs data, abnormal unit-price filtering and mirror-trade discrepancies, with validation against customs interventions. This establishes prior art for customs-data fraud screening, though it does not provide the same cryptographic source-to-action authorization model.
+
+### Revised contribution statement
+
+The strongest defensible contribution is a **reproducible, EXIM-inspired synthetic threat-matrix and comparative systems evaluation** of how cross-document evidence, independent-source claims, capture integrity, claim-scoped provenance, action binding, and transitive dependency metadata interact before a consequential action. The work compares specified baselines and attack cases and documents where each mechanism fails.
+
+The work does **not** establish a new theory or primitive for:
+- quorum safety or epistemic fault tolerance;
+- runtime action-boundary governance;
+- signed authorization records or certified execution traces;
+- cryptographic provenance or supply-chain attestations;
+- graph-based independence auditing;
+- customs fraud detection or multimodal trade sensing.
+
+The benchmark is synthetic. It does not establish real-world false-positive/false-negative rates, operational source independence, or deployment safety. The v4 and v5 additions improve the controlled threat model, but they do not remove the need for independently adjudicated EXIM data and external replication.
+
+### Revised arXiv gate
+
+Before submission, the manuscript must:
+1. cite and explicitly compare the direct overlaps above;
+2. report v3, v4 and v5 as separate supplementary experiments with exact run IDs and artifact hashes;
+3. distinguish a compromised registry signing private key (with the original public key pinned) from trust-anchor replacement;
+4. keep historical 1B--2E reported outputs separate from newly generated reconstruction results;
+5. state that all current EGA benchmark outcomes are synthetic and avoid deployment-probability claims;
+6. undergo a clean-checkout reproduction and independent technical review.
+
+**Submission decision remains NOT READY.** The research line has progressed, but a synthetic benchmark and internal CI success are not substitutes for real-world validation or independent review.
