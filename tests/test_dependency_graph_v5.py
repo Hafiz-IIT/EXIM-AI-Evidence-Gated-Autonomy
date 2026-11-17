@@ -312,5 +312,38 @@ class DependencyGraphV5Tests(unittest.TestCase):
                 self.assertEqual((ok, reason), (False, "invalid_quorum_threshold"))
 
 
+    def test_graph_aware_detects_shared_gateway_and_physical_measurement_source(self):
+        for kind, ancestor in (
+            ("acquisition", "gateway:shared-acquisition"),
+            ("physical", "scale:shared-source"),
+        ):
+            with self.subTest(kind=kind):
+                graph = self.make_graph(shared={
+                    "members": ["w1", "w2"], "kind": kind, "ancestor": ancestor,
+                })
+                creds = self.make_credentials(self.root, graph, self.names)
+                records = [
+                    (self.record(name, 42.0, creds[name]), creds[name])
+                    for name in ("w1", "w2")
+                ]
+                ok, reason, _ = self.evaluate(records, "graph_aware", graph=graph)
+                self.assertFalse(ok)
+                self.assertEqual(reason, "shared_dependency_graph:" + ancestor)
+
+    def test_graph_aware_selects_an_independent_matching_pair_from_three(self):
+        graph = self.make_graph(shared={
+            "members": ["w1", "w2"], "kind": "admin", "ancestor": "parent:holding",
+        })
+        creds = self.make_credentials(self.root, graph, self.names)
+        records = [
+            (self.record("w1", 42.0, creds["w1"]), creds["w1"]),
+            (self.record("w2", 99.0, creds["w2"]), creds["w2"]),
+            (self.record("w3", 42.0, creds["w3"]), creds["w3"]),
+        ]
+        ok, reason, supporters = self.evaluate(records, "graph_aware", graph=graph)
+        self.assertEqual((ok, reason), (True, "quorum_valid"))
+        self.assertEqual({item["source_id"] for item in supporters}, {"source-w1", "source-w3"})
+
+
 if __name__ == "__main__":
     unittest.main()
