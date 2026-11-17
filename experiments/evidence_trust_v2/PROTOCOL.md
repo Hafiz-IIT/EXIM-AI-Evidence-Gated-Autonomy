@@ -14,7 +14,7 @@ The prototype uses four role-specific Ed25519 keys:
 
 1. **Capture authority (CA):** signs tenant/case scope, raw document-instance digest, source identifier, acquisition channel and capture-session identifier.
 2. **Interpretation authority (IA):** signs normalized quantity, gross weight and HS fields, parser name/version, and the digest of the raw input. Its signature attests to a claimed transformation lineage, not semantic correctness.
-3. **Independent witness authority (IWA):** signs a separate synthetic scale/inspection record with its own acquisition-domain label. In the baseline model its values are derived from the benchmark ground-truth record. This is a deliberately idealized independent witness, not a real external source.
+3. **Independent witness authority (IWA):** signs a separate synthetic scale/inspection record with its own acquisition-domain and administrative-domain labels. In the baseline model its values are derived from the benchmark ground-truth record. This is a deliberately idealized independent witness, not a real external source.
 4. **Authorization authority (AA):** verifies role signatures, tenant/case scope, parent digests, witness agreement and the existing `evidence_gate_v1` policy, then signs the resulting action and evidence-graph digest.
 
 The experiment uses deterministic test-only keys. The code does not implement KMS/HSM custody, independent signer enrollment, durable replay state, distributed transactions, secure capture or production revocation.
@@ -35,7 +35,7 @@ The runner evaluates all 15 non-empty subsets of the four roles: four single-rol
 Two deterministic controls are evaluated separately from key compromise:
 
 - **Source forgery before capture:** the source document is already forged when an otherwise honest capture authority receives it. IA processes the captured document and IWA retains the independent ground-truth value.
-- **Shared-dependency witness:** the witness is deliberately copied from the same forged document source and the external measurement is aligned to that source. No signing key is compromised. The authorization gate compares the declared witness source identifier and acquisition domain with the capture source; a disclosed shared source must be rejected.
+- **Shared-dependency witness:** the witness is deliberately copied from the same forged document source and the external measurement is aligned to that source. No signing key is compromised. The authorization gate compares the declared witness source identifier, acquisition domain and administrative domain with the capture source; a disclosed shared source must be rejected.
 
 The distinction matters: source forgery is not the same event as capture-key compromise. Likewise, a compromised IWA signing key is modeled as control over the IWA's signed measurement claim, not as automatic compromise of CA or IA.
 
