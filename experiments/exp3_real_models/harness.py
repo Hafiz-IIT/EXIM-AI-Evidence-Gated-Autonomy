@@ -374,7 +374,7 @@ def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) ->
         "configured_output_token_cap": total_output_tokens,
         "preflight_estimated_cost_usd": total_cost if all_priced else None,
         "cost_known": all_priced,
-        "method": "rough estimate: ceil(serialized prompt characters / 3) input tokens plus configured max_tokens output cap; provider tokenization and actual usage may differ",
+        "method": "rough estimate, not a guaranteed bound: ceil(serialized prompt characters / 3) input tokens plus configured max_tokens output cap; provider tokenization and actual usage may differ",
         "roles": role_totals,
     }
 
