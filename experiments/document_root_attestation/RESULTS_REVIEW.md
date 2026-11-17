@@ -84,7 +84,7 @@ The next design should not simply add more signatures to the same trust domain. 
 5. **Fail-closed authorization:** invalid, missing, stale or replayed evidence proofs must prevent ACT and produce a review/evidence-request outcome. The authorization engine must verify proofs against a trust registry obtained independently of the evidence payload.
 6. **Operational controls:** production would require KMS/HSM-backed keys, authenticated signer enrollment, key rotation and revocation procedures, durable atomic replay state, audit logs and incident response. None is implemented by this synthetic experiment.
 
-A follow-up experiment should separately vary (a) capture signer compromise, (b) extraction signer compromise, (c) external sensor compromise, (d) authorization signer compromise, and (e) pairs/triples of these compromises. It should include attacks where the attacker can alter only one channel, and cases where supposedly independent channels share a hidden upstream dependency.
+A follow-up experiment should separately vary (a) capture signer compromise, (b) extraction signer compromise, (c) external sensor compromise, (d) authorization signer compromise, and (e) pairs/triples of these compromises. It should include attacks where the attacker can alter only one channel, and cases where supposedly independent channels share a hidden upstream dependency. The proposed separation-of-duties design and preregistered threat matrix are documented in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md); this is a design proposal, not an implemented control.
 
 ## 6. Limitations
 
