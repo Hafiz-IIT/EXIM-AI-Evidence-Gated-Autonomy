@@ -23,6 +23,16 @@ Even that applied contribution is preliminary. All current measurements and iden
 
 **Internet-Draft status note:** DIV, DEWP, and ARP are individual Internet-Drafts. An Internet-Draft is a work-in-progress document and does not imply IETF endorsement or consensus. They are important public technical prior art, but must be cited as work in progress, not as published IETF standards.
 
+## Additional overlaps from the 18 November 2026 review
+
+- **EFD** by He and Yu (2026), [The Illusion of Independent Quorums](https://arxiv.org/abs/2609.02925), directly studies epistemic fault domains, shared evidence ancestry and dependency-aware quorum selection. **VP-CONTROL** by Zheng et al. (2026), [Engineering Reliable Commit Gates](https://arxiv.org/abs/2609.10969), studies verification portfolios and common-mode data failures. These substantially overlap with the general v3 quorum and independence problem.
+- **TradeSense-EQA** by Chen et al. (2026), [Sensors 26(16), 5272](https://doi.org/10.3390/s26165272), already integrates trade declarations with physical sensing, evidence chains, risk analysis and abstention. Earlier shipping-fraud and HS-code classification work also exists: [Triepels et al. (2018)](https://doi.org/10.1016/j.eswa.2018.01.007) and [Chen et al. (2021)](https://doi.org/10.1109/DSAA53316.2021.9564203).
+- **Execution-boundary authorization** overlaps with [From Intent to Execution Grant](https://arxiv.org/abs/2609.11596), [Proof of Execution](https://arxiv.org/abs/2607.05397), [Temporary Authority, Permanent Effects](https://arxiv.org/abs/2607.10487), and [Mnemosyne](https://arxiv.org/abs/2607.00269).
+- **Provenance and capture authenticity** overlap with Faraj et al.'s IoT provenance review ([DOI](https://doi.org/10.1145/3718735)), Pan et al.'s data-provenance survey ([DOI](https://doi.org/10.1145/3593294)), Dirin et al.'s IoTAttest ([DOI](https://doi.org/10.3390/s23177532)), and Brito et al.'s capture-time authenticity work ([arXiv](https://arxiv.org/abs/2603.27883)).
+- **Selective prediction and verifier-assisted abstention** overlap with Hendrickx et al.'s reject-option survey ([DOI](https://doi.org/10.1007/s10994-024-06534-3)) and Sedoc et al.'s [Trust but Verify](https://arxiv.org/abs/2605.25133).
+
+These additions narrow the defensible contribution further: EGA is not a new quorum theory, generic trade-risk detector, generic provenance framework, or general execution-gating architecture. It is a synthetic, domain-specific adversarial evaluation of evidence-to-action authorization under explicit assumptions.
+
 ## Claim boundaries for EGA v3
 
 ### Claims we should not make
