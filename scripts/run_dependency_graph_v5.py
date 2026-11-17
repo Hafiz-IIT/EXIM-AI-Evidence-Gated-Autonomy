@@ -94,7 +94,7 @@ def make_graph(scenario, root):
     nodes = {}
     kinds = ("admin", "idp", "kms", "firmware", "acquisition", "physical", "upstream")
     for name in ("w1", "w2", "w3"):
-        nodes[f"source:{name}"] = [f"{kind}:{name}" for kind in kinds]
+        nodes[f"source:witness-{name}"] = [f"{kind}:{name}" for kind in kinds]
         for kind in kinds:
             nodes[f"{kind}:{name}"] = []
 
@@ -137,7 +137,7 @@ def make_sources(scenario, graph):
         direct_admin = "shared-admin" if scenario == "direct_shared_admin" and name in {"w1", "w2"} else f"admin-{name}"
         creds[name] = issue_graph_bound_source_credential(
             graph_digest=graph["body"]["graph_digest"],
-            dependency_leaf_node=f"source:{name}",
+            dependency_leaf_node=f"source:witness-{name}",
             dependency_manifest_complete=not (
                 scenario == "incomplete_dependency_manifest" and name == "w1"
             ),
