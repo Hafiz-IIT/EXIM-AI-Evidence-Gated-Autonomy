@@ -64,6 +64,20 @@ These are useful engineering and experimental artifacts. They do **not** prove r
 19. **Ron Triepels, Hennie Daniels and Ad Feelders (2018), [Data-driven fraud detection in international shipping](https://doi.org/10.1016/j.eswa.2018.01.007), *Expert Systems with Applications* 99, 193–202.** Prior work on document manipulation, miscoding and smuggling using shipment data.
 20. **Hao Chen et al. (2021), [The use of machine learning to identify the correctness of HS Code for the customs import declarations](https://doi.org/10.1109/DSAA53316.2021.9564203), IEEE DSAA.** Prior work on HS-code correctness using customs ground-truth data.
 
+## Additional direct prior art and standards recovered from the repository's earlier audit
+
+The existing v3 review also identifies prior work and current technical specifications that must remain in the novelty boundary:
+
+- Clifford Kahn (1998), [Tolerating Penetrations and Insider Attacks by Requiring Independent Corroboration](https://www.nspw.org/papers/1998/nspw1998-kahn.pdf). Independent corroboration and the difficulty of proving independence are established concepts.
+- Stefan Buijsman and Herman Veluwenkamp (2023), [Spotting When Algorithms Are Wrong](https://doi.org/10.1007/s11023-022-09591-0), *Minds and Machines* 33, 541–562. Undercutting and rebutting defeaters are prior conceptual foundations for bounded recovery.
+- UK National Protective Security Authority, [Claims, Arguments and Evidence (CAE) Concepts](https://www.npsa.gov.uk/system/files/documents/npsa-concepts-and-their-applicationcae-concepts1.pdf). Evidence credibility, authenticity, provenance, competence and defeaters are established assurance-case concerns.
+- IETF [RFC 9943 — An Architecture for Trustworthy and Transparent Digital Supply Chains (SCITT Architecture)](https://www.rfc-editor.org/rfc/rfc9943.html) (March 2026). Signed statements, transparency services, receipts, append-only and non-equivocation properties are existing infrastructure.
+- Christian Janbjer, [Deterministic Intent Verification (DIV) Protocol Specification](https://datatracker.ietf.org/doc/html/draft-janbjer-div-01), draft-janbjer-div-01 (19 Oct 2026), work in progress. Signed intent payloads, local trust anchors, identity-bound multi-approver requirements, freshness, nonce redemption and execution-time verification are adjacent prior art.
+- Christian Janbjer, [Deterministic Evidence & Witness Protocol (DEWP)](https://datatracker.ietf.org/doc/html/draft-janbjer-dewp-01), draft-janbjer-dewp-01 (19 Oct 2026), work in progress. Tamper-evident audit commitments, Merkle inclusion, independent anchors and signed execution-evidence statements overlap with provenance and witness evidence.
+- Joel Hillier, [Attestation Reconciliation Protocol (ARP)](https://datatracker.ietf.org/doc/html/draft-hillier-scitt-arp-06), draft-hillier-scitt-arp-06 (23 Oct 2026), work in progress. Witness sets, pairwise distinct operating-party identifiers, common-control exclusions, and the explicit limitation that declared independence is not proof of actual independence are particularly close to v3's quorum mechanism.
+
+DIV, DEWP and ARP are Internet-Drafts, not IETF-endorsed standards. They are still relevant public technical prior art and must be cited as work in progress.
+
 ## Candidate research reframing
 
 The broad directions of generic quorum reliability, trade anomaly detection, evidence chains, cryptographic provenance and execution-time authorization are already occupied by substantial prior work. The current evidence does not justify a novelty claim for any of those ideas in isolation.
@@ -75,6 +89,8 @@ The narrower candidate is an **adversarial security evaluation of provenance-to-
 This is not yet a novelty claim. It must be compared against EFD/DAQC, VP-CONTROL, TradeSense-EQA, commit-time authorization, execution-boundary contracts, runtime proof of execution, IoT provenance/remote attestation, and capture-time authenticity research.
 
 A possible contribution is a reproducible EXIM-focused adversarial benchmark that attacks the *assurance properties* of evidence objects and their binding to specific claims and actions, rather than proposing another generic quorum or anomaly detector. For example, a signed weighbridge record may support gross weight but must not be accepted as evidence for HS classification; a fresh measurement for another container must not satisfy the current shipment; a valid signature over a stale measurement must not authorize a current filing; and a valid capture receipt must not imply that a source document was truthful before capture. This would be an empirical security evaluation with explicit assumptions, not a new cryptographic primitive or general theory.
+
+A separate follow-on experiment, already identified in the earlier v3 review, should compare key-unique, direct-field-distinct 2-of-3, direct-field-distinct 3-of-3, and graph-aware witness selection using transitive dependency ancestry (parent control, cloud identity provider, key-management root, firmware/build pipeline, acquisition device, physical measurement source and upstream feed). It should inject cases where identifiers differ while an ancestor is shared, and cases where dependency manifests are incomplete or falsified. EFD and ARP already cover much of the general theory, so this should be framed as an EXIM-specific empirical comparison and not as a new structural-cut metric.
 
 ## Required next research work
 
