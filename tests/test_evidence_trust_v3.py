@@ -1,5 +1,7 @@
 import unittest
 
+from scripts.run_evidence_trust_v3 import make_source_forgery
+
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from src.evidence_trust_v3 import (
     issue_identity_credential, issue_witness_assertion, verify_witness_quorum,
@@ -144,6 +146,36 @@ class EvidenceTrustV3Tests(unittest.TestCase):
         self.assertFalse(is_recoverable_verifier_false_reject(safe_features, "ACT"))
         self.assertFalse(is_recoverable_verifier_false_reject(
             dict(safe_features, v_rejects=0), "ESCALATE"))
+
+    def test_pre_capture_source_forgery_invalidates_safe_to_act_label(self):
+        case = {
+            "safe_to_act": True,
+            "observable": {
+                "documents": {
+                    "invoice": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                    "packing_list": None,
+                    "declaration": None,
+                },
+                "document_instances": [{
+                    "kind": "invoice",
+                    "fields": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                }],
+                "provenance": {"integrity_status": "valid", "document_set_sha256": ""},
+                "machine": {
+                    "extraction": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                    "classification": {"hs": "1234"},
+                },
+            },
+        }
+        forged = make_source_forgery(case)
+        self.assertFalse(forged["safe_to_act"])
+        self.assertTrue(case["safe_to_act"])
+        self.assertEqual(
+            forged["observable"]["provenance"]["document_set_sha256"],
+            __import__("src.provenance", fromlist=["canonical_sha256"]).canonical_sha256(
+                forged["observable"]["document_instances"]
+            ),
+        )
 
     def test_forged_identity_credential_is_rejected(self):
         credential = dict(self.credentials[0])
