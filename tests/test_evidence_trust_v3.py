@@ -1,6 +1,7 @@
 import unittest
 
 from scripts.run_evidence_trust_v3 import make_source_forgery
+from src.provenance import canonical_sha256
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from src.evidence_trust_v3 import (
@@ -172,9 +173,7 @@ class EvidenceTrustV3Tests(unittest.TestCase):
         self.assertTrue(case["safe_to_act"])
         self.assertEqual(
             forged["observable"]["provenance"]["document_set_sha256"],
-            __import__("src.provenance", fromlist=["canonical_sha256"]).canonical_sha256(
-                forged["observable"]["document_instances"]
-            ),
+            canonical_sha256(forged["observable"]["document_instances"]),
         )
 
     def test_forged_identity_credential_is_rejected(self):
