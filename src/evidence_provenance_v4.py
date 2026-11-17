@@ -74,13 +74,13 @@ def verify_source_credential(credential: dict, *, trusted_issuer_key: Ed25519Pub
 
 def issue_claim_evidence(*, credential: dict, source_private_key: Ed25519PrivateKey,
                          claim_type: str, value, unit: str, subject_id: str,
-                         action_id: str, document_digest: str, input_digest: str,
+                         action_id: str, action_payload_digest: str, document_digest: str, input_digest: str,
                          output_digest: str, transformation_id: str, tool_version: str,
                          observed_at: int, issued_at: int, expires_at: int,
                          sequence_number: int, nonce: str,
                          calibration_id: str = "", calibration_valid_until: int = 0) -> dict:
     identity = credential["body"]
-    required = (claim_type, subject_id, action_id, document_digest, input_digest,
+    required = (claim_type, subject_id, action_id, action_payload_digest, document_digest, input_digest,
                 output_digest, transformation_id, tool_version, nonce)
     if not all(isinstance(v, str) and v for v in required):
         raise ValueError("claim, scope, digest and transformation fields must be non-empty")
@@ -92,7 +92,7 @@ def issue_claim_evidence(*, credential: dict, source_private_key: Ed25519Private
         "schema": EVIDENCE_SCHEMA, "credential_digest": canonical_sha256(identity),
         "source_id": identity["source_id"], "source_type": identity["source_type"],
         "key_id": identity["key_id"], "claim_type": claim_type, "value": value,
-        "unit": unit, "subject_id": subject_id, "action_id": action_id,
+        "unit": unit, "subject_id": subject_id, "action_id": action_id,\n        "action_payload_digest": action_payload_digest,
         "document_digest": document_digest, "input_digest": input_digest,
         "output_digest": output_digest, "transformation_id": transformation_id,
         "tool_version": tool_version, "observed_at": observed_at,
@@ -108,7 +108,7 @@ def issue_claim_evidence(*, credential: dict, source_private_key: Ed25519Private
 def verify_claim_evidence(record: dict, credential: dict, *,
                           trusted_issuer_key: Ed25519PublicKey, tenant_id: str,
                           expected_claim: str, expected_subject_id: str,
-                          expected_action_id: str, expected_document_digest: str,
+                          expected_action_id: str, expected_action_payload_digest: str, expected_document_digest: str,
                           now: int, consumed_nonces: MutableSet[str] | None = None,
                           last_sequences: dict[str, int] | None = None,
                           revoked_serials: frozenset[str] = frozenset()
@@ -215,14 +215,14 @@ def evaluate_claim(records: Iterable[tuple[dict, dict]], *,
     return True, "claim_supported", verified
 
 
-def issue_action_binding(*, action_id: str, subject_id: str, document_digest: str,
+def issue_action_binding(*, action_id: str, action_payload_digest: str, subject_id: str, document_digest: str,
                           policy_version: str, required_claims: Iterable[str],
                           evidence_digests: Iterable[str], issued_at: int, expires_at: int,
                           private_key: Ed25519PrivateKey) -> dict:
     if expires_at <= issued_at:
         raise ValueError("invalid action-binding validity window")
     payload = {
-        "schema": ACTION_SCHEMA, "action_id": action_id, "subject_id": subject_id,
+        "schema": ACTION_SCHEMA, "action_id": action_id,\n        "action_payload_digest": action_payload_digest, "subject_id": subject_id,
         "document_digest": document_digest, "policy_version": policy_version,
         "required_claims": sorted(set(required_claims)),
         "evidence_digests": sorted(set(evidence_digests)),
@@ -241,7 +241,7 @@ def verify_action_binding(binding: dict, *, trusted_authorizer_key: Ed25519Publi
         if payload.get("schema") != ACTION_SCHEMA:
             return False, "unsupported_action_binding_schema"
         expected = {
-            "action_id": action_id, "subject_id": subject_id,
+            "action_id": action_id, "action_payload_digest": action_payload_digest,\n            "subject_id": subject_id,
             "document_digest": document_digest, "policy_version": policy_version,
             "required_claims": sorted(set(required_claims)),
             "evidence_digests": sorted(set(evidence_digests)),
