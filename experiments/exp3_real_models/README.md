@@ -9,3 +9,5 @@
 5. Freeze the exact provider/model and prompt/benchmark identities with `python scripts/freeze_exp3_config.py --config /path/to/private-model-config.json --prepared-dir results/exp3_real_models --output /path/to/frozen-config.json`. Final holdout requires an explicit confirmation flag and exact freeze-hash matches. Partial final-holdout runs are refused.
 
 The adapter supports OpenAI-compatible Chat Completions. It does not create API keys, select paid providers, or make calls in CI. No real-model results are claimed until actual provider responses and run artifacts exist.
+
+The CLI entry points explicitly add the repository root to Python's import path so they run both in GitHub Actions and when invoked from a shell.
