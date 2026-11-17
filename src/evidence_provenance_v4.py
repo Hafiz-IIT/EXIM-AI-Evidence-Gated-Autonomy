@@ -177,7 +177,8 @@ def verify_claim_evidence(record: dict, credential: dict, *,
             "acquisition_domain": identity["acquisition_domain"],
             "administrative_domain": identity["administrative_domain"],
             "gateway_id": identity["gateway_id"],
-            "key_admin_domain": identity["key_admin_domain"],\n            "trust_root_id": identity["trust_root_id"],
+            "key_admin_domain": identity["key_admin_domain"],
+            "trust_root_id": identity["trust_root_id"],
         }}
     except (KeyError, TypeError, ValueError, InvalidSignature):
         return False, "invalid_evidence", None
