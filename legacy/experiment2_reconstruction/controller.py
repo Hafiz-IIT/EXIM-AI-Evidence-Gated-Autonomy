@@ -545,7 +545,7 @@ def reconstruct_experiment2(benchmark_path: Path, original_results_dir: Path, ou
             continue
         row = json.loads(line)
         row.pop("safe_to_act", None)
-        normalized_rows.append(json.dumps(row) + "\\n")
+        normalized_rows.append(json.dumps(row) + "\n")
     normalized_benchmark_hash = sha256_bytes("".join(normalized_rows).encode("utf-8"))
     expected_benchmark_hash = "1d7890f861b874e6535b88340fe50d46b1c299b85a9517948ad39c3213fc0032"
     manifest = {
