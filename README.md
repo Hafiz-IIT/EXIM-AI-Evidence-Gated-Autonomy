@@ -126,8 +126,8 @@ The numerical and security claims in the manuscript are tied to the repository's
 
 | Evidence item | Result documented in the repository |
 |---|---|
-| Synthetic cases | 500 unique evidence situations × low/high consequence = 1,000 cases |
-| Controlled failure families | 10 |
+| Historical v0.3 synthetic cases | 500 unique evidence situations × low/high consequence = 1,000 cases |\n| Extended v0.4 synthetic cases | 700 unique evidence situations × low/high consequence = 1,400 cases |
+| Controlled failure families | 10 in v0.3; 14 in v0.4 |
 | Deterministic Evidence Gate | 0/500 unsafe high-consequence ACT in the reported setup |
 | Risk Gate / Always Verify | 50/500 in the reported deterministic comparison |
 | Stochastic high-risk incorrect-action rate | 1.86% optimistic; 6.10% moderate; 13.09% harsh |
@@ -163,10 +163,10 @@ The v0.4 policy now requests missing required documents and escalates duplicate 
 
 **Security limitation discovered in v0.4:** the document-set SHA-256 is unkeyed. A test demonstrates that a coherent attacker rewrite followed by digest recomputation still passes the current gate. It detects mismatched/corrupted content, not a maliciously rewritten source. Authenticity requires a trusted signature/attestation bound to the raw document set and signer identity; v0.4 does not provide that.
 
-## One-command reproduction
+## Document-root attestation threat experiment\n\n- [Protocol](experiments/document_root_attestation/PROTOCOL.md)\n- [Verified results and family-level breakdown](experiments/document_root_attestation/RESULTS_REVIEW.md)\n- [Implementation](src/provenance.py) and [experiment runner](scripts/run_document_root_attestation.py)\n- [CI run 43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43955044311) with archived `ega-document-root-attestation-v1` artifact\n\nThe v1 attestation binds raw document instances and normalized document slots. Across 700 HIGH-risk v0.4 cases, raw tampering, unsigned coherent rewrite, revoked-key use, cross-tenant reuse and second-use nonce replay were rejected in all tested cases. Under the combined scenario of trusted-root signer compromise plus coordinated upstream rewrites, 300 of 700 cases (42.86%) resulted in unsafe ACT; 300 of 350 ACT decisions (85.71%) were unsafe. This is a conditional synthetic stress test, not a real-world risk estimate or a result about key theft alone. See the results review for assumptions and limitations.\n\n## One-command reproduction
 
 ```bash
 python scripts/reproduce_all.py
 ```
 
-This regenerates and verifies benchmark v0.3 and v0.4, runs both explicitly parameterized reconstruction suites and the v0.4 sensitivity sweeps, and displays the historical result tables without overwriting them. Outputs are stored separately under `results/reconstruction_v1/` and `results/reconstruction_v2/`. Neither reconstruction reproduces the historical 1B–2E results. Experiment 1A's original downstream-resolution implementation also remains unrecovered. Full manuscript compilation is exercised by GitHub Actions.
+This regenerates and verifies benchmark v0.3 and v0.4, runs both explicitly parameterized reconstruction suites, the v0.4 sensitivity sweeps and the document-root attestation threat experiment, and displays the historical result tables without overwriting them. Outputs are stored separately under `results/reconstruction_v1/` and `results/reconstruction_v2/`. Neither reconstruction reproduces the historical 1B–2E results. Experiment 1A's original downstream-resolution implementation also remains unrecovered. Full manuscript compilation is exercised by GitHub Actions.
