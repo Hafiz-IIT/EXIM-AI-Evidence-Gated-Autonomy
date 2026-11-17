@@ -249,7 +249,7 @@ def main():
             ),
             "safe_ACT_coverage_3of3": round(safe_acts_3of3 / safe_n, 6) if safe_n else None,
             "false_block_rate_3of3": (
-                round((safe_n - safe_acts_3of3) / safe_n, 6) if safe_n else 0
+                round((safe_n - safe_acts_3of3) / safe_n, 6) if safe_n else None
             ),
             "ESCALATE_3of3": n - acts_3of3,
         })
