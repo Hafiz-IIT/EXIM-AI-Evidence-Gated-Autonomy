@@ -323,8 +323,12 @@ def main():
     for scenario in ("hidden_shared_parent", "hidden_shared_idp", "hidden_shared_kms",
                      "hidden_shared_firmware", "hidden_shared_gateway",
                      "hidden_shared_physical", "hidden_shared_upstream"):
+        if metric(scenario, "K2_key_unique", "unsafe_ACT") <= 0:
+            raise AssertionError(f"key-only policy did not expose {scenario}")
         if metric(scenario, "F2_field_distinct", "unsafe_ACT") <= 0:
             raise AssertionError(f"flat-field policy did not expose {scenario}")
+        if metric(scenario, "F3_field_distinct", "unsafe_ACT") != 0:
+            raise AssertionError(f"strict 3-of-3 should reject two-witness collusion in {scenario}")
         if metric(scenario, "G2_graph_aware", "unsafe_ACT") != 0:
             raise AssertionError(f"graph-aware policy failed to block {scenario}")
     if metric("direct_shared_admin", "K2_key_unique", "unsafe_ACT") <= 0:
