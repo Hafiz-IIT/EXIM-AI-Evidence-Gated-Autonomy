@@ -21,6 +21,7 @@ from src.evidence_trust_v3 import (
 from src.evidence_trust_v4 import (
     DEPENDENCY_LAYERS,
     issue_identity_credential_v4,
+    verify_identity_credential_v4,
     verify_witness_quorum_v4,
 )
 from src.provenance import canonical_sha256
@@ -142,6 +143,26 @@ def scenario_rows(cases, scenario):
         root_private, scenario
     )
     rows = []
+    dependency_rows = []
+    for witness_index, credential in enumerate(credentials):
+        body = credential["body"]
+        valid, credential_reason, _, _ = verify_identity_credential_v4(
+            credential, trusted_issuer_key=root_public,
+            expected_tenant_id=TENANT, now=NOW,
+        )
+        dependency_rows.append({
+            "scenario": scenario,
+            "witness_id": body.get("witness_id"),
+            "key_id": body.get("key_id"),
+            "source_id": body.get("source_id"),
+            "acquisition_domain": body.get("acquisition_domain"),
+            "administrative_domain": body.get("administrative_domain"),
+            "credential_issuer_id": body.get("issuer_id"),
+            "credential_valid_under_scenario_root": valid,
+            "credential_validation_reason": credential_reason,
+            "compromised_witness": witness_index in compromised,
+            "dependency_roots_json": json.dumps(body.get("dependency_roots", {}), sort_keys=True),
+        })
     for index, original_case in enumerate(cases):
         case = (
             make_source_forgery(original_case)
@@ -241,7 +262,7 @@ def scenario_rows(cases, scenario):
             "graph_3of3_safe_act": bool(action_graph_3 == "ACT" and case["safe_to_act"]),
         }
         rows.append(row)
-    return rows
+    return rows, dependency_rows
 
 
 def summarize(rows):
@@ -275,12 +296,16 @@ def summarize(rows):
 def main():
     cases = load_cases()
     rows = []
+    dependency_rows = []
     for scenario in SCENARIOS:
-        rows.extend(scenario_rows(cases, scenario))
+        scenario_rows_out, scenario_dependencies = scenario_rows(cases, scenario)
+        rows.extend(scenario_rows_out)
+        dependency_rows.extend(scenario_dependencies)
     summary = summarize(rows)
     OUT.mkdir(parents=True, exist_ok=True)
     write_csv(OUT / "evidence_trust_v4_cases.csv", rows)
     write_csv(OUT / "evidence_trust_v4_summary.csv", summary)
+    write_csv(OUT / "evidence_trust_v4_dependencies.csv", dependency_rows)
     manifest = {
         "protocol": "ega-evidence-trust-architecture-v4-dependency-roots",
         "status": "synthetic threat experiment; not production validation",
@@ -288,6 +313,7 @@ def main():
         "high_risk_cases_per_scenario": len(cases),
         "scenario_count": len(SCENARIOS),
         "case_scenario_rows": len(rows),
+        "witness_dependency_rows": len(dependency_rows),
         "policies": [
             "field-only 2-of-3 ablation",
             "dependency-root-aware 2-of-3",
@@ -308,7 +334,7 @@ def main():
         "python_version": platform.python_version(),
         "outputs_sha256": {
             name: hashlib.sha256((OUT / name).read_bytes()).hexdigest()
-            for name in ("evidence_trust_v4_cases.csv", "evidence_trust_v4_summary.csv")
+            for name in ("evidence_trust_v4_cases.csv", "evidence_trust_v4_summary.csv", "evidence_trust_v4_dependencies.csv")
         },
     }
     (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
