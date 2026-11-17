@@ -130,6 +130,8 @@ def verify_claim_evidence(record: dict, credential: dict, *,
                 return False, "source_identity_mismatch", None
         if env.get("claim_type") != expected_claim:
             return False, "claim_type_mismatch", None
+        if env.get("unit") != expected_unit:
+            return False, "unit_mismatch", None
         if expected_claim not in identity["allowed_claims"]:
             return False, "source_not_competent_for_claim", None
         if env.get("subject_id") != expected_subject_id:
@@ -142,8 +144,12 @@ def verify_claim_evidence(record: dict, credential: dict, *,
             return False, "document_binding_mismatch", None
         if not isinstance(now, int) or now < env["issued_at"] or now >= env["expires_at"]:
             return False, "evidence_expired_or_not_yet_valid", None
-        if env["observed_at"] > now:
+        if env["observed_at"] > now or env["observed_at"] > env["issued_at"]:
             return False, "future_observation", None
+        if (env["issued_at"] < identity["issued_at"]
+                or env["issued_at"] >= identity["expires_at"]
+                or env["expires_at"] > identity["expires_at"]):
+            return False, "evidence_outside_credential_window", None
         if env["nonce"] in (consumed_nonces or set()):
             return False, "replay", None
         previous = (last_sequences or {}).get(identity["source_id"], 0)
@@ -193,16 +199,16 @@ def evaluate_claim(records: Iterable[tuple[dict, dict]], *,
                    tolerance: float = 0.0) -> tuple[bool, str, list[dict]]:
     """Require competent, valid, matching, independently administered evidence."""
     verified = []
-    nonces: set[str] = set()
-    sequences: dict[str, int] = {}
+    nonces = consumed_nonces if consumed_nonces is not None else set()
+    sequences = last_sequences if last_sequences is not None else {}
     for record, credential in records:
         ok, reason, evidence = verify_claim_evidence(
             record, credential, trusted_issuer_key=trusted_issuer_key,
             tenant_id=tenant_id, expected_claim=claim_type,
             expected_subject_id=expected_subject_id, expected_action_id=expected_action_id,
             expected_action_payload_digest=expected_action_payload_digest,
-            expected_document_digest=expected_document_digest, now=now,
-            consumed_nonces=nonces, last_sequences=sequences)
+            expected_document_digest=expected_document_digest, expected_unit=expected_unit,
+            now=now, consumed_nonces=nonces, last_sequences=sequences)
         if not ok:
             return False, reason, []
         verified.append(evidence)
