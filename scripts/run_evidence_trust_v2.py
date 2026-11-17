@@ -122,6 +122,8 @@ def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False
         "raw_document_digest": raw_digest,
         "source_id": "synthetic-document-source",
         "acquisition_channel": "controlled-test-fixture",
+        "acquisition_domain": "document-operations",
+        "administrative_domain": "capture-admin",
         "capture_session": "capture-" + case["case_id"],
     }
     capture = create_attestation(
@@ -162,7 +164,8 @@ def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False
             "item_type": obs["external"]["inspection_item_type"],
         }
         witness_source_id = "synthetic-document-source"
-        witness_domain = "document-source"
+        witness_domain = "document-operations"
+        witness_admin_domain = "capture-admin"
     elif "witness" in compromised:
         witness_fields = {
             "gross_weight": obs["external"]["measured_weight"],
@@ -170,6 +173,7 @@ def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False
         }
         witness_source_id = "independent-scale-and-inspection"
         witness_domain = "independent-operations"
+        witness_admin_domain = "witness-admin"
     else:
         witness_fields = {
             "gross_weight": case["ground_truth"]["gross_weight"],
@@ -180,6 +184,7 @@ def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False
     witness_source = {
         "source_id": witness_source_id,
         "acquisition_domain": witness_domain,
+        "administrative_domain": witness_admin_domain,
         "fields": witness_fields,
     }
     witness_source_digest = canonical_sha256(witness_source)
@@ -226,8 +231,9 @@ def authorize(case, compromised, nonce_prefix, witness_dependency=False):
     capture_source = capture["envelope"]["payload"]
     checks["witness_independence"] = (
         witness_source["source_id"] != capture_source["source_id"]
-        and witness_source["acquisition_domain"] != capture_source["acquisition_channel"],
-        "distinct_source_and_acquisition_domain",
+        and witness_source["acquisition_domain"] != capture_source["acquisition_domain"]
+        and witness_source["administrative_domain"] != capture_source["administrative_domain"],
+        "distinct_source_acquisition_and_admin_domains",
     )
 
     ia_fields = interpretation["envelope"]["payload"]["fields"]
