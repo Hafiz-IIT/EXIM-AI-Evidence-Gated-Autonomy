@@ -163,7 +163,40 @@ def make_record(source_type, claim, value, case, scenario, root, keys, credentia
     )
 
 
+
+def make_source_forgery(case):
+    """Forge source documents before honest capture; preserve physical ground truth."""
+    forged = copy.deepcopy(case)
+    obs = forged["observable"]
+    source = next((doc for doc in obs["documents"].values() if doc is not None),
+                  obs["machine"]["extraction"])
+    fields = {
+        "quantity": int(source["quantity"]) + 7,
+        "gross_weight": round(float(source["gross_weight"]) + 11.25, 2),
+        "hs": "9999",
+    }
+    for document in obs["documents"].values():
+        if document is not None:
+            document.update(fields)
+    for instance in obs["document_instances"]:
+        instance["fields"].update(fields)
+    # Honest capture attests to the forged source bytes; it does not prove
+    # that the source document agrees with the physical shipment.
+    obs["provenance"]["integrity_status"] = "valid"
+    obs["provenance"]["document_set_sha256"] = canonical_sha256(obs["document_instances"])
+    invoice = obs["documents"].get("invoice")
+    if invoice is not None:
+        for field in ("quantity", "gross_weight", "hs"):
+            obs["machine"]["extraction"][field] = invoice[field]
+        obs["machine"]["classification"]["hs"] = invoice["hs"]
+    # Preserve the original physical/benchmark ground truth.
+    forged["safe_to_act"] = False
+    return forged
+
+
 def run_one(case, scenario):
+    if scenario == "source_forgery_before_capture":
+        case = make_source_forgery(case)
     root, keys, credentials, authorizer = make_sources(scenario)
     obs = case["observable"]
     parsed = obs["machine"]["extraction"]
