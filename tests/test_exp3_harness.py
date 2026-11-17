@@ -64,7 +64,7 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             benchmark = root / "cases.jsonl"
-            benchmark.write_text("".join(json.dumps(x) + "\\n" for x in cases))
+            benchmark.write_text("".join(json.dumps(x) + "\n" for x in cases))
             manifest = prepare_tasks(benchmark, root / "prepared")
             private = json.loads((root / "prepared/private/private_metadata.json").read_text())
             public_text = (
@@ -122,7 +122,7 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         extraction = {"quantity": 5, "gross_weight": 7.5, "hs": "8542", "confidence": 0.99}
         same_family = [
             {"model_id": "m1", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}, "parse_ok": True},
-            {"model_id": "m2", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}},
+            {"model_id": "m2", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}, "parse_ok": True},
         ]
         cross_family = [
             {"model_id": "m1", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}},
