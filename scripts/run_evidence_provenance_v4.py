@@ -175,6 +175,8 @@ def make_source_forgery(case):
         "gross_weight": round(float(source["gross_weight"]) + 11.25, 2),
         "hs": "9999",
     }
+    if source is obs["machine"]["extraction"]:
+        source.update(fields)
     for document in obs["documents"].values():
         if document is not None:
             document.update(fields)
@@ -184,11 +186,11 @@ def make_source_forgery(case):
     # that the source document agrees with the physical shipment.
     obs["provenance"]["integrity_status"] = "valid"
     obs["provenance"]["document_set_sha256"] = canonical_sha256(obs["document_instances"])
-    invoice = obs["documents"].get("invoice")
-    if invoice is not None:
-        for field in ("quantity", "gross_weight", "hs"):
-            obs["machine"]["extraction"][field] = invoice[field]
-        obs["machine"]["classification"]["hs"] = invoice["hs"]
+    # Model an honest parser reading the forged source document that remains
+    # available (invoice when present, otherwise the available document).
+    for field in ("quantity", "gross_weight", "hs"):
+        obs["machine"]["extraction"][field] = source[field]
+    obs["machine"]["classification"]["hs"] = source["hs"]
     # Preserve the original physical/benchmark ground truth.
     forged["safe_to_act"] = False
     return forged
