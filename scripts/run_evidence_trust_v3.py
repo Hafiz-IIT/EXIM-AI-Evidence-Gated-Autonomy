@@ -267,7 +267,7 @@ def main():
         "forged_source_identity": (100, 0, 0, 0),
         "source_forgery_before_capture": (0, 0, 0, 0),
         "shared_administrative_domain": (0, 0, 0, 0),
-        "registry_root_compromise": (150, 50, 0, 0),
+        "registry_root_compromise": (150, 50, 100, 0),
     }
     for scenario, (acts_2of3, unsafe_2of3, acts_3of3, unsafe_3of3) in expected.items():
         actual = by_scenario[scenario]
