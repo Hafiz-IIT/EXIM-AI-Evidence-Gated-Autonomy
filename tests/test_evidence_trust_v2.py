@@ -64,6 +64,28 @@ class EvidenceTrustV2Tests(unittest.TestCase):
             (False, "parent_mismatch"),
         )
 
+    def test_tenant_binding_and_parser_substitution_are_rejected(self):
+        record = create_attestation(
+            role="interpretation", key_id="ia-key", tenant_id="tenant-A",
+            case_id="case-1", parent_digest="capture-root",
+            payload={"parser_version": "2.0", "fields": {"hs": "8542"}},
+            private_key=self.key, issued_at=100, expires_at=200, nonce="n-scope",
+        )
+        args = dict(
+            expected_role="interpretation", trusted_keys={"ia-key": self.public},
+            case_id="case-1", parent_digest="capture-root", now=150,
+        )
+        self.assertEqual(
+            verify_attestation(record, tenant_id="tenant-B", **args),
+            (False, "tenant_mismatch"),
+        )
+        altered = copy.deepcopy(record)
+        altered["envelope"]["payload"]["parser_version"] = "9.9"
+        self.assertEqual(
+            verify_attestation(altered, tenant_id="tenant-A", **args),
+            (False, "invalid_attestation"),
+        )
+
     def test_expiry_revocation_and_replay_are_enforced(self):
         record = create_attestation(
             role="capture", key_id="capture-key", tenant_id="tenant-A",
