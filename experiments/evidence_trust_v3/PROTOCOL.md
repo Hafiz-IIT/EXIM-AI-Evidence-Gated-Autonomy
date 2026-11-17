@@ -48,6 +48,23 @@ The recovery policy is tested against all eight v3 threat scenarios. Results rep
 
 The runner evaluates the same signed assertions twice: the primary 2-of-3 policy and a strict 3-of-3 sensitivity policy. Both use the same bounded verifier-false-reject recovery rule and the same synthetic cases. The comparison isolates the effect of requiring unanimity among the three enrolled witnesses. A 3-of-3 quorum is expected to block a two-witness collusion when the third honest witness disagrees, but it also loses availability when any credential is invalid or the trust anchor is compromised. Three compromised witnesses can still authorize a jointly fabricated measurement. These are benchmark-specific deterministic comparisons, not universal threshold recommendations.
 
+## Pre-registered acceptance profile
+
+The deterministic runner includes assertions for the following expected ACT / unsafe-ACT counts (out of 700 cases per scenario). These are executable regression expectations, not empirical probability estimates.
+
+| Scenario | 2-of-3 ACT | 2-of-3 unsafe ACT | 3-of-3 ACT | 3-of-3 unsafe ACT |
+|---|---:|---:|---:|---:|
+| Honest baseline | 100 | 0 | 100 | 0 |
+| One witness compromised | 100 | 0 | 100 | 0 |
+| Two witnesses compromised | 150 | 50 | 100 | 0 |
+| All witnesses compromised | 150 | 50 | 150 | 50 |
+| Forged source identity | 100 | 0 | 0 | 0 |
+| Source forgery before capture | 0 | 0 | 0 | 0 |
+| Shared administrative domain | 0 | 0 | 0 | 0 |
+| Registry-root compromise | 150 | 50 | 0 | 0 |
+
+The 100 honest ACTs comprise 50 clean cases plus 50 deliberately constructed safe cases with isolated verifier false rejection (C7), recovered only after a valid witness quorum and all other policy guards pass. The 50 unsafe ACTs in two-witness collusion, full-roster compromise and registry-root compromise arise in C4 consistent-but-wrong. Strict 3-of-3 blocks the two-witness and registry-root scenarios in this fixture, but cannot defend against compromise of all three enrolled witnesses. It also loses availability when one credential is invalid, as shown by the forged-source-identity control. CI must fail if these deterministic acceptance profiles drift.
+
 ## Claim boundary
 
 All keys, identities, measurements and source records are synthetic. Deterministic benchmark counts are not real-world probabilities. The implementation does not provide production CA governance, KMS/HSM custody, hardware-backed device identity, secure enrollment, trusted time, durable distributed revocation, or proof of operational independence. Results must not be described as production security validation.
