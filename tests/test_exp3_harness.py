@@ -206,8 +206,8 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             {"model_id": "m2", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}, "parse_ok": True},
         ]
         cross_family = [
-            {"model_id": "m1", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}},
-            {"model_id": "m2", "family_id": "family_b", "normalized": {"accept": True, "confidence": 0.9}},
+            {"model_id": "m1", "family_id": "family_a", "normalized": {"accept": True, "confidence": 0.9}, "parse_ok": True},
+            {"model_id": "m2", "family_id": "family_b", "normalized": {"accept": True, "confidence": 0.9}, "parse_ok": True},
         ]
         self.assertEqual(evaluate_case(case, extraction, same_family)["controller_action"], "ESCALATE")
         self.assertEqual(evaluate_case(case, extraction, cross_family)["controller_action"], "ACT")
