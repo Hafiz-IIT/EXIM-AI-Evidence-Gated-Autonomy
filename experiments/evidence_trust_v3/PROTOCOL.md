@@ -34,6 +34,10 @@ A 2-of-3 quorum is expected to tolerate one compromised witness only when the ot
 
 A registry signature proves that the pinned issuer signed a credential binding a key to identity claims. It does **not** prove that the source physically exists, that the acquisition channel is honest, or that the claimed administrative domains are genuinely independent. Those require external identity proofing, governance, audits, and operational controls.
 
+## Quorum verification invariants
+
+The verifier enforces the configured witness roster size and distinct witness IDs. It then groups only assertions that match the controller's expected measurement and checks witness ID, key ID, source ID, acquisition domain, and administrative domain independence within each matching group. A dissenting or non-matching witness cannot contribute an independence claim to the supporters. Invalid credentials can be excluded, but the remaining matching supporters must still satisfy the threshold and all independence checks.
+
 ## Claim boundary
 
 All keys, identities, measurements and source records are synthetic. Deterministic benchmark counts are not real-world probabilities. The implementation does not provide production CA governance, KMS/HSM custody, hardware-backed device identity, secure enrollment, trusted time, durable distributed revocation, or proof of operational independence. Results must not be described as production security validation.
