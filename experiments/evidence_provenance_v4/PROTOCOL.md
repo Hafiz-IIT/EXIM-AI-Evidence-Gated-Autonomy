@@ -1,8 +1,8 @@
 # Evidence Provenance v4 — Research Protocol and Threat Model
 
-**Status:** Design protocol; experiments not yet run.  
+**Status:** Implemented synthetic experiment; full CI and manuscript build passed (run 44160689194). Results are deterministic and not production validation.  
 **Branch:** `research/adversarial-evidence-provenance-v4`  
-**Date:** 2026-11-18  
+**Date:** 2026-11-18 (results review updated after validation)  
 **Data policy:** Synthetic benchmark only in this phase. No private customs records, client documents, credentials, or production API calls.
 
 ## 1. Why this direction changed
@@ -94,7 +94,7 @@ The benchmark will distinguish attacks that the earlier v2/v3 experiments partia
 | A9 | Two apparently different sources share gateway/admin domain | Dependency separation |
 | A10 | Trust-store / registry-root compromise | Trust-anchor assumption |
 | A11 | Multiple sensors under one compromised control plane | Common-cause compromise |
-| A12 | Evidence changes after approval but before action | Action binding / time-of-check-to-time-of-use |
+| A12 | Action payload substituted after evidence evaluation but before authorization verification | Exact action-payload binding (not atomic TOCTOU enforcement) |
 | A13 | Missing or contradictory evidence | Fail-closed behavior and availability |
 | A14 | Isolated model-verifier false rejection with independently sufficient evidence | Bounded recovery |
 | A15 | False-accepting verifier plus internally consistent but wrong documents | Semantic false acceptance |
@@ -131,7 +131,7 @@ Primary outcomes, reported per attack family and overall:
 - cross-subject and cross-claim substitution acceptance;
 - invalid-signature / invalid-lineage acceptance;
 - calibration-invalid acceptance;
-- action-binding / TOCTOU bypass rate;
+- action-payload substitution acceptance rate;
 - human-review / escalation rate.
 
 If a probabilistic simulation is added, its probabilities must be explicitly labeled as programmed assumptions, not fitted real-world rates. Deterministic scenario counts must never be described as probabilities.
@@ -143,7 +143,7 @@ If a probabilistic simulation is added, its probabilities must be explicitly lab
 - **H3:** Claim-type competence checks reject cross-claim substitution even when every reused evidence item has a valid signature.
 - **H4:** Transformation binding detects parser/OCR lineage substitution but cannot establish semantic correctness of the parser output.
 - **H5:** Dependency checks reject declared shared-gateway or shared-administration evidence, but cannot prove that undeclared common dependencies do not exist.
-- **H6:** Action binding rejects stale approvals and evidence/action substitution at the commit boundary, subject to complete mediation and atomic enforcement assumptions.
+- **H6:** The signed action envelope rejects a changed action-payload digest in the tested verifier path; this does not establish atomic commit or general time-of-check-to-time-of-use safety.
 - **H7:** Bounded recovery improves safe-action coverage only for isolated verifier false rejections where all claim-specific evidence obligations independently pass; it must not recover from source, scope, freshness, conflict, or trust-root failures.
 
 Each hypothesis must be supported by an executable test and a counterexample test.
@@ -154,6 +154,8 @@ Each hypothesis must be supported by an executable test and a counterexample tes
 - Ed25519 signatures authenticate enrolled keys and signed bytes; they do not prove physical truth, lawful authority, calibration correctness, or operational independence.
 - Administrative-domain labels are assertions unless independently audited.
 - No production PKI, hardware root of trust, TPM/TEE attestation, customs-system connector, or secure sensor acquisition is implemented in this phase.
+- Replay state is caller-managed in-memory state in the runner; no durable distributed nonce store or atomic one-time redemption exists.
+- The action-payload digest binds a synthetic action descriptor, not an executed external side effect; no commit-time TOCTOU guarantee is implemented.
 - No production-readiness, real-world probability, or deployment-safety claim is permitted.
 - This protocol is a research design, not a customs compliance recommendation.
 
@@ -173,13 +175,28 @@ Each hypothesis must be supported by an executable test and a counterexample tes
 - Triepels, Daniels and Feelders, [Data-driven fraud detection in international shipping](https://doi.org/10.1016/j.eswa.2018.01.007), *Expert Systems with Applications* 99 (2018).
 - Chen et al., [The use of machine learning to identify the correctness of HS Code for the customs import declarations](https://doi.org/10.1109/DSAA53316.2021.9564203), DSAA (2021).
 
-## 13. Exit criteria for v4
+## 13. Validation status and exit criteria
 
-Do not open a v4 PR or claim a research result until:
-1. the attack matrix and evidence schema are implemented;
-2. unit tests include both positive and negative cases for every assurance property;
-3. the same frozen synthetic cases are run through B0–B4 and ablations;
-4. the summary includes complete confusion matrices and per-claim metrics;
-5. independent code review checks that no evidence field is silently trusted merely because it is signed;
-6. full CI and manuscript build pass;
-7. a final novelty matrix records what is replicated, extended, and still potentially distinct.
+Implemented and validated in full CI run [44160689194](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44160689194), 29/29 steps passed. The run includes the v4 unit tests, all 16 scenario executions, artifact upload, prior experiment suites, publication-table reproduction and LaTeX compilation. The artifact manifest and case-level/summary CSV hashes are recorded in [RESULTS_REVIEW.md](RESULTS_REVIEW.md).
+
+Completed for this synthetic milestone:
+1. the v4 evidence schema and attack runner are implemented;
+2. regression tests cover positive and negative scope, competence, unit, credential-window, replay, lineage, calibration and action-payload cases;
+3. the frozen 700-case HIGH-risk benchmark is run across 16 scenarios;
+4. case-level and summary outputs are uploaded with SHA-256 hashes;
+5. full CI and manuscript compilation pass.
+
+Still required before any arXiv submission or deployment claim:
+- independent security/code review of complete mediation, persistent replay state, trust-root operations and actual commit-time atomicity;
+- a full-text novelty matrix and dependency-ancestry v5 comparison against EFD and ARP;
+- real operational validation only if the paper later makes claims beyond a synthetic benchmark.
+
+## 14. Validated v4 results
+
+See [RESULTS_REVIEW.md](RESULTS_REVIEW.md) for the full 16-scenario table, attack-by-attack interpretation, availability costs, limitations and output hashes. In brief: the honest baseline authorized all 100 safe cases with zero unsafe ACT; replay, stale, cross-subject, cross-claim, parser-lineage, calibration, shared-admin, credential-tampering and action-payload-substitution attacks failed closed but blocked all safe cases in those attack scenarios; single-weighbridge compromise, all-source compromise and registry-root compromise each produced 50 unsafe C4 actions; a compound tariff-registry plus independently false-accepting verifier scenario produced 50 unsafe C8 actions. An isolated tariff-registry compromise was contained by the existing correlated-verifier guard in this fixture.
+
+The v4 result is a hybrid of the existing v1 gate, v3 bounded false-reject recovery and v4 claim-scoped evidence checks. It is not a standalone deployment policy and does not establish real-world probabilities.
+
+## 15. Follow-on dependency-ancestry experiment
+
+The next study is preregistered in [the v5 protocol](../dependency_graph_v5/PROTOCOL.md). It compares key-unique, direct-field-distinct 2-of-3, direct-field-distinct 3-of-3 and graph-aware 2-of-3 selection under hidden shared parent, cloud identity, KMS, firmware and upstream-feed dependencies. EFD and ARP already address the general theory; v5 is an EXIM-specific empirical comparison, not a new structural-cut metric.
