@@ -271,5 +271,46 @@ class DependencyGraphV5Tests(unittest.TestCase):
         self.assertEqual((ok, reason), (True, "quorum_valid"))
 
 
+    def test_graph_issuer_rejects_malformed_node_and_parent_identifiers(self):
+        with self.assertRaises(ValueError):
+            issue_dependency_graph(
+                graph_id="bad", version="1", tenant_id=self.tenant,
+                nodes={"source:w1": "admin:w1"}, issued_at=100, expires_at=400,
+                signer_private_key=self.root,
+            )
+        with self.assertRaises(ValueError):
+            issue_dependency_graph(
+                graph_id="bad", version="1", tenant_id=self.tenant,
+                nodes={"source:w1": [""]}, issued_at=100, expires_at=400,
+                signer_private_key=self.root,
+            )
+
+    def test_graph_verifier_rejects_invalid_identity_and_validity_metadata(self):
+        bad_identity = {
+            "body": dict(self.graph["body"], graph_id=""),
+            "signature_b64": self.graph["signature_b64"],
+        }
+        ok, reason, _ = verify_dependency_graph(
+            bad_identity, trusted_registry_key=self.root.public_key(),
+            tenant_id=self.tenant, now=self.now)
+        self.assertEqual((ok, reason), (False, "dependency_graph_identity_invalid"))
+
+        bad_window = {
+            "body": dict(self.graph["body"], expires_at=True),
+            "signature_b64": self.graph["signature_b64"],
+        }
+        ok, reason, _ = verify_dependency_graph(
+            bad_window, trusted_registry_key=self.root.public_key(),
+            tenant_id=self.tenant, now=self.now)
+        self.assertEqual((ok, reason), (False, "dependency_graph_validity_invalid"))
+
+    def test_quorum_threshold_must_be_a_positive_non_boolean_integer(self):
+        records = [(self.record(n, 42.0), self.credentials[n]) for n in self.names]
+        for threshold in (0, -1, 2.0, True):
+            with self.subTest(threshold=threshold):
+                ok, reason, _ = self.evaluate(records, "field_distinct", threshold=threshold)
+                self.assertEqual((ok, reason), (False, "invalid_quorum_threshold"))
+
+
 if __name__ == "__main__":
     unittest.main()
