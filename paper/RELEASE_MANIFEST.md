@@ -64,7 +64,7 @@ The full v2 experiment execution with the coherent-rewrite regression test passe
 2. Compare the new reconstruction protocol against the historical result tables and explain all differences without parameter fitting.
 3. Review the new reconstruction's model assumptions and threats to validity independently.
 4. Freeze the exact policies, stochastic assumptions, seeds, cost matrix, and attack configurations.
-5. Expand document-root threat testing into independently varied capture, extraction, external-sensor and authorization trust-domain compromises; the first combined-compromise experiment is complete but synthetic.
+5. Extend the four-authority v2 matrix with independently authenticated source/admin-domain registries, multiple independent witnesses, partial sensor compromise, and more realistic key-administration/recovery workflows. The current role matrix and trust-store poisoning control remain synthetic.
 6. Redesign OOD transformations to test meaningful evidence-quality/dependency shifts.
 7. Expand sensitivity analysis beyond the current one-factor and selected two-factor sweeps.
 8. Reconcile all manuscript tables and claims against newly generated outputs.
