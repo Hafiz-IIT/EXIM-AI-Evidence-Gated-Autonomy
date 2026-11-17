@@ -222,6 +222,13 @@ def authorize(case, compromised, nonce_prefix, witness_dependency=False):
         tenant_id=TENANT, case_id=case["case_id"],
         parent_digest=witness_source_digest, now=NOW,
     )
+    witness_source = witness["envelope"]["payload"]
+    capture_source = capture["envelope"]["payload"]
+    checks["witness_independence"] = (
+        witness_source["source_id"] != capture_source["source_id"]
+        and witness_source["acquisition_domain"] != capture_source["acquisition_channel"],
+        "distinct_source_and_acquisition_domain",
+    )
 
     ia_fields = interpretation["envelope"]["payload"]["fields"]
     witness_fields = witness["envelope"]["payload"]["fields"]
