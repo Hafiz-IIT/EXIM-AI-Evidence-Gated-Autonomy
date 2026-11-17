@@ -55,7 +55,7 @@ def main():
         "status": "estimated_no_model_calls",
         "splits": args.splits,
         "conditions": [c["condition_id"] for c in selected],
-        "estimate_method": "input tokens approximated as ceil(serialized prompt characters / 4); output tokens bounded by max_tokens per call",
+        "estimate_method": "input tokens approximated as ceil(serialized prompt characters / 3); output tokens bounded by max_tokens per call",
         "cost_known_for_all_selected_runs": all_priced,
         "total_upper_bound_cost_usd": total_cost if all_priced else None,
         "max_budget_usd": args.max_budget_usd,

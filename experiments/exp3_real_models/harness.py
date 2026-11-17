@@ -347,7 +347,7 @@ def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) ->
         for task in tasks:
             messages = message_builder(task)
             serialized = json.dumps(messages, ensure_ascii=False, separators=(",", ":"))
-            input_tokens += math.ceil(len(serialized) / 4)
+            input_tokens += math.ceil(len(serialized) / 3)
         output_tokens = len(tasks) * max_tokens
         in_price = spec.get("input_usd_per_1k_tokens")
         out_price = spec.get("output_usd_per_1k_tokens")
@@ -374,7 +374,7 @@ def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) ->
         "upper_bound_output_tokens": total_output_tokens,
         "upper_bound_cost_usd": total_cost if all_priced else None,
         "cost_known": all_priced,
-        "method": "input tokens approximated as ceil(serialized prompt characters / 4); output tokens bounded by max_tokens per call",
+        "method": "input tokens approximated as ceil(serialized prompt characters / 3); output tokens bounded by max_tokens per call",
         "roles": role_totals,
     }
 

@@ -16,6 +16,6 @@ Before setting API keys or running a model, estimate calls and a conservative up
 
 `python scripts/estimate_exp3_cost.py --config /path/to/private-model-config.json --prepared-dir results/exp3_real_models --splits development validation --output results/exp3_real_models/cost_estimate.json`
 
-Populate each model's input/output USD per 1K token prices. The estimator uses prompt characters/4 for input tokens and the configured `max_tokens` as an output upper bound; it is deliberately conservative and not a provider quote. Set `settings.max_estimated_cost_usd` in the private config to enforce the same preflight budget in the runner. The freeze hash binds all run settings.
+Populate each model's input/output USD per 1K token prices. The estimator uses prompt characters/3 for input tokens and the configured `max_tokens` as an output upper bound; it is deliberately conservative and not a provider quote. Set `settings.max_estimated_cost_usd` in the private config to enforce the same preflight budget in the runner. The freeze hash binds all run settings.
 
 The harness verifies the integrity of both public and private task files before cost estimation or model execution. Do not share `private/evaluation_map.jsonl` or `private/private_metadata.json`; the latter contains the per-preparation task-ID salt.
