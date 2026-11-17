@@ -389,6 +389,36 @@ The strongest conclusion is therefore deliberately narrow:
 
 Whether such mechanisms improve real-world AI safety remains an empirical question for the preregistered model and human studies.
 
+## 21. Supplementary Reconstruction: Document-Root Attestation (Benchmark v0.4)
+
+This section reports a subsequent synthetic extension and is **not merged into the historical v0.3 benchmark tables or the original Experiment 2 results**. Benchmark v0.4 contains 700 unique underlying situations paired across LOW/HIGH actions, for 1,400 total cases and 14 fault families. The document-root threat runner evaluates its 700 HIGH-risk cases.
+
+The document-root attestation signs canonical hashes of both raw document instances and normalized document slots, together with tenant and case identifiers, signer/key identity, issuance and expiry times, and a nonce. The verifier checks the trusted-key registry, revocation state, tenant/case scope, validity window, content digests, nonce replay state, and Ed25519 signature. The experiment uses deterministic test-only keys and process-local replay state.
+
+The full CI run [43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43955044311) passed the regression suite, benchmark generation and integrity checks, v1/v2 reconstruction, document-root threat runner, artifact uploads, historical-table loading, and manuscript compilation. The nine document-root scenarios each contain 700 HIGH-risk cases:
+
+| Scenario | Attestation accepted | Rejected | Downstream ACT | Unsafe ACT |
+|---|---:|---:|---:|---:|
+| Valid baseline | 700 | 0 | 50 | 0 |
+| Raw document-instance tampering | 0 | 700 | 0 | 0 |
+| Coherent rewrite without trusted private key | 0 | 700 | 0 | 0 |
+| Trusted root signer compromise + coordinated upstream rewrite | 700 | 0 | 350 | 300 |
+| Revoked old key | 0 | 700 | 0 | 0 |
+| Rotated new key | 700 | 0 | 50 | 0 |
+| Cross-tenant replay | 0 | 700 | 0 | 0 |
+| First nonce use | 700 | 0 | 50 | 0 |
+| Second nonce use (replay) | 0 | 700 | 0 | 0 |
+
+In the combined compromise scenario, the attacker is assumed to possess the trusted document-root private key and coordinate changes to raw documents, normalized document slots, machine extraction, HS classification, and externally measured weight. The forged attestations then verify for all 700 cases. The existing gate authorizes 350 ACT decisions; 300 are unsafe relative to the original benchmark ground truth. This is **42.86% of all HIGH-risk cases** and **85.71% of the ACT decisions** in this specific synthetic scenario.
+
+The 300 unsafe ACTs occur in six families: C1 extraction error, C2 cross-document conflict, C4 consistent but wrong, C6 verifier false accept, C9 cascading error, and C13 corrupted provenance (50 each). The other 50 ACT decisions occur in the clean family and are safe. Missing evidence, stale evidence, duplicate document kinds, and the other tested families remain blocked under this particular coordinated rewrite.
+
+These figures are conditional outcomes under an intentionally strong combined-compromise assumption. They are not estimates of real-world attack probability and do not show that document-root key theft alone causes the same result. The experiment demonstrates that a signature authenticates a payload relative to a key; it does not establish semantic truth when the signing authority and corroborating upstream channels are jointly compromised.
+
+The architectural implication is to separate independent capture attestation from extraction/normalization, external measurement, and action authorization. The capture authority should attest to source identity, acquisition channel, receipt time, and immutable raw-object digest—not certify that extracted values are true. High-consequence fields require corroboration from independently acquired sources and independently administered trust domains. Production use would additionally require KMS/HSM-backed key custody, authenticated signer enrollment, durable atomic replay state, operational revocation, audit logging, and incident response; none is implemented here.
+
+Protocol and complete family-level results: [experiments/document_root_attestation/PROTOCOL.md](../experiments/document_root_attestation/PROTOCOL.md) and [experiments/document_root_attestation/RESULTS_REVIEW.md](../experiments/document_root_attestation/RESULTS_REVIEW.md). The manuscript remains a synthetic research artifact and is not ready for arXiv submission.
+
 ## References
 
 [1] Ryan Greenblatt, Buck Shlegeris, Kshitij Sachan, and Fabien Roger. *AI Control: Improving Safety Despite Intentional Subversion*. arXiv:2312.06942, 2023.
