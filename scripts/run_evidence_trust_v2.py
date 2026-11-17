@@ -111,7 +111,7 @@ def apply_compromise_capabilities(case, compromised):
     return result
 
 
-def issue_role_records(case, compromised, nonce_prefix):
+def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False):
     obs = case["observable"]
     keys = {role: test_key(role) for role in ROLES}
     public_keys = {role + "-key": key.public_key() for role, key in keys.items()}
@@ -151,19 +151,35 @@ def issue_role_records(case, compromised, nonce_prefix):
         nonce=nonce_prefix + "-interpretation",
     )
 
-    if "witness" in compromised:
+    if witness_dependency:
+        source_doc = obs["documents"].get("invoice")
+        source_doc = source_doc or next(
+            (d for d in obs["documents"].values() if d is not None),
+            obs["machine"]["extraction"],
+        )
+        witness_fields = {
+            "gross_weight": source_doc["gross_weight"],
+            "item_type": obs["external"]["inspection_item_type"],
+        }
+        witness_source_id = "synthetic-document-source"
+        witness_domain = "document-source"
+    elif "witness" in compromised:
         witness_fields = {
             "gross_weight": obs["external"]["measured_weight"],
             "item_type": obs["external"]["inspection_item_type"],
         }
+        witness_source_id = "independent-scale-and-inspection"
+        witness_domain = "independent-operations"
     else:
         witness_fields = {
             "gross_weight": case["ground_truth"]["gross_weight"],
             "item_type": case["ground_truth"]["item_type"],
         }
+        witness_source_id = "independent-scale-and-inspection"
+        witness_domain = "independent-operations"
     witness_source = {
-        "source_id": "independent-scale-and-inspection",
-        "acquisition_domain": "independent-operations",
+        "source_id": witness_source_id,
+        "acquisition_domain": witness_domain,
         "fields": witness_fields,
     }
     witness_source_digest = canonical_sha256(witness_source)
@@ -177,9 +193,9 @@ def issue_role_records(case, compromised, nonce_prefix):
     return keys, public_keys, scope_parent, raw_digest, capture, interpretation, witness, witness_source_digest
 
 
-def authorize(case, compromised, nonce_prefix):
+def authorize(case, compromised, nonce_prefix, witness_dependency=False):
     (keys, public_keys, scope_parent, raw_digest, capture, interpretation,
-     witness, witness_source_digest) = issue_role_records(case, compromised, nonce_prefix)
+     witness, witness_source_digest) = issue_role_records(case, compromised, nonce_prefix, witness_dependency)
     obs = case["observable"]
     checks = {}
     checks["capture"] = verify_attestation(
@@ -266,11 +282,14 @@ def run_scenario(cases, name, compromised=(), control=None):
             active_compromises = ()
         elif control == "shared_dependency":
             case = make_source_forgery(original, shared_witness=True)
-            active_compromises = ("witness",)
+            active_compromises = ()
         else:
             case = apply_compromise_capabilities(original, compromised)
             active_compromises = compromised
-        outcome = authorize(case, active_compromises, f"{name}-{index:05d}")
+        outcome = authorize(
+            case, active_compromises, f"{name}-{index:05d}",
+            witness_dependency=(control == "shared_dependency"),
+        )
         unsafe = outcome["action"] == "ACT" and not original["safe_to_act"]
         rows.append({
             "scenario": name,
