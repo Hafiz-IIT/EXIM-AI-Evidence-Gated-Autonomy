@@ -44,6 +44,10 @@ The v3 controller may recover an isolated machine-verifier false rejection only 
 
 The recovery policy is tested against all eight v3 threat scenarios. Results report the number of recoveries separately. Because the benchmark's C7 family is deliberately labeled as a false-reject case, any improved coverage there is a benchmark-specific result, not evidence that real-world verifier rejections are generally safe to override.
 
+## Threshold sensitivity: 2-of-3 versus 3-of-3
+
+The runner evaluates the same signed assertions twice: the primary 2-of-3 policy and a strict 3-of-3 sensitivity policy. Both use the same bounded verifier-false-reject recovery rule and the same synthetic cases. The comparison isolates the effect of requiring unanimity among the three enrolled witnesses. A 3-of-3 quorum is expected to block a two-witness collusion when the third honest witness disagrees, but it also loses availability when any credential is invalid or the trust anchor is compromised. Three compromised witnesses can still authorize a jointly fabricated measurement. These are benchmark-specific deterministic comparisons, not universal threshold recommendations.
+
 ## Claim boundary
 
 All keys, identities, measurements and source records are synthetic. Deterministic benchmark counts are not real-world probabilities. The implementation does not provide production CA governance, KMS/HSM custody, hardware-backed device identity, secure enrollment, trusted time, durable distributed revocation, or proof of operational independence. Results must not be described as production security validation.
