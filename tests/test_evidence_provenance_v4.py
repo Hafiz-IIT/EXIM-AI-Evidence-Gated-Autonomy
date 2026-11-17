@@ -216,6 +216,12 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
         )
         self.assertTrue(verify_claim_evidence(pair[0], pair[1], **kwargs)[0])
         self.assertEqual(verify_claim_evidence(pair[0], pair[1], **kwargs)[1], "replay")
+        new_nonce_pair = self.evidence(
+            "weighbridge", "gross_weight", 42.0, nonce="fresh-nonce-same-sequence")
+        self.assertEqual(
+            verify_claim_evidence(new_nonce_pair[0], new_nonce_pair[1], **kwargs)[1],
+            "non_monotonic_sequence",
+        )
 
     def test_action_binding_prevents_evidence_or_action_substitution(self):
         evidence_pairs = [
@@ -260,7 +266,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
         self.assertEqual(reason, "unit_mismatch")
 
     def test_evidence_must_be_issued_within_credential_validity(self):
-        pair = self.evidence("weighbridge", "gross_weight", 42.0, issued_at=99)
+        pair = self.evidence("weighbridge", "gross_weight", 42.0, observed_at=98, issued_at=99)
         ok, reason, _ = self.verify(pair, "gross_weight")
         self.assertFalse(ok)
         self.assertEqual(reason, "evidence_outside_credential_window")
