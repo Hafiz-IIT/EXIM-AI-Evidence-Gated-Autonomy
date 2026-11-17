@@ -127,6 +127,8 @@ def verify_witness_quorum(items: Iterable[tuple[dict, dict]], *,
                           now: int, threshold: int = 2, total_required: int = 3,
                           revoked_serials: frozenset[str] = frozenset()) -> tuple[bool, str, int]:
     """Require a valid threshold of mutually independent, matching identities."""
+    if not isinstance(threshold, int) or not isinstance(total_required, int) or threshold < 1 or total_required < threshold:
+        return False, "invalid_quorum_configuration", 0
     accepted = []
     for record, credential in items:
         valid, reason, identity = verify_witness_assertion(
