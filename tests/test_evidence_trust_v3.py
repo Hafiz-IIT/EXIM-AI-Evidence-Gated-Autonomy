@@ -56,7 +56,7 @@ class EvidenceTrustV3Tests(unittest.TestCase):
 
     def test_shared_administrative_domain_is_not_independent(self):
         credentials = list(self.credentials)
-        credentials[1] = issue_identity_credential(
+        credentials = [issue_identity_credential(\n            issuer_id="research-root", witness_id=f"w{i}", key_id=f"k{i}",\n            public_key=self.witnesses[i-1].public_key(), source_id=f"source-{i}",\n            acquisition_domain=f"acquisition-{i}", administrative_domain="admin-1",\n            tenant_id="tenant-A", serial=f"serial-{i}", issued_at=100,\n            expires_at=300, issuer_private_key=self.root,\n        ) for i in (1, 2, 3)]\n        credentials[1] = issue_identity_credential(
             issuer_id="research-root", witness_id="w2", key_id="k2",
             public_key=self.witnesses[1].public_key(), source_id="source-2",
             acquisition_domain="acquisition-2", administrative_domain="admin-1",
