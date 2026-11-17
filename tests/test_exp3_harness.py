@@ -95,7 +95,7 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             self.assertNotIn(private["task_id_salt"], public_text)
             self.assertEqual(manifest["public_task_count"], 12)
 
-    def test_cost_estimator_counts_three_roles_and_uses_configured_prices(self):
+    def test_cost_estimator_reports_rough_preflight_estimate(self):
         case = self.make_case("C0", "U-00-000")
         task = build_public_task(case, "canonical", "cost-test-salt")
         models = {
@@ -108,7 +108,7 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         estimate = estimate_condition_cost([task], condition, config)
         self.assertEqual(estimate["api_call_count"], 3)
         self.assertTrue(estimate["cost_known"])
-        self.assertGreater(estimate["upper_bound_cost_usd"], 0)
+        self.assertGreater(estimate["preflight_estimated_cost_usd"], 0)
 
     def test_provider_or_schema_failures_force_escalation(self):
         case = self.make_case("C0", "U-00-000")
@@ -237,9 +237,9 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             report = json.loads(output.read_text())
             self.assertEqual(report["status"], "estimated_no_model_calls")
             self.assertEqual(report["runs"][0]["api_call_count"], 18)
-            self.assertGreater(report["total_upper_bound_cost_usd"], 0)
+            self.assertGreater(report["total_preflight_estimated_cost_usd"], 0)
 
-    def test_cost_budget_blocks_before_api_key_preflight(self):
+    def test_preflight_budget_blocks_before_api_key_check(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -259,7 +259,7 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             condition = {"condition_id": "budget-test", "extractor_model": "extractor", "verifier_models": ["verifier_a", "verifier_b"]}
             config = {
                 "models": models, "conditions": [condition],
-                "settings": {"max_tokens": 500, "max_estimated_cost_usd": 0.000001},
+                "settings": {"max_tokens": 500, "max_preflight_estimated_cost_usd": 0.000001},
             }
             with self.assertRaisesRegex(RuntimeError, "exceeds configured budget"):
                 run_condition(
