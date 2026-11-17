@@ -24,7 +24,7 @@ Can a threshold of multiple witnesses reduce the unsafe-authorization exposure o
 5. Forged source-identity credential (credential-body tampering without a valid registry signature).
 6. Source forgery before capture, separately from signer/credential compromise.
 7. Disclosed shared administrative domain.
-8. Registry-root compromise, treated as a trust-anchor failure rather than a routine witness failure.
+8. Registry signing-key compromise: the attacker's control of the existing issuer private key is assumed, while the verifier retains the original pinned public key.
 
 The deterministic HIGH-risk benchmark v0.4 subset is reused. Outputs are a separate v3 result set and do not overwrite v2 artifacts or historical results. In the pre-capture source-forgery scenario, the document set is changed relative to the unchanged physical ground truth and the transformed case is relabeled unsafe-to-authorize. Safe-action coverage and false-block rate are therefore undefined for that scenario; the relevant metric is whether the policy issues any unsafe ACT.
 
@@ -61,9 +61,9 @@ The deterministic runner includes assertions for the following expected ACT / un
 | Forged source identity | 100 | 0 | 0 | 0 |
 | Source forgery before capture | 0 | 0 | 0 | 0 |
 | Shared administrative domain | 0 | 0 | 0 | 0 |
-| Registry-root compromise | 150 | 50 | 0 | 0 |
+| Registry-root compromise | 150 | 50 | 100 | 0 |
 
-The 100 honest ACTs comprise 50 clean cases plus 50 deliberately constructed safe cases with isolated verifier false rejection (C7), recovered only after a valid witness quorum and all other policy guards pass. The 50 unsafe ACTs in two-witness collusion, full-roster compromise and registry-root compromise arise in C4 consistent-but-wrong. Strict 3-of-3 blocks the two-witness and registry-root scenarios in this fixture, but cannot defend against compromise of all three enrolled witnesses. It also loses availability when one credential is invalid, as shown by the forged-source-identity control. CI must fail if these deterministic acceptance profiles drift.
+The 100 honest ACTs comprise 50 clean cases plus 50 deliberately constructed safe cases with isolated verifier false rejection (C7), recovered only after a valid witness quorum and all other policy guards pass. The 50 unsafe ACTs in two-witness collusion, full-roster compromise and registry-root compromise arise in C4 consistent-but-wrong. Strict 3-of-3 blocks the two-witness and registry signing-key compromise scenarios while retaining safe-case coverage because the third honest credential remains valid under the pinned issuer key. It cannot defend against compromise of all three enrolled witnesses. It loses availability when one credential is invalid, as shown by the forged-source-identity control. CI must fail if these deterministic acceptance profiles drift.
 
 ## Claim boundary
 
