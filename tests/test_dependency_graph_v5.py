@@ -262,14 +262,25 @@ class DependencyGraphV5Tests(unittest.TestCase):
     def test_graph_root_compromise_can_hide_a_shared_parent(self):
         # Model compromise of the existing issuer private key, not replacement
         # of the verifier's trust anchor. The verifier continues to pin self.root.
+        shared_dependency = {
+            "kind": "gateway",
+            "members": ("w1", "w2"),
+            "ancestor": "parent:common-control",
+        }
+        ground_truth_graph = self.make_graph(shared=shared_dependency, root=self.root)
         forged_graph = self.make_graph(root=self.root)
-        creds = self.make_credentials(self.root, forged_graph, self.names)
-        records = [(self.record(n, 42.0, creds[n]), creds[n]) for n in ("w1", "w2")]
 
-        # The real dependency exists in the attacker's ground-truth model but is
-        # omitted from the graph signed by the compromised, already-trusted key.
+        # The actual dependency is present in ground truth but omitted from the
+        # false graph signed with the already-trusted registry key.
+        self.assertIn("parent:common-control", ground_truth_graph["body"]["nodes"])
+        self.assertIn(
+            "parent:common-control",
+            ground_truth_graph["body"]["nodes"]["gateway:w1"],
+        )
         self.assertNotIn("parent:common-control", forged_graph["body"]["nodes"])
 
+        creds = self.make_credentials(self.root, forged_graph, self.names)
+        records = [(self.record(n, 42.0, creds[n]), creds[n]) for n in ("w1", "w2")]
         ok, reason, _ = self.evaluate(
             records, "graph_aware", graph=forged_graph, root=self.root)
         self.assertEqual((ok, reason), (True, "quorum_valid"))
