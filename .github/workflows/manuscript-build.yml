@@ -54,6 +54,17 @@ jobs:
           path: data/benchmark_v0.4/
           if-no-files-found: error
           retention-days: 90
+      - name: Run v4 claim-scoped evidence provenance experiments
+        id: evidence_provenance_v4
+        run: python scripts/run_evidence_provenance_v4.py
+      - name: Upload v4 evidence provenance outputs
+        if: always() && steps.evidence_provenance_v4.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-evidence-provenance-v4
+          path: results/evidence_provenance_v4/
+          if-no-files-found: error
+          retention-days: 90
       - name: Run v0.4 reconstruction and sensitivity analysis
         id: runner_v2
         run: |
@@ -96,17 +107,6 @@ jobs:
         with:
           name: ega-evidence-trust-v3
           path: results/evidence_trust_v3/
-          if-no-files-found: error
-          retention-days: 90
-      - name: Run v4 claim-scoped evidence provenance experiments
-        id: evidence_provenance_v4
-        run: python scripts/run_evidence_provenance_v4.py
-      - name: Upload v4 evidence provenance outputs
-        if: always() && steps.evidence_provenance_v4.outcome == 'success'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ega-evidence-provenance-v4
-          path: results/evidence_provenance_v4/
           if-no-files-found: error
           retention-days: 90
       - name: Reproduce publication tables from checked-in historical result files
