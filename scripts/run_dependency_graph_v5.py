@@ -86,7 +86,7 @@ def compromised_witnesses(scenario):
         "incomplete_dependency_manifest": {"w1", "w2"},
         "graph_structure_attack": {"w1", "w2"},
         "graph_integrity_attack": {"w1", "w2"},
-        "registry_root_compromise": {"w1", "w2", "w3"},
+        "registry_root_compromise": {"w1", "w2"},
     }[scenario]
 
 
@@ -110,6 +110,12 @@ def make_graph(scenario, root):
         for name in ("w1", "w2"):
             nodes[f"{kind}:{name}"] = [ancestor]
         nodes[ancestor] = []
+
+    if scenario == "registry_root_compromise":
+        # The real topology has w1 and w2 under a common parent. The compromised
+        # registry signs a forged manifest that omits that true shared ancestor.
+        # The signed graph therefore looks disjoint even though the real sources are not.
+        pass
 
     if scenario == "graph_structure_attack":
         nodes["admin:w1"] = ["missing:dependency-parent"]
@@ -142,7 +148,7 @@ def make_sources(scenario, graph):
                 scenario == "incomplete_dependency_manifest" and name == "w1"
             ),
             issuer_id="synthetic-v5-registry", source_id=f"witness-{name}",
-            source_type="independent_witness", key_id=f"key-{name}",
+            source_type="weighbridge", key_id=f"key-{name}",
             public_key=keys[name].public_key(), allowed_claims=["gross_weight"],
             acquisition_domain=f"acquisition-{name}",
             administrative_domain=direct_admin,
@@ -217,6 +223,12 @@ def evaluate_one(case, scenario, policy_name, policy, threshold):
     return {
         "scenario": scenario, "policy": policy_name, "case_id": case["case_id"],
         "family": case["family"], "safe_to_act_ground_truth": safe,
+        "ground_truth_common_dependency": scenario in {
+            "direct_shared_admin", "hidden_shared_parent", "hidden_shared_idp",
+            "hidden_shared_kms", "hidden_shared_firmware", "hidden_shared_upstream",
+            "registry_root_compromise",
+        },
+        "registry_graph_omits_true_common_parent": scenario == "registry_root_compromise",
         "quorum_valid": quorum_ok, "quorum_reason": quorum_reason,
         "matching_supporters": len(supporters),
         "legacy_gate_action": legacy_action, "bounded_recovery_eligible": recovery,
@@ -288,6 +300,10 @@ def main():
         raise AssertionError("graph-aware policy should fail closed on unresolved graph nodes")
     if metric("graph_integrity_attack", "G2_graph_aware", "unsafe_ACT") != 0:
         raise AssertionError("graph-aware policy should fail closed on graph signature tampering")
+    if metric("registry_root_compromise", "F2_field_distinct", "unsafe_ACT") <= 0:
+        raise AssertionError("two colluding witnesses should pass the field-distinct policy under root compromise")
+    if metric("registry_root_compromise", "F3_field_distinct", "unsafe_ACT") != 0:
+        raise AssertionError("strict 3-of-3 should reject two colluding witnesses when the third remains honest")
     if metric("registry_root_compromise", "G2_graph_aware", "unsafe_ACT") <= 0:
         raise AssertionError("compromised registry root should expose graph-trust residual")
 
