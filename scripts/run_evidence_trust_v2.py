@@ -111,9 +111,18 @@ def apply_compromise_capabilities(case, compromised):
     return result
 
 
-def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False):
+def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False,
+                       key_admin_compromise=False):
     obs = case["observable"]
-    keys = {role: test_key(role) for role in ROLES}
+    keys = {
+        role: test_key(
+            "key-admin-enrolled-" + role
+            if key_admin_compromise and role != "authorization" else role
+        )
+        for role in ROLES
+    }
+    # Under key-admin compromise, the trust registry is poisoned to accept
+    # attacker-enrolled upstream keys; AA's own key remains uncompromised.
     public_keys = {role + "-key": key.public_key() for role, key in keys.items()}
     scope_parent = canonical_sha256({"tenant": TENANT, "case": case["case_id"]})
 
@@ -199,9 +208,9 @@ def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False
     return keys, public_keys, scope_parent, raw_digest, capture, interpretation, witness, witness_source_digest
 
 
-def authorize(case, compromised, nonce_prefix, witness_dependency=False):
+def authorize(case, compromised, nonce_prefix, witness_dependency=False, key_admin_compromise=False):
     (keys, public_keys, scope_parent, raw_digest, capture, interpretation,
-     witness, witness_source_digest) = issue_role_records(case, compromised, nonce_prefix, witness_dependency)
+     witness, witness_source_digest) = issue_role_records(\n        case, compromised, nonce_prefix, witness_dependency, key_admin_compromise\n    )
     obs = case["observable"]
     checks = {}
     checks["capture"] = verify_attestation(
@@ -297,12 +306,16 @@ def run_scenario(cases, name, compromised=(), control=None):
         elif control == "shared_dependency":
             case = make_source_forgery(original, shared_witness=True)
             active_compromises = ()
+        elif control == "key_admin_compromise":
+            active_compromises = ("capture", "interpretation", "witness")
+            case = apply_compromise_capabilities(original, active_compromises)
         else:
             case = apply_compromise_capabilities(original, compromised)
             active_compromises = compromised
         outcome = authorize(
             case, active_compromises, f"{name}-{index:05d}",
             witness_dependency=(control == "shared_dependency"),
+            key_admin_compromise=(control == "key_admin_compromise"),
         )
         unsafe = outcome["action"] == "ACT" and not original["safe_to_act"]
         rows.append({
@@ -358,6 +371,8 @@ def main():
     rows.extend(run_scenario(cases, "honest_baseline"))
     rows.extend(run_scenario(cases, "source_forgery_before_capture", control="source_forgery"))
     rows.extend(run_scenario(cases, "shared_dependency_witness", control="shared_dependency"))
+    rows.extend(run_scenario(cases, "key_admin_compromise_trust_store_poisoning",
+                             control="key_admin_compromise"))
 
     OUT.mkdir(parents=True, exist_ok=True)
     case_path = OUT / "evidence_trust_v2_cases.csv"
@@ -373,7 +388,8 @@ def main():
         "authority_roles": list(ROLES),
         "compromise_combinations": [list(x) for x in matrix],
         "additional_controls": [
-            "honest_baseline", "source_forgery_before_capture", "shared_dependency_witness"
+            "honest_baseline", "source_forgery_before_capture",
+            "shared_dependency_witness", "key_admin_compromise_trust_store_poisoning"
         ],
         "scenario_count": len(summaries),
         "case_scenario_rows": len(rows),
