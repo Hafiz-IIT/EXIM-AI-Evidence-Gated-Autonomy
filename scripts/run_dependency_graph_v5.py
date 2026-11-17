@@ -44,6 +44,7 @@ SCENARIOS = (
     "hidden_shared_firmware",
     "hidden_shared_upstream",
     "incomplete_dependency_manifest",
+    "graph_structure_attack",
     "graph_integrity_attack",
     "registry_root_compromise",
 )
@@ -83,6 +84,7 @@ def compromised_witnesses(scenario):
         "hidden_shared_firmware": {"w1", "w2"},
         "hidden_shared_upstream": {"w1", "w2"},
         "incomplete_dependency_manifest": {"w1", "w2"},
+        "graph_structure_attack": {"w1", "w2"},
         "graph_integrity_attack": {"w1", "w2"},
         "registry_root_compromise": {"w1", "w2", "w3"},
     }[scenario]
@@ -108,6 +110,9 @@ def make_graph(scenario, root):
         for name in ("w1", "w2"):
             nodes[f"{kind}:{name}"] = [ancestor]
         nodes[ancestor] = []
+
+    if scenario == "graph_structure_attack":
+        nodes["admin:w1"] = ["missing:dependency-parent"]
 
     graph = issue_dependency_graph(
         graph_id="ega-v5-dependency-graph", version="1", tenant_id=TENANT,
@@ -279,6 +284,8 @@ def main():
         raise AssertionError("field-distinct policy should block direct shared administration")
     if metric("incomplete_dependency_manifest", "G2_graph_aware", "unsafe_ACT") != 0:
         raise AssertionError("graph-aware policy should fail closed on incomplete dependency manifests")
+    if metric("graph_structure_attack", "G2_graph_aware", "unsafe_ACT") != 0:
+        raise AssertionError("graph-aware policy should fail closed on unresolved graph nodes")
     if metric("graph_integrity_attack", "G2_graph_aware", "unsafe_ACT") != 0:
         raise AssertionError("graph-aware policy should fail closed on graph signature tampering")
     if metric("registry_root_compromise", "G2_graph_aware", "unsafe_ACT") <= 0:
