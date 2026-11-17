@@ -24,7 +24,8 @@ class EvidenceTrustV3Tests(unittest.TestCase):
             for i, key in enumerate(self.witnesses, 1)
         ]
 
-    def records(self, weights=(10.0, 10.0, 10.0)):
+    def records(self, weights=(10.0, 10.0, 10.0), credentials=None):
+        credentials = credentials or self.credentials
         return [
             (issue_witness_assertion(
                 credential=credential, witness_private_key=key,
@@ -33,7 +34,7 @@ class EvidenceTrustV3Tests(unittest.TestCase):
                 issued_at=110, expires_at=200,
             ), credential)
             for i, (key, credential, weight) in enumerate(
-                zip(self.witnesses, self.credentials, weights), 1)
+                zip(self.witnesses, credentials, weights), 1)
         ]
 
     def verify(self, items):
@@ -50,30 +51,24 @@ class EvidenceTrustV3Tests(unittest.TestCase):
         self.assertEqual(self.verify(self.records((99.0, 10.0, 10.0))),
                          (True, "quorum_valid", 2))
 
-    def test_two_compromised_witnesses_can_control_quorum(self):
+    def test_two_compromised_witnesses_cannot_match_honest_target(self):
         self.assertEqual(self.verify(self.records((99.0, 99.0, 10.0))),
                          (False, "quorum_disagreement", 1))
 
-    def test_shared_administrative_domain_is_not_independent(self):
-        credentials = list(self.credentials)
-        credentials = [issue_identity_credential(\n            issuer_id="research-root", witness_id=f"w{i}", key_id=f"k{i}",\n            public_key=self.witnesses[i-1].public_key(), source_id=f"source-{i}",\n            acquisition_domain=f"acquisition-{i}", administrative_domain="admin-1",\n            tenant_id="tenant-A", serial=f"serial-{i}", issued_at=100,\n            expires_at=300, issuer_private_key=self.root,\n        ) for i in (1, 2, 3)]\n        credentials[1] = issue_identity_credential(
-            issuer_id="research-root", witness_id="w2", key_id="k2",
-            public_key=self.witnesses[1].public_key(), source_id="source-2",
-            acquisition_domain="acquisition-2", administrative_domain="admin-1",
-            tenant_id="tenant-A", serial="serial-2", issued_at=100,
-            expires_at=300, issuer_private_key=self.root,
+    def test_all_witnesses_must_have_distinct_admin_domains(self):
+        credentials = []
+        for i, key in enumerate(self.witnesses, 1):
+            credentials.append(issue_identity_credential(
+                issuer_id="research-root", witness_id=f"w{i}", key_id=f"k{i}",
+                public_key=key.public_key(), source_id=f"source-{i}",
+                acquisition_domain=f"acquisition-{i}", administrative_domain="shared-admin",
+                tenant_id="tenant-A", serial=f"serial-{i}", issued_at=100,
+                expires_at=300, issuer_private_key=self.root,
+            ))
+        self.assertEqual(
+            self.verify(self.records(credentials=credentials)),
+            (False, "insufficient_identity_independence:administrative_domain", 0),
         )
-        records = [
-            (issue_witness_assertion(
-                credential=credential, witness_private_key=key,
-                tenant_id="tenant-A", case_id="case-1", parent_digest="root",
-                gross_weight=10.0, item_type="machine", nonce=f"shared-{i}",
-                issued_at=110, expires_at=200,
-            ), credential)
-            for i, (key, credential) in enumerate(zip(self.witnesses, credentials))
-        ]
-        self.assertEqual(self.verify(records),
-                         (False, "insufficient_identity_independence:administrative_domain", 0))
 
     def test_forged_identity_credential_is_rejected(self):
         credential = dict(self.credentials[0])
@@ -96,6 +91,14 @@ class EvidenceTrustV3Tests(unittest.TestCase):
         self.assertFalse(valid)
         self.assertEqual(reason, "insufficient_valid_witnesses")
         self.assertEqual(count, 0)
+
+    def test_invalid_quorum_configuration_is_rejected(self):
+        result = verify_witness_quorum(
+            self.records(), trusted_issuer_key=self.root.public_key(), tenant_id="tenant-A",
+            case_id="case-1", parent_digest="root", expected_weight=10.0,
+            expected_item_type="machine", now=150, threshold=4, total_required=3,
+        )
+        self.assertEqual(result, (False, "invalid_quorum_configuration", 0))
 
 
 if __name__ == "__main__":
