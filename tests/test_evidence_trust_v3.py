@@ -70,6 +70,31 @@ class EvidenceTrustV3Tests(unittest.TestCase):
             (False, "insufficient_identity_independence:administrative_domain", 0),
         )
 
+    def test_matching_quorum_must_itself_be_independent(self):
+        credentials = [
+            issue_identity_credential(
+                issuer_id="research-root", witness_id=f"w{i}", key_id=f"k{i}",
+                public_key=key.public_key(), source_id=f"source-{i}",
+                acquisition_domain=f"acquisition-{i}",
+                administrative_domain=("shared-admin" if i in (1, 2) else "admin-3"),
+                tenant_id="tenant-A", serial=f"serial-{i}", issued_at=100,
+                expires_at=300, issuer_private_key=self.root,
+            )
+            for i, key in enumerate(self.witnesses, 1)
+        ]
+        # Two matching assertions share an administrator; the independent
+        # third witness dissents and must not make the colluding pair look independent.
+        self.assertEqual(
+            self.verify(self.records((10.0, 10.0, 99.0), credentials=credentials)),
+            (False, "insufficient_identity_independence", 2),
+        )
+
+    def test_quorum_requires_the_configured_distinct_witness_roster(self):
+        self.assertEqual(
+            self.verify(self.records()[:2]),
+            (False, "incomplete_or_duplicate_witness_roster", 0),
+        )
+
     def test_forged_identity_credential_is_rejected(self):
         credential = dict(self.credentials[0])
         credential["body"] = dict(credential["body"], source_id="attacker-source")
