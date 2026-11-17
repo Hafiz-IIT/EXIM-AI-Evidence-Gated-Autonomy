@@ -18,7 +18,7 @@ def main():
     parser.add_argument("--prepared-dir", type=Path, default=Path("results/exp3_real_models"))
     parser.add_argument("--splits", nargs="+", default=["development", "validation"])
     parser.add_argument("--conditions", nargs="*")
-    parser.add_argument("--max-budget-usd", type=float)
+    parser.add_argument("--max-preflight-budget-usd", "--max-budget-usd", dest="max_budget_usd", type=float)
     parser.add_argument("--output", type=Path, default=Path("results/exp3_real_models/cost_estimate.json"))
     args = parser.parse_args()
 
@@ -60,7 +60,7 @@ def main():
         "total_preflight_estimated_cost_usd": total_cost if all_priced else None,
         "max_budget_usd": args.max_budget_usd,
         "runs": estimates,
-        "warning": "This is a rough planning estimate, not a guaranteed upper bound or provider quote. Actual tokenization, hidden message overhead, cached-input pricing and output usage may differ. Reconcile against provider-reported usage and billing.",
+        "warning": "This is a rough planning estimate, not a guaranteed upper bound or provider quote. Actual tokenization, hidden message overhead, cached-input pricing and output usage may differ. The preflight threshold is not a hard spend cap; reconcile against provider-reported usage and billing.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
