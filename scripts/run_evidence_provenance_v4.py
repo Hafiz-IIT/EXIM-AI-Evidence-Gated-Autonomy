@@ -224,7 +224,7 @@ def run_one(case, scenario):
         ok, reason, accepted = evaluate_claim(
             evidence[claim], trusted_issuer_key=root.public_key(), tenant_id=TENANT,
             claim_type=claim, expected_subject_id=subject_id,
-            expected_action_id=action_id, expected_action_payload_digest=canonical_sha256(case["action"]),
+            expected_action_id=action_id, expected_action_payload_digest=action_payload_digest,
             expected_document_digest=doc_digest,
             now=NOW, required_source_types=required,
             tolerance=0.01 if claim == "gross_weight" else 0.0,
