@@ -4,7 +4,7 @@
 
 **NOT READY FOR SUBMISSION**
 
-The project has reported synthetic results and a compiled manuscript, but the full experiment runners for Experiments 1B–2E are not present in the repository. The current reproduction command regenerates the benchmark and loads existing CSVs; it does not rerun the simulations that produced those CSVs.
+The repository now contains explicit runners for new reconstruction experiments (v1/v2), the v3 authenticated witness-quorum study, and a v4 claim-scoped evidence-provenance prototype. The v3 manuscript update and its full CI run (44159840913) passed. However, the original historical experiment runners and complete parameter configurations for Experiments 1B–2E are still absent from Git history. The new reconstruction runs are new simulations under explicit protocols, not historical reproductions. The v4 experiment stage has generated an initial artifact, but the latest code changes (claim units, credential validity bounds, shared replay state, and stale-vs-replay separation) still require a complete successful workflow. The paper is therefore not submission-ready.
 
 ## Paper identity
 **Title:** Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence  
@@ -34,23 +34,25 @@ These are currently claims cross-checked against stored result files, not indepe
 
 ## Required blockers
 
-- [ ] Commit executable experiment runners for stochastic verification/retrieval/escalation (1B).
-- [ ] Commit executable runners for adversarial metadata/evidence stress (1C).
-- [ ] Commit executable runners for OOD/compound-shift evaluation (1D).
-- [ ] Commit executable runners for attestation attacks, trust-root compromise, and dual-lineage experiments (2A–2E).
-- [ ] Expand benchmark coverage for missing invoice and missing packing-list evidence.
-- [ ] Rerun all results from a clean checkout and compare output hashes.
-- [ ] Reconcile manuscript tables, claims ledger, and manifests with regenerated results.
-- [ ] Complete a fresh literature/novelty review.
+- [ ] Recover the original historical 1B–2E experiment source and parameters, or remove/relabel the historical numerical claims so they are not presented as independently reproduced.
+- [x] Commit new reconstruction runners for 1B/1C/1D and 2B–2E under explicit v1/v2 protocols; keep them clearly distinguished from historical reproductions.
+- [x] Commit and validate the v3 witness-quorum runner, regression tests, results review, and manuscript section (full CI run 44159840913).
+- [ ] Complete a full successful CI run for the latest v4 claim-scoped provenance code; the latest action-payload, unit, credential-window, replay-state and stale-evidence changes must be validated together.
+- [ ] Complete the dependency-ancestry follow-up comparing key-only, direct-field-distinct 2-of-3/3-of-3 and graph-aware evidence independence, with shared-parent, cloud-IDP, KMS, firmware and upstream-feed attacks.
+- [ ] Rerun all current results from a clean checkout and compare output hashes for benchmark v0.4 and each v2/v3/v4 experiment artifact.
+- [ ] Reconcile manuscript tables, claims ledger, protocol versions, results reviews and manifests with the final regenerated artifacts.
+- [ ] Complete a full-text novelty review against EFD, VP-CONTROL, TradeSense-EQA, commit-time authorization, SCITT, DIV/DEWP/ARP, IoT provenance, defeaters and reject-option research.
 - [ ] Complete final mathematical, security, and manuscript review.
 
 ## Checks already completed
 
-- [x] LaTeX source compiles in GitHub Actions.
+- [x] LaTeX source compiles in GitHub Actions for the v3 manuscript revision (run 44159840913).
 - [x] Existing result CSVs are checked into version control.
 - [x] A regression test now verifies that missing invoice, packing list, or declaration requests evidence.
 - [x] Benchmark generation and pair-integrity checks run in CI.
 - [x] Manuscript and claim boundary explicitly state that results are synthetic.
+- [x] Related-work section now includes EFD, VP-CONTROL, TradeSense-EQA, execution-boundary authorization and provenance-security work.
+- [x] Preliminary novelty audit records additional SCITT, DIV, DEWP and ARP prior art.
 
 ## Release decision
 
