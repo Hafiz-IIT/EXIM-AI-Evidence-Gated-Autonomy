@@ -536,7 +536,7 @@ The defensible contribution remains an EXIM-inspired synthetic security evaluati
 
 [29] Jun He and Deying Yu. *Verifiable Agentic Infrastructure: Proof-Derived Authorization for Sovereign AI Systems*. arXiv:2605.15228, 2026. https://arxiv.org/abs/2605.15228
 
-[30] Jun He, Openkedge Io, and Deying Yu. *When AI Agents Commit: Cognitive Serializability Across Data, Evidence, Policy, and Authority*. arXiv:2609.20261, 2026. https://arxiv.org/abs/2609.20261
+[30] Jun He and Deying Yu. *When AI Agents Commit: Cognitive Serializability Across Data, Evidence, Policy, and Authority*. arXiv:2609.20261, 2026. https://arxiv.org/abs/2609.20261
 
 [31] Elias Calboreanu. *LATTICE: A Governance-First Architecture for Authorized Autonomous AI Operations*. Frontiers in Artificial Intelligence 9, 2026. https://doi.org/10.3389/frai.2026.1800407
 
