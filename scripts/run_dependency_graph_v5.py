@@ -272,7 +272,8 @@ def summarize(rows):
             for reason in rejected:
                 reason_counts[reason] = reason_counts.get(reason, 0) + 1
             graph_failure_prefixes = (
-                "dependency_graph_", "dependency_", "shared_dependency_graph:",
+                "dependency_graph_", "dependency_", "invalid_dependency_graph_",
+                "shared_dependency_graph:",
             )
             graph_failures = sum(
                 reason.startswith(graph_failure_prefixes) for reason in rejected
@@ -347,6 +348,12 @@ def main():
         raise AssertionError("strict 3-of-3 should reject two colluding witnesses when the third remains honest")
     if metric("registry_root_compromise", "G2_graph_aware", "unsafe_ACT") <= 0:
         raise AssertionError("compromised registry root should expose graph-trust residual")
+    if metric("graph_structure_attack", "G2_graph_aware", "graph_validation_rejections") != 700:
+        raise AssertionError("all unresolved-graph cases must be counted as graph validation rejections")
+    if metric("graph_integrity_attack", "G2_graph_aware", "graph_validation_rejections") != 700:
+        raise AssertionError("all invalid-signature cases must be counted as graph validation rejections")
+    if metric("incomplete_dependency_manifest", "G2_graph_aware", "graph_validation_rejections") != 50:
+        raise AssertionError("incomplete manifests must be counted separately from unrelated cases")
     root_rows = [row for row in rows if row["scenario"] == "registry_root_compromise"]
     if not all(
         row["ground_truth_shared_dependency_id"] == "parent:common-control"
