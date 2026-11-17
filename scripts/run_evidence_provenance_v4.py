@@ -41,6 +41,7 @@ SCENARIOS = (
     "action_substitution",
     "single_weighbridge_compromise",
     "single_tariff_registry_compromise",
+    "tariff_compromise_with_independent_false_accept",
     "all_sources_compromised",
     "registry_root_compromise",
 )
@@ -93,7 +94,7 @@ def make_sources(scenario):
     }
     keys = {name: key(name + ("-attacker" if scenario == "all_sources_compromised"
                               or (scenario == "single_weighbridge_compromise" and name == "weighbridge")
-                              or (scenario == "single_tariff_registry_compromise" and name == "tariff_registry")
+                              or (scenario in {"single_tariff_registry_compromise", "tariff_compromise_with_independent_false_accept"} and name == "tariff_registry")
                               or scenario == "registry_root_compromise" else ""))
             for name in specs}
     if scenario == "shared_admin_gateway":
@@ -170,6 +171,11 @@ def run_one(case, scenario):
     subject_id = case["case_id"]
     action_id = "submit:" + case["case_id"]
     case_for_gate = copy.deepcopy(case)
+    if scenario == "tariff_compromise_with_independent_false_accept":
+        # Model two independent but jointly false-accepting verifiers so the
+        # existing dependency-diversity guard does not itself block the case.
+        for index, verifier in enumerate(case_for_gate["observable"]["machine"]["verifiers"]):
+            verifier["dependency_group"] = f"independent-false-accept-{index}"
 
     if scenario in {"single_weighbridge_compromise", "all_sources_compromised",
                     "registry_root_compromise"}:
@@ -181,7 +187,7 @@ def run_one(case, scenario):
     if scenario in {"single_weighbridge_compromise", "all_sources_compromised",
                     "registry_root_compromise"}:
         weight_value = parsed["gross_weight"]
-    if scenario in {"single_tariff_registry_compromise", "all_sources_compromised",
+    if scenario in {"single_tariff_registry_compromise", "tariff_compromise_with_independent_false_accept", "all_sources_compromised",
                     "registry_root_compromise"}:
         hs_value = parsed_hs
     if scenario in {"all_sources_compromised", "registry_root_compromise"}:
@@ -325,11 +331,13 @@ def main():
     if by["source_forgery_before_capture"]["unsafe_ACT"] != 0:
         raise AssertionError("honest physical evidence must block pre-capture source forgery")
     for scenario in (
-        "single_weighbridge_compromise", "single_tariff_registry_compromise",
+        "single_weighbridge_compromise", "tariff_compromise_with_independent_false_accept",
         "all_sources_compromised", "registry_root_compromise",
     ):
         if by[scenario]["unsafe_ACT"] <= 0:
             raise AssertionError(f"{scenario} must expose a residual false-authorization path")
+    if by["single_tariff_registry_compromise"]["unsafe_ACT"] != 0:
+        raise AssertionError("the existing correlated-verifier guard should block isolated tariff-source compromise in C8")
     OUT.mkdir(parents=True, exist_ok=True)
     write_csv(OUT / "evidence_provenance_v4_cases.csv", rows)
     write_csv(OUT / "evidence_provenance_v4_summary.csv", summary)
