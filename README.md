@@ -198,10 +198,11 @@ The v1 attestation binds raw document instances and normalized document slots. A
 - [Experiment runner](scripts/run_evidence_trust_v3.py)
 - [Regression tests](tests/test_evidence_trust_v3.py)
 - [Results review](experiments/evidence_trust_v3/RESULTS_REVIEW.md)
+- [Pinned artifact manifest and output hashes](results/evidence_trust_v3/manifest-44164029203.json)
 - [Preliminary novelty audit](research/NOVELTY_AUDIT.md)
 - [Related-work comparison](experiments/evidence_trust_v3/RELATED_WORK_AND_NOVELTY.md)
 - [Draft pull request #6](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/pull/6)
-- [Successful full CI run 44159840913](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44159840913)
+- [Successful full CI run 44164029203](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44164029203)
 
 The v3 study compares 2-of-3 and strict 3-of-3 thresholds across eight scenarios and 5,600 case-scenario rows. Bounded recovery from an isolated verifier false rejection restores all 100 safe cases in the honest baseline with zero unsafe ACT. Two-witness collusion still produces 50 unsafe C4 actions under 2-of-3; strict 3-of-3 blocks this modeled case but not full-roster compromise. Strict 3-of-3 also blocks all safe cases when one credential is invalid. The witness is derived from synthetic benchmark ground truth, not a deployed sensor.
 
