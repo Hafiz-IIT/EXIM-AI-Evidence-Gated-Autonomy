@@ -57,6 +57,8 @@ These are deterministic counts over a fixed synthetic benchmark, not deployment 
 
 ## 5. Integrity and reproduction
 
+Pinned manifest: [results/evidence_trust_v3/manifest-44164029203.json](../../results/evidence_trust_v3/manifest-44164029203.json).
+
 Manifest:
 - `evidence_trust_v3_cases.csv`: `4d81c3b15c73d11a15e718324539e02ef7bee8601bbbfdafc4cc69d49da65c34`
 - `evidence_trust_v3_summary.csv`: `3208079f763132fd8c35f23c302e5c812d6d197c53e17ef24b8e1f97eb65fa94`
