@@ -20,9 +20,27 @@ GRAPH_SCHEMA = "ega-dependency-graph-v5"
 def issue_dependency_graph(*, graph_id: str, version: str, tenant_id: str,
                            nodes: dict[str, Iterable[str]], issued_at: int,
                            expires_at: int, signer_private_key: Ed25519PrivateKey) -> dict:
-    if expires_at <= issued_at or not graph_id or not version or not tenant_id:
+    if (not all(isinstance(value, str) and value for value in (graph_id, version, tenant_id))
+            or not isinstance(issued_at, int) or isinstance(issued_at, bool)
+            or not isinstance(expires_at, int) or isinstance(expires_at, bool)
+            or expires_at <= issued_at):
         raise ValueError("invalid graph identity or validity interval")
-    normalized = {node: sorted(set(parents)) for node, parents in sorted(nodes.items())}
+    if not isinstance(nodes, dict) or not nodes:
+        raise ValueError("dependency graph nodes must be a non-empty mapping")
+    normalized = {}
+    for node, parents in nodes.items():
+        if not isinstance(node, str) or not node:
+            raise ValueError("dependency node identifiers must be non-empty strings")
+        if isinstance(parents, (str, bytes)):
+            raise ValueError("dependency parents must be an iterable of node identifiers")
+        try:
+            parent_list = list(parents)
+        except TypeError as exc:
+            raise ValueError("dependency parents must be iterable") from exc
+        if not all(isinstance(parent, str) and parent for parent in parent_list):
+            raise ValueError("dependency parent identifiers must be non-empty strings")
+        normalized[node] = sorted(set(parent_list))
+    normalized = dict(sorted(normalized.items()))
     body = {
         "schema": GRAPH_SCHEMA, "graph_id": graph_id, "version": version,
         "tenant_id": tenant_id, "nodes": normalized,
@@ -37,7 +55,9 @@ def issue_dependency_graph(*, graph_id: str, version: str, tenant_id: str,
 
 def resolve_ancestors(nodes: dict[str, list[str]], leaf: str) -> frozenset[str]:
     """Return transitive ancestors; reject missing nodes and dependency cycles."""
-    if leaf not in nodes:
+    if not isinstance(leaf, str) or not leaf:
+        raise ValueError("dependency_leaf_missing")
+    if not isinstance(nodes, dict) or leaf not in nodes:
         raise ValueError("dependency_leaf_missing")
     visiting: set[str] = set()
     memo: dict[str, set[str]] = {}
@@ -71,10 +91,23 @@ def verify_dependency_graph(graph_record: dict, *, trusted_registry_key: Ed25519
             return False, "unsupported_dependency_graph_schema", None
         if body.get("tenant_id") != tenant_id:
             return False, "dependency_graph_tenant_mismatch", None
-        if not isinstance(now, int) or now < body["issued_at"] or now >= body["expires_at"]:
+        if (not isinstance(body.get("graph_id"), str) or not body["graph_id"]
+                or not isinstance(body.get("version"), str) or not body["version"]):
+            return False, "dependency_graph_identity_invalid", None
+        issued_at, expires_at = body.get("issued_at"), body.get("expires_at")
+        if (not isinstance(issued_at, int) or isinstance(issued_at, bool)
+                or not isinstance(expires_at, int) or isinstance(expires_at, bool)
+                or expires_at <= issued_at):
+            return False, "dependency_graph_validity_invalid", None
+        if not isinstance(now, int) or isinstance(now, bool) or now < issued_at or now >= expires_at:
             return False, "dependency_graph_expired_or_not_yet_valid", None
         nodes = body["nodes"]
         if not isinstance(nodes, dict) or not nodes:
+            return False, "dependency_graph_empty_or_malformed", None
+        if any(not isinstance(node, str) or not node
+               or not isinstance(parents, list)
+               or not all(isinstance(parent, str) and parent for parent in parents)
+               for node, parents in nodes.items()):
             return False, "dependency_graph_empty_or_malformed", None
         if body.get("graph_digest") != canonical_sha256(nodes):
             return False, "dependency_graph_digest_mismatch", None
@@ -123,7 +156,8 @@ def evaluate_quorum(records: Iterable[tuple[dict, dict]], *, policy: str, thresh
     if policy not in {"key_unique", "field_distinct", "graph_aware"}:
         return False, "unknown_independence_policy", []
     supplied = list(records)
-    if threshold < 1 or threshold > len(supplied):
+    if (not isinstance(threshold, int) or isinstance(threshold, bool)
+            or threshold < 1 or threshold > len(supplied)):
         return False, "invalid_quorum_threshold", []
 
     graph_body = None
