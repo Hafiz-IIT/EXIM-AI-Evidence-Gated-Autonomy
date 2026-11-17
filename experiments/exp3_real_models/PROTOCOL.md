@@ -67,3 +67,5 @@ Final-holdout execution requires:
 ## Limitations
 
 All benchmark cases and source documents are synthetic. This study evaluates model outputs on a controlled testbed; it does not validate real customs workflows, production security, or the independence of model families. The OOD rendering is a synthetic wording/layout shift, not a real scanned-document distribution.
+
+Before estimating or running any model, the harness verifies the hashes of the public task file, task manifest, private evaluation map and private task-ID salt, and checks that public/private task IDs form an exact one-to-one mapping. The final-holdout freeze also binds the private evaluation-map hash.
