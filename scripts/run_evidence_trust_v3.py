@@ -110,17 +110,19 @@ def scenario_rows(cases, scenario):
         credentials[0] = dict(credentials[0])
         credentials[0]["body"] = dict(credentials[0]["body"], source_id="attacker-source")
     if scenario == "registry_root_compromise":
-        attacker_root = key("attacker-registry-root")
-        root_public = attacker_root.public_key()
+        # The existing registry signing private key is compromised. The
+        # verifier keeps the original pinned public key; the attacker uses the
+        # stolen private key to enroll two attacker-controlled witness keys.
+        compromised_registry_private = root_private
         for i in (0, 1):
             credentials[i] = issue_identity_credential(
-                issuer_id="attacker-registry-root", witness_id=f"attacker-witness-{i+1}",
+                issuer_id="synthetic-registry", witness_id=f"attacker-witness-{i+1}",
                 key_id=f"attacker-key-{i+1}", public_key=private_keys[i].public_key(),
                 source_id=f"attacker-source-{i+1}",
                 acquisition_domain=f"attacker-acquisition-{i+1}",
                 administrative_domain=f"attacker-admin-{i+1}", tenant_id=TENANT,
                 serial=f"attacker-credential-{i+1}", issued_at=NOW - 100,
-                expires_at=NOW + 10000, issuer_private_key=attacker_root,
+                expires_at=NOW + 10000, issuer_private_key=compromised_registry_private,
             )
     rows = []
     for index, original_case in enumerate(cases):
