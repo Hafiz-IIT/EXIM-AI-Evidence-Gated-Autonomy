@@ -245,6 +245,19 @@ class DependencyGraphV5Tests(unittest.TestCase):
         ok, reason, _ = self.evaluate(records, "field_distinct")
         self.assertFalse(ok)
         self.assertEqual(reason, "insufficient_identity_independence")
+        self.assertFalse(self.evaluate(records, "graph_aware")[0])
+
+    def test_graph_aware_policy_cannot_prevent_full_roster_collusion(self):
+        records = [(self.record(n, 99.0), self.credentials[n]) for n in self.names]
+        ok, reason, _ = evaluate_quorum(
+            records, policy="graph_aware", threshold=2,
+            trusted_registry_key=self.root.public_key(), tenant_id=self.tenant,
+            graph_record=self.graph, claim_type="gross_weight", expected_value=99.0,
+            expected_unit="kg", expected_subject_id=self.subject,
+            expected_action_id=self.action, expected_action_payload_digest=self.action_digest,
+            expected_document_digest=self.doc_digest, now=self.now,
+        )
+        self.assertEqual((ok, reason), (True, "quorum_valid"))
 
     def test_graph_root_compromise_can_hide_a_shared_parent(self):
         attacker_root = Ed25519PrivateKey.generate()
