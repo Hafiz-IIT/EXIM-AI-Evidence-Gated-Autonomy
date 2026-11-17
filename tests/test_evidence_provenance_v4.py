@@ -199,7 +199,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
             claim_type="gross_weight", expected_subject_id=self.subject,
             expected_action_id=self.action,
             expected_action_payload_digest=self.action_payload_digest, expected_document_digest=self.doc_digest,
-            now=self.now, required_source_types=frozenset({"document_parser", "weighbridge"}),
+            expected_unit="kg", now=self.now, required_source_types=frozenset({"document_parser", "weighbridge"}),
             tolerance=0.01,
         )
         self.assertEqual((ok, reason), (False, "shared_dependency:administrative_domain"))
