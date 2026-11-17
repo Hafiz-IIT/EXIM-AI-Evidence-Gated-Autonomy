@@ -12,7 +12,7 @@ Can a threshold of multiple witnesses reduce the unsafe-authorization exposure o
 - Each registry-signed credential binds witness ID, key ID, public-key bytes, source ID, acquisition domain, administrative domain, tenant, serial, and validity window.
 - Each witness signs a case-scoped measurement assertion bound to its credential digest and evidence parent.
 - Authorization requires two matching assertions from at least two distinct witness IDs, key IDs, source IDs, acquisition domains, and administrative domains. Independence is evaluated on the matching supporters themselves; a dissenting third witness cannot lend independence to a colluding pair.
-- The configured roster must contain exactly three distinct witness IDs; up to one invalid credential can be tolerated only if two remaining valid, independent witnesses form the matching quorum.
+- The configured roster must contain exactly three distinct witness IDs; up to one invalid credential can be tolerated only if two remaining valid, independent witnesses form the matching quorum. Repeated entries or a missing roster member cannot increase the number of independent supporters.
 - A credential cannot be edited to claim a different source or key without invalidating the registry signature.
 
 ## Prespecified threat scenarios
