@@ -20,15 +20,16 @@ Can a threshold of multiple witnesses reduce the unsafe-authorization exposure o
 2. One witness compromised.
 3. Two witnesses compromised.
 4. All three witnesses compromised.
-5. Forged source-identity credential.
-6. Disclosed shared administrative domain.
-7. Registry-root compromise, treated as a trust-anchor failure rather than a routine witness failure.
+5. Forged source-identity credential (credential-body tampering without a valid registry signature).
+6. Source forgery before capture, separately from signer/credential compromise.
+7. Disclosed shared administrative domain.
+8. Registry-root compromise, treated as a trust-anchor failure rather than a routine witness failure.
 
 The deterministic HIGH-risk benchmark v0.4 subset is reused. Outputs are a separate v3 result set and do not overwrite v2 artifacts or historical results.
 
 ## Interpretation
 
-A 2-of-3 quorum is expected to tolerate one compromised witness only when the other two provide valid, independent, matching evidence. Two compromised witnesses can control a 2-of-3 quorum. A forged credential should fail under an uncompromised pinned registry key. Shared administrative-domain labels should fail the declared independence check.
+A 2-of-3 quorum is expected to tolerate one compromised witness only when the other two provide valid, independent, matching evidence. Two compromised witnesses can control a 2-of-3 quorum. A forged credential should fail under an uncompromised pinned registry key. Source forgery before capture is a distinct threat: the identity credential may still be valid, so detection depends on the independent witness disagreeing with the forged document interpretation. Shared administrative-domain labels should fail the declared independence check. The controller's independent-measurement input is populated only from a successfully verified quorum; it must not fall back to the benchmark's untouched measurement when quorum verification fails.
 
 A registry signature proves that the pinned issuer signed a credential binding a key to identity claims. It does **not** prove that the source physically exists, that the acquisition channel is honest, or that the claimed administrative domains are genuinely independent. Those require external identity proofing, governance, audits, and operational controls.
 
