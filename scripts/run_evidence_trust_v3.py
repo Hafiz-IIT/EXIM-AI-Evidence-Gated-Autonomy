@@ -238,8 +238,7 @@ def main():
             for name in ("evidence_trust_v3_cases.csv", "evidence_trust_v3_summary.csv")
         },
     }
-    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "
-", encoding="utf-8")
+    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(manifest, indent=2))
     print(json.dumps(summary, indent=2))
 
