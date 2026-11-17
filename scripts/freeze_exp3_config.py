@@ -29,6 +29,9 @@ def main():
     models = config["models"]
     conditions = config["conditions"]
     for name, spec in models.items():
+        for secret_field in ("api_key", "api_token", "access_token", "secret", "authorization"):
+            if spec.get(secret_field):
+                raise SystemExit(f"model {name} must reference credentials through api_key_env, not inline {secret_field}")
         if not spec.get("model") or "REPLACE_WITH" in spec["model"] or ".example" in spec.get("base_url", ""):
             raise SystemExit(f"model {name} still contains placeholder identity")
         for field in ("provider", "base_url", "family_id", "api_key_env"):

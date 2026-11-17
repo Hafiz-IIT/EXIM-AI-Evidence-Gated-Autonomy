@@ -151,6 +151,23 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         self.assertFalse(valid)
         self.assertFalse(normalized["accept"])
 
+    def test_freeze_rejects_inline_provider_secrets(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            config_path = root / "config.json"
+            config_path.write_text(json.dumps({
+                "models": {"m": {"provider": "mock", "base_url": "https://api.test/v1", "model": "m", "family_id": "f", "api_key_env": "KEY", "api_key": "do-not-store"}},
+                "conditions": [], "settings": {},
+            }))
+            prepared = root / "prepared"
+            (prepared / "public").mkdir(parents=True)
+            (prepared / "private").mkdir()
+            with self.assertRaises(subprocess.CalledProcessError):
+                subprocess.run([
+                    sys.executable, "scripts/freeze_exp3_config.py",
+                    "--config", str(config_path), "--prepared-dir", str(prepared), "--output", str(root / "frozen.json"),
+                ], cwd=Path(__file__).resolve().parents[1], check=True, capture_output=True, text=True)
+
     def test_freeze_binds_task_manifest_and_unique_holdout_family(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
         with tempfile.TemporaryDirectory() as temp:
