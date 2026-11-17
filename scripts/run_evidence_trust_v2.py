@@ -181,6 +181,7 @@ def issue_role_records(case, compromised, nonce_prefix, witness_dependency=False
         }
         witness_source_id = "independent-scale-and-inspection"
         witness_domain = "independent-operations"
+        witness_admin_domain = "witness-admin"
     witness_source = {
         "source_id": witness_source_id,
         "acquisition_domain": witness_domain,
