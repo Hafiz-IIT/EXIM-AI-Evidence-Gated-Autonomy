@@ -9,7 +9,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from experiments.exp3_real_models.harness import estimate_condition_cost, read_jsonl
+from experiments.exp3_real_models.harness import estimate_condition_cost, verify_prepared_package
 
 
 def main():
@@ -23,8 +23,8 @@ def main():
     args = parser.parse_args()
 
     config = json.loads(args.config.read_text(encoding="utf-8"))
-    public_tasks = {row["task_id"]: row for row in read_jsonl(args.prepared_dir / "public" / "tasks.jsonl")}
-    private_map = read_jsonl(args.prepared_dir / "private" / "evaluation_map.jsonl")
+    _, _, public_rows, private_map = verify_prepared_package(args.prepared_dir)
+    public_tasks = {row["task_id"]: row for row in public_rows}
     selected = [c for c in config["conditions"] if not args.conditions or c["condition_id"] in args.conditions]
     unknown = set(args.conditions or []) - {c["condition_id"] for c in config["conditions"]}
     if unknown:

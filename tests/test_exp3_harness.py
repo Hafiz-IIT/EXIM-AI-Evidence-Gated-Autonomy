@@ -15,6 +15,7 @@ from experiments.exp3_real_models.harness import (
     estimate_condition_cost,
     prepare_tasks,
     run_condition,
+    verify_prepared_package,
     build_public_task,
     normalize_extraction,
     normalize_verifier,
@@ -57,6 +58,19 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         for forbidden in ("ground_truth", "fault", "safe_to_act", "family", "severity", "pair_id", "case_id"):
             self.assertNotIn(forbidden, serialized)
         assert_public_task_blinded(task)
+
+    def test_prepared_package_detects_private_map_tampering(self):
+        cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            benchmark = root / "cases.jsonl"
+            benchmark.write_text("".join(json.dumps(x) + "\n" for x in cases))
+            prepared = root / "prepared"
+            prepare_tasks(benchmark, prepared)
+            private_map = prepared / "private" / "evaluation_map.jsonl"
+            private_map.write_text(private_map.read_text() + "{}\n")
+            with self.assertRaisesRegex(ValueError, "private evaluation map hash"):
+                verify_prepared_package(prepared)
 
     def test_task_ids_are_salted_and_not_predictable_from_case_id(self):
         case = self.make_case("C4", "U-01-123")
@@ -173,6 +187,8 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             self.assertEqual(frozen["task_manifest_sha256"], hashlib.sha256(manifest_path.read_bytes()).hexdigest())
             self.assertEqual(frozen["public_tasks_sha256"], manifest["public_tasks_sha256"])
             self.assertEqual(frozen["task_id_salt_sha256"], manifest["task_id_salt_sha256"])
+            private_meta = json.loads((prepared / "private" / "private_metadata.json").read_text())
+            self.assertEqual(frozen["private_evaluation_map_sha256"], private_meta["private_evaluation_map_sha256"])
 
     def test_cost_budget_blocks_before_api_key_preflight(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
