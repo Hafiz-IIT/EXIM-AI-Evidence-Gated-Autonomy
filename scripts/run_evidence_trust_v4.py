@@ -77,6 +77,7 @@ def make_credentials(root_private, scenario):
         "two_witnesses_compromised": {0, 1},
         "all_witnesses_compromised": {0, 1, 2},
         "two_compromised_shared_parent": {0, 1},
+        "registry_root_compromise": {0, 1},
     }.get(scenario, set())
     for index, name in enumerate(NAMES, 1):
         private = key(name)
