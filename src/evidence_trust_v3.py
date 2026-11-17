@@ -159,6 +159,9 @@ def verify_witness_quorum(items: Iterable[tuple[dict, dict]], *,
     # Independence must be checked within that matching group, not across all
     # valid witnesses (a dissenting third witness cannot lend independence to
     # two colluding supporters).
+    if len(accepted) < threshold:
+        return False, "insufficient_valid_witnesses", 0
+
     matching_groups = {}
     for envelope, identity in accepted:
         try:
@@ -169,6 +172,7 @@ def verify_witness_quorum(items: Iterable[tuple[dict, dict]], *,
                 and measurement[1] == expected_item_type):
             matching_groups.setdefault(measurement, []).append(identity)
 
+    matching_count = max((len(group) for group in matching_groups.values()), default=0)
     for supporters in matching_groups.values():
         if len(supporters) < threshold:
             continue
@@ -176,11 +180,13 @@ def verify_witness_quorum(items: Iterable[tuple[dict, dict]], *,
             "witness_id", "key_id", "source_id",
             "acquisition_domain", "administrative_domain",
         )
-        if all(len({identity[field] for identity in supporters}) >= threshold
-               for field in independent_fields):
+        failed_field = next(
+            (field for field in independent_fields
+             if len({identity[field] for identity in supporters}) < threshold),
+            None,
+        )
+        if failed_field is None:
             return True, "quorum_valid", len(supporters)
+        return False, "insufficient_identity_independence:" + failed_field, 0
 
-    matching_count = max((len(group) for group in matching_groups.values()), default=0)
-    if matching_count < threshold:
-        return False, "quorum_disagreement", matching_count
-    return False, "insufficient_identity_independence", matching_count
+    return False, "quorum_disagreement", matching_count
