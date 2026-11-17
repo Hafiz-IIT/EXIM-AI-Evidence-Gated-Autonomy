@@ -1,0 +1,35 @@
+{
+  "protocol": "ega-evidence-trust-architecture-v3",
+  "status": "synthetic threat experiment; not production validation",
+  "benchmark_version": "0.4",
+  "high_risk_cases_per_scenario": 700,
+  "scenario_count": 8,
+  "case_scenario_rows": 5600,
+  "witness_quorum": "2-of-3 primary; 3-of-3 sensitivity",
+  "threshold_sensitivity": "same cases and assertions evaluated at thresholds 2 and 3",
+  "identity_binding": "registry-root-signed credential binds public key to source and domain claims",
+  "scenarios": [
+    "honest_baseline",
+    "one_witness_compromised",
+    "two_witnesses_compromised",
+    "all_witnesses_compromised",
+    "forged_source_identity",
+    "source_forgery_before_capture",
+    "shared_administrative_domain",
+    "registry_root_compromise"
+  ],
+  "limitations": [
+    "All keys, identities, measurements and source records are synthetic.",
+    "Registry signature authenticates the issuer's credential, not real-world source truth.",
+    "Distinct domain labels do not prove operational independence.",
+    "No production PKI, KMS/HSM, hardware identity, durable revocation or trusted time.",
+    "Deterministic benchmark counts are not real-world probabilities."
+  ],
+  "source_commit": "d23628f879fa9d17d2d9c6c0721b70cb83c52aa8",
+  "workflow_run_id": "44164029203",
+  "python_version": "3.11.18",
+  "outputs_sha256": {
+    "evidence_trust_v3_cases.csv": "4d81c3b15c73d11a15e718324539e02ef7bee8601bbbfdafc4cc69d49da65c34",
+    "evidence_trust_v3_summary.csv": "3208079f763132fd8c35f23c302e5c812d6d197c53e17ef24b8e1f97eb65fa94"
+  }
+}
