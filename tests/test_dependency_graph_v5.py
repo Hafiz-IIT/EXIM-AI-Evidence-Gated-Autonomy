@@ -29,7 +29,7 @@ class DependencyGraphV5Tests(unittest.TestCase):
         else:
             nodes = {}
             for name in self.names:
-                nodes[f"source:{name}"] = [
+                nodes[f"source:source-{name}"] = [
                     f"admin:{name}", f"idp:{name}", f"kms:{name}", f"firmware:{name}",
                     f"acquisition:{name}", f"physical:{name}",
                 ]
@@ -51,7 +51,7 @@ class DependencyGraphV5Tests(unittest.TestCase):
         for name in names:
             direct_admin = "shared-admin" if name in shared_direct else f"admin-{name}"
             creds[name] = issue_graph_bound_source_credential(
-                graph_digest=digest, dependency_leaf_node=f"source:{name}",
+                graph_digest=digest, dependency_leaf_node=f"source:source-{name}",
                 dependency_manifest_complete=name not in incomplete,
                 issuer_id="synthetic-registry", source_id=f"source-{name}",
                 source_type="weighbridge", key_id=f"key-{name}",
@@ -97,7 +97,7 @@ class DependencyGraphV5Tests(unittest.TestCase):
             self.graph, trusted_registry_key=self.root.public_key(),
             tenant_id=self.tenant, now=self.now)
         self.assertEqual((ok, reason), (True, "valid_dependency_graph"))
-        ancestors = resolve_ancestors(body["nodes"], "source:w1")
+        ancestors = resolve_ancestors(body["nodes"], "source:source-w1")
         self.assertIn("admin:w1", ancestors)
         self.assertIn("physical:w1", ancestors)
 
