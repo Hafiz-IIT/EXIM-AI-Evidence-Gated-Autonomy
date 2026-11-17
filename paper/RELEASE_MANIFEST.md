@@ -97,3 +97,22 @@ The full workflow [43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Ga
 Across 700 HIGH-risk v0.4 cases, the verifier rejected raw tampering, unsigned coherent rewrites, revoked-key use, cross-tenant reuse and second-use nonce replay in all tested cases. Under the combined scenario of trusted document-root signer compromise plus coordinated upstream rewrites, the forged attestation verified in all 700 cases; the downstream gate authorized 350 ACT decisions, 300 unsafe against benchmark ground truth (42.86% of all HIGH-risk cases; 85.71% of ACT decisions). The 300 unsafe decisions occurred in C1, C2, C4, C6, C9 and C13 (50 each).
 
 This is a conditional synthetic attack outcome under coordinated compromise of the signing authority and upstream evidence channels. It is not a real-world probability or a result about signer-key theft alone. The implementation uses deterministic test keys and process-local replay state; production key custody, authenticated signer enrollment, secure capture, distributed replay protection and operational key management remain unimplemented. The manuscript remains **not ready for arXiv submission**.
+
+
+## Four-authority Evidence-Trust v2 extension (CI-verified)
+
+- Implementation: `src/evidence_trust_v2.py`
+- Runner: `scripts/run_evidence_trust_v2.py`
+- Tests: `tests/test_evidence_trust_v2.py`
+- Protocol: `experiments/evidence_trust_v2/PROTOCOL.md`
+- Results review: `experiments/evidence_trust_v2/RESULTS_REVIEW.md`
+- Output guide: `results/evidence_trust_v2/README.md`
+- Pinned manifest: `results/evidence_trust_v2/manifest-44025577491.json`
+- Verified full CI run: [44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491)
+
+The experiment evaluates 15 non-empty combinations of CA, IA, IWA and AA compromise, plus an honest baseline and three controls, across 700 HIGH-risk v0.4 cases per scenario. The archived artifact contains 13,300 case-scenario rows and 19 summaries. The full workflow passed tests, benchmark generation/verification, reconstruction and sensitivity runners, document-root v1, evidence-trust v2, historical-table loading, artifact uploads and LaTeX compilation.
+
+Key results: IWA-only compromise produced 50 unsafe ACT decisions (7.14% of all HIGH-risk cases); CA+IWA, CA+IA+IWA, and key-admin trust-store poisoning each produced 300 (42.86%); any scenario including AA produced 600 (85.71%). Source forgery before capture and a disclosed shared-dependency witness produced no ACT in this specific synthetic model.
+
+The witness is an idealized ground-truth-derived record; source and administrative-domain labels are not externally authenticated. The model uses deterministic test keys and does not implement production KMS/HSM custody, authenticated enrollment, durable replay storage, secure capture or operational revocation. The result does not establish real-world independence or production security.
+
