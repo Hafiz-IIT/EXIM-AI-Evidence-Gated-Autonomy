@@ -5,7 +5,7 @@
 - **Paper:** Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence
 - **Author:** Syed Hafiz Ali
 - **Repository:** https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy
-- **Version:** Historical v1 artifact plus separately versioned benchmark v0.4 / reconstruction v2
+- **Version:** Historical v1 artifact plus separately versioned benchmark v0.4, reconstruction v2, document-root attestation v1 and evidence-trust v2
 - **Historical benchmark v0.3:** 500 underlying evidence situations paired across LOW/HIGH consequence = 1,000 cases
 - **Extended benchmark v0.4:** 700 underlying evidence situations paired across LOW/HIGH consequence = 1,400 cases; 14 fault families
 - **Benchmark seed:** 42
@@ -15,12 +15,7 @@
 
 **Not ready for arXiv submission.** The result CSVs are version-controlled and the manuscript claims have been compared against them, but the repository does not yet contain all experiment-runner source needed to regenerate those results.
 
-The current `scripts/reproduce_all.py` command:
-1. regenerates the synthetic benchmark;
-2. verifies benchmark structure/pair integrity;
-3. loads and prints the existing result CSVs.
-
-It does **not** rerun the stochastic verification, OOD, provenance-attack, trust-root-compromise, or separation-of-duties simulations. The CI workflow therefore does not establish full computational reproducibility of Experiments 1B–2E.
+The current `scripts/reproduce_all.py` command regenerates and verifies v0.3/v0.4, runs the separately versioned reconstruction v1/v2 suites, the document-root attestation experiment, the four-authority evidence-trust v2 matrix, and loads historical result tables unchanged. The new runners use explicit newly documented assumptions; they do not reproduce the historical 1B–2E numbers. The original Experiment 1A downstream-resolution implementation also remains unrecovered.
 
 ## Known policy correction
 
