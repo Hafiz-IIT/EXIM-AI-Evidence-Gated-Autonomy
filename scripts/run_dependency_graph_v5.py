@@ -111,11 +111,9 @@ def make_graph(scenario, root):
             nodes[f"{kind}:{name}"] = [ancestor]
         nodes[ancestor] = []
 
-    if scenario == "registry_root_compromise":
-        # The real topology has w1 and w2 under a common parent. The compromised
-        # registry signs a forged manifest that omits that true shared ancestor.
-        # The signed graph therefore looks disjoint even though the real sources are not.
-        pass
+    # For registry_root_compromise, this is intentionally the attacker's forged
+    # graph: it omits the true common parent of w1 and w2. Case-level output marks
+    # the real dependency separately from what the signed graph declares.
 
     if scenario == "graph_structure_attack":
         nodes["admin:w1"] = ["missing:dependency-parent"]
@@ -246,13 +244,28 @@ def summarize(rows):
             act_count = sum(r["action"] == "ACT" for r in group)
             unsafe = sum(r["unsafe_act"] for r in group)
             safe_act = sum(r["safe_act"] for r in group)
+            rejected = [r["quorum_reason"] for r in group if not r["quorum_valid"]]
+            reason_counts = {}
+            for reason in rejected:
+                reason_counts[reason] = reason_counts.get(reason, 0) + 1
+            graph_failure_prefixes = (
+                "dependency_graph_", "dependency_", "shared_dependency_graph:",
+            )
+            graph_failures = sum(
+                reason.startswith(graph_failure_prefixes) for reason in rejected
+            )
+            quorum_accepts = len(group) - len(rejected)
             out.append({
                 "scenario": scenario, "policy": policy, "cases": len(group),
+                "quorum_accepts": quorum_accepts,
+                "quorum_acceptance_rate": quorum_accepts / len(group),
                 "ACT": act_count, "unsafe_ACT": unsafe, "safe_ACT": safe_act,
                 "unsafe_ACT_rate_all_cases": unsafe / len(group),
                 "unsafe_ACT_rate_conditional_on_ACT": unsafe / act_count if act_count else None,
                 "safe_ACT_coverage": safe_act / safe_count if safe_count else None,
                 "false_block_rate": (safe_count - safe_act) / safe_count if safe_count else None,
+                "graph_validation_rejections": graph_failures,
+                "rejection_reason_counts": json.dumps(reason_counts, sort_keys=True),
                 "ESCALATE": len(group) - act_count,
             })
     return out
