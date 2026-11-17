@@ -22,6 +22,8 @@ The repository now contains explicit runners for new reconstruction experiments 
 
 These are currently claims cross-checked against stored result files, not independently regenerated from complete committed experiment source.
 
+The v3 supplementary experiment is separately reproducible from its committed protocol and runner: the honest baseline recovered 100/100 safe cases with zero unsafe ACT; 2-of-3 admitted 50/700 unsafe ACT under two-witness collusion and registry-root compromise; strict 3-of-3 blocked those modeled cases but not full-roster compromise and failed closed under one invalid credential. These v3 counts are validated by full CI run 44159840913. Do not conflate this supplementary result with the unrecovered historical 1B–2E simulations. No v4 result should be stated until its latest full workflow and artifact have passed review.
+
 ## Claims forbidden
 - "solves AI safety"
 - "guarantees safety"
