@@ -70,7 +70,7 @@ def write_csv(path, rows):
 
 
 def make_sources(scenario):
-    root = key("attacker-root" if scenario == "registry_root_compromise" else "registry-root")
+    # In the registry-root scenario the existing issuer private key is compromised;\n    # the verifier continues to pin the original registry public key.\n    root = key("registry-root")
     specs = {
         "document_parser": {
             "claims": ["gross_weight", "quantity", "hs_code"],
