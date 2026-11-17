@@ -101,12 +101,12 @@ class EvidenceTrustV2Tests(unittest.TestCase):
         result = authorize(forged, (), "test-source-forgery")
         self.assertNotEqual(result["action"], "ACT")
 
-    def test_shared_dependency_witness_can_mask_source_forgery(self):
+    def test_shared_dependency_witness_is_rejected_when_source_identity_is_disclosed(self):
         forged = make_source_forgery(self.case, shared_witness=True)
         result = authorize(
             forged, (), "test-shared-dependency", witness_dependency=True
         )
-        self.assertEqual(result["action"], "ACT")
+        self.assertNotEqual(result["action"], "ACT")
 
     def test_authorization_authority_compromise_can_bypass_policy(self):
         result = authorize(self.case, ("authorization",), "test-aa-compromise")
