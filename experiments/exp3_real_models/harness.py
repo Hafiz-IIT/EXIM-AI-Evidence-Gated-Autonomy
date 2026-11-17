@@ -324,7 +324,7 @@ def _endpoint(base_url: str) -> str:
 
 
 def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) -> dict:
-    """Conservative offline estimate: chars/4 input tokens and max_tokens output per call."""
+    """Conservative offline estimate: chars/3 input tokens and max_tokens output per call."""
     models = config["models"]
     settings = config["settings"]
     max_tokens = int(settings.get("max_tokens", 500))
