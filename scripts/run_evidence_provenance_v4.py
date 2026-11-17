@@ -32,6 +32,7 @@ SCENARIOS = (
     "honest_baseline",
     "source_forgery_before_capture",
     "replay_attack",
+    "stale_evidence",
     "cross_subject_substitution",
     "cross_claim_substitution",
     "parser_lineage_tampering",
@@ -129,7 +130,7 @@ def make_record(source_type, claim, value, case, scenario, root, keys, credentia
     calibration_id, calibration_until = "", 0
     if source_type == "weighbridge":
         calibration_id, calibration_until = "scale-calibration-1", NOW + 1000
-    if scenario == "replay_attack" and source_type == "weighbridge":
+    if scenario == "stale_evidence" and source_type == "weighbridge":
         observed_at, issued_at, expires_at = NOW - 1000, NOW - 1000, NOW - 1
     if scenario == "cross_subject_substitution" and source_type == "rfid_counter":
         subject_id = "different-shipment"
@@ -156,7 +157,8 @@ def make_record(source_type, claim, value, case, scenario, root, keys, credentia
         output_digest=output_digest, transformation_id="transform-" + source_type,
         tool_version="synthetic-" + source_type + "-1.0",
         observed_at=observed_at, issued_at=issued_at, expires_at=expires_at,
-        sequence_number=1, nonce=f"{case['case_id']}:{scenario}:{source_type}:{claim}",
+        sequence_number=({"gross_weight": 1, "quantity": 2, "hs_code": 3}[claim] if source_type == "document_parser" else 1),
+        nonce=f"{case['case_id']}:{scenario}:{source_type}:{claim}",
         calibration_id=calibration_id, calibration_valid_until=calibration_until,
     )
 
@@ -213,6 +215,9 @@ def run_one(case, scenario):
                          case, scenario, root, keys, credentials), credentials["tariff_registry"]),
         ],
     }
+    if scenario == "replay_attack":
+        # A duplicated signed sensor assertion in one action batch must be rejected.
+        evidence["gross_weight"].append(evidence["gross_weight"][1])
     if scenario == "cross_claim_substitution":
         evidence["hs_code"][1] = (
             make_record("weighbridge", "hs_code", parsed_hs,
@@ -222,6 +227,8 @@ def run_one(case, scenario):
 
     claim_results = {}
     verified_evidence = []
+    consumed_nonces = set()
+    last_sequences = {}
     for claim in CLAIMS:
         required = {
             "gross_weight": frozenset({"document_parser", "weighbridge"}),
@@ -234,7 +241,9 @@ def run_one(case, scenario):
             expected_action_id=action_id, expected_action_payload_digest=action_payload_digest,
             expected_document_digest=doc_digest,
             now=NOW, required_source_types=required,
+            expected_unit={"gross_weight": "kg", "quantity": "items", "hs_code": "HS"}[claim],
             tolerance=0.01 if claim == "gross_weight" else 0.0,
+            consumed_nonces=consumed_nonces, last_sequences=last_sequences,
         )
         claim_results[claim] = (ok, reason)
         verified_evidence.extend(accepted)
@@ -250,7 +259,7 @@ def run_one(case, scenario):
         policy_version=POLICY, required_claims=CLAIMS, evidence_digests=evidence_digests,
         issued_at=NOW - 10, expires_at=NOW + 100, private_key=authorizer,
     )
-    redeem_action = action_id + ":substituted" if scenario == "action_substitution" else action_id
+    redeem_action = action_id
     redeem_payload = dict(case["action"])
     if scenario == "action_substitution":
         redeem_payload["name"] = "substituted-action"
@@ -322,7 +331,7 @@ def main():
     if by["honest_baseline"]["unsafe_ACT"] != 0 or by["honest_baseline"]["safe_ACT_coverage"] != 1.0:
         raise AssertionError("honest baseline must have zero unsafe ACT and full safe-case coverage")
     for scenario in (
-        "replay_attack", "cross_subject_substitution", "cross_claim_substitution",
+        "replay_attack", "stale_evidence", "cross_subject_substitution", "cross_claim_substitution",
         "parser_lineage_tampering", "invalid_calibration", "shared_admin_gateway",
         "credential_tampering", "action_substitution",
     ):
