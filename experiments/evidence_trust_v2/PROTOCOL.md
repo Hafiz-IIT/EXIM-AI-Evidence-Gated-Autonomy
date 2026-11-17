@@ -32,10 +32,11 @@ The runner evaluates all 15 non-empty subsets of the four roles: four single-rol
 
 ## 4. Separate controls
 
-Two deterministic controls are evaluated separately from key compromise:
+Three deterministic controls are evaluated separately from the 15 role-key compromise combinations:
 
 - **Source forgery before capture:** the source document is already forged when an otherwise honest capture authority receives it. IA processes the captured document and IWA retains the independent ground-truth value.
 - **Shared-dependency witness:** the witness is deliberately copied from the same forged document source and the external measurement is aligned to that source. No signing key is compromised. The authorization gate compares the declared witness source identifier, acquisition domain and administrative domain with the capture source; a disclosed shared source must be rejected.
+- **Key-administration compromise:** the trust registry is poisoned to accept attacker-enrolled capture, interpretation and witness keys while AA remains honest. This models compromise of trust enrollment/registry control, not theft of the original role private keys.
 
 The distinction matters: source forgery is not the same event as capture-key compromise. Likewise, a compromised IWA signing key is modeled as control over the IWA's signed measurement claim, not as automatic compromise of CA or IA.
 
