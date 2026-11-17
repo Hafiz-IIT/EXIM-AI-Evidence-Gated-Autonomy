@@ -79,3 +79,10 @@ Unsafe:
 - signed provenance makes autonomous AI safe;
 - the scheme is production-secure;
 - dual attestation eliminates compromise risk.
+
+
+## Archival recovery note
+
+On 18 November 2026, the original 12 September 2026 research archives were recovered from the user's Library. The missing seven-row dual-lineage compromise CSV is restored with its original SHA-256, alongside the trust-root compromise table and 30-seed dual-lineage stochastic outputs. The exact original v1 core and generic Ed25519 helper are preserved under legacy/experiment2_original/ and verified against the original snapshot manifest.
+
+The recovered archives do not contain the original executable v2/v3 Experiment 2 controller/runner. The current v2/v3 source must therefore not be described as an exact reconstruction of those historical controllers. See docs/EXP2_SOURCE_RECOVERY.md. Issue #3 remains open for this missing source-level component.

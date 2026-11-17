@@ -1,0 +1,8 @@
+compromise,unsafe_ACTs,ICAR_high,ACT_rate,ESCALATE_rate
+none,0,0.0,0.1,0.3
+verifier_A,0,0.0,0.0,0.9
+lineage_A,0,0.0,0.0,0.9
+lineage_B,0,0.0,0.0,0.9
+verifier_A_plus_lineage_A,0,0.0,0.0,0.9
+both_lineage,50,0.1,0.2,0.2
+verifier_A_plus_both,50,0.1,0.2,0.2

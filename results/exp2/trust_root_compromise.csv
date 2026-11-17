@@ -1,0 +1,8 @@
+compromise,unsafe_ACTs,ICAR_high,ACT_rate,ESCALATE_rate,VERIFY_rate,REQUEST_rate
+none,0,0.0,0.1,0.3,0.4,0.2
+verifier_A,50,0.1,0.2,0.2,0.4,0.2
+verifier_AB,50,0.1,0.2,0.2,0.4,0.2
+verifier_ABC,50,0.1,0.2,0.2,0.4,0.2
+external_sensor,50,0.1,0.2,0.2,0.4,0.2
+authorization_authority,50,0.1,0.2,0.3,0.4,0.1
+all_roots,150,0.3,0.4,0.1,0.4,0.1
