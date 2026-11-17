@@ -2,6 +2,8 @@ import json
 import unittest
 import hashlib
 import tempfile
+import os
+import csv
 from pathlib import Path
 
 from experiments.exp3_real_models.harness import (
@@ -9,6 +11,7 @@ from experiments.exp3_real_models.harness import (
     assign_splits,
     evaluate_case,
     prepare_tasks,
+    run_condition,
     build_public_task,
     normalize_extraction,
     normalize_verifier,
@@ -115,6 +118,45 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         normalized, valid = normalize_verifier({"accept": "yes", "confidence": 0.9})
         self.assertFalse(valid)
         self.assertFalse(normalized["accept"])
+
+    def test_provider_failure_is_logged_and_forces_escalation(self):
+        cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            benchmark = root / "cases.jsonl"
+            benchmark.write_text("".join(json.dumps(x) + "\n" for x in cases))
+            prepared = root / "prepared"
+            prepare_tasks(benchmark, prepared)
+            models = {
+                "extractor": {"model": "mock-extractor", "provider": "mock", "base_url": "https://example.invalid/v1", "family_id": "family_a", "api_key_env": "EXP3_TEST_KEY"},
+                "verifier_a": {"model": "mock-verifier-a", "provider": "mock", "base_url": "https://example.invalid/v1", "family_id": "family_b", "api_key_env": "EXP3_TEST_KEY"},
+                "verifier_b": {"model": "mock-verifier-b", "provider": "mock", "base_url": "https://example.invalid/v1", "family_id": "family_c", "api_key_env": "EXP3_TEST_KEY"},
+            }
+            condition = {"condition_id": "mock-failure", "extractor_model": "extractor", "verifier_models": ["verifier_a", "verifier_b"]}
+            config = {"models": models, "conditions": [condition], "settings": {"max_retries": 0, "timeout_seconds": 1}}
+            previous = os.environ.get("EXP3_TEST_KEY")
+            os.environ["EXP3_TEST_KEY"] = "test-only-not-a-real-key"
+            try:
+                def fail_transport(url, headers, body):
+                    raise RuntimeError("simulated provider outage")
+                summary = run_condition(
+                    config=config, condition=condition, split="development",
+                    prepared_dir=prepared, output_dir=root / "run",
+                    max_tasks=1, transport=fail_transport,
+                )
+            finally:
+                if previous is None:
+                    os.environ.pop("EXP3_TEST_KEY", None)
+                else:
+                    os.environ["EXP3_TEST_KEY"] = previous
+            rows = list(csv.DictReader((root / "run/case_results.csv").open()))
+            manifest = json.loads((root / "run/run_manifest.json").read_text())
+            provider_errors = (root / "run/provider_errors.jsonl").read_text().splitlines()
+            self.assertEqual(rows[0]["controller_action"], "ESCALATE")
+            self.assertEqual(rows[0]["provider_error"], "True")
+            self.assertEqual(manifest["status"], "completed_with_provider_errors")
+            self.assertEqual(manifest["provider_error_count"], 1)
+            self.assertEqual(len(provider_errors), 1)
 
     def test_v1_gate_uses_family_labels_as_dependency_groups(self):
         from experiments.exp3_real_models.harness import evaluate_case
