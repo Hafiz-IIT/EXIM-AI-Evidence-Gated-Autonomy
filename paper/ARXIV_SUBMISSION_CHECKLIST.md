@@ -74,6 +74,8 @@ These later synthetic extensions do not recover the original frozen Experiment 2
 
 No real-model Experiment 3 result is claimed until the unchecked execution items are completed.
 
+The Experiment 3 cost preflight is an approximate planning heuristic, not a guaranteed upper bound or hard spend cap. Final usage and cost must be reconciled against provider-reported token usage and billing.
+
 ## Release decision
 
 Do not upload the current manuscript as a research preprint until every blocker above is closed. A successful LaTeX build or benchmark-generation workflow is not a substitute for rerunning the experiments.
