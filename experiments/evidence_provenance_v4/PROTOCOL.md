@@ -32,7 +32,7 @@ The protocol treats the following as separate predicates. Passing one never impl
 
 1. **Content integrity:** the bytes or canonical claim have not changed since the digest/signature was made.
 2. **Origin authentication:** the signature chains to an enrolled key and an explicitly named issuer/trust root.
-3. **Freshness and anti-replay:** the evidence is within its validity interval, has a monotonic sequence/nonce, and has not already been consumed for this action.
+3. **Freshness and anti-replay:** the evidence is within its validity interval and the credential's validity window, has an observation time no later than issuance, has a monotonic per-source sequence/nonce, and has not already been consumed for this action. The caller must provide replay state across claim evaluations; the prototype does not implement a durable distributed nonce store.
 4. **Subject applicability:** the evidence is bound to the exact shipment, container, declaration, party, and transaction under review.
 5. **Claim applicability / source competence:** the source type is permitted to support this particular claim. A weighbridge may support gross weight; it cannot establish HS classification or country of origin.
 6. **Transformation lineage:** each OCR/parser/normalization/classification step identifies its input digest, output digest, tool/version, and signer. A valid parser signature attests to a claimed transformation, not correctness of the transformation.
@@ -65,10 +65,10 @@ Each synthetic evidence record should contain at least:
 
 - `evidence_id`, `claim_id`, `claim_type`, `value`, `unit`;
 - `subject_id` (shipment/container/declaration/party as applicable);
-- `source_id`, `source_type`, `source_key_id`, `issuer_id`;
+- `source_id`, `source_type`, `source_key_id`, `issuer_id` / `trust_root_id`;
 - `acquisition_method`, `acquisition_event_id`, `gateway_id`;
 - `observed_at`, `issued_at`, `expires_at`, `sequence_number`, `nonce`;
-- `document_digest`, `input_digest`, `output_digest`, `transformation_id`, `tool_version`;
+- `document_digest`, `input_digest`, `output_digest`, `transformation_id`, `tool_version`, expected `unit`;
 - `administrative_domain`, `key_admin_domain`, `trust_root_id`;
 - `calibration_id`, `calibration_valid_until`, `device_health`;
 - signature and verification metadata.
@@ -85,7 +85,8 @@ The benchmark will distinguish attacks that the earlier v2/v3 experiments partia
 | A1 | Post-signature content mutation | Content integrity |
 | A2 | Source document forged before honest capture | Difference between authentic capture and truthful source |
 | A3 | Forged or wrong-role credential | Origin authentication and role binding |
-| A4 | Stale evidence / replayed sequence or nonce | Freshness and anti-replay |
+| A4 | Stale evidence outside its validity window | Freshness and credential-window enforcement |
+| A4b | Duplicate evidence/nonce replayed in one action batch or a later evaluation | Anti-replay state and monotonic source sequence |
 | A5 | Evidence from another shipment/declaration | Subject applicability |
 | A6 | Weight evidence reused to approve HS/origin claim | Claim applicability and source competence |
 | A7 | Parser/OCR transformation input or output substituted | Transformation lineage |
@@ -115,7 +116,7 @@ The EFD structural-cut metric and VP-CONTROL portfolio ideas are related baselin
 
 ## 8A. Scenario interpretation
 
-The runner includes separate cases for isolated tariff-registry compromise and a compound tariff-registry compromise plus two independently labeled false-accepting verifiers. The isolated attack is expected to be contained by the existing verifier-dependency guard in the C8 correlated-verifier family. The compound scenario changes the verifier dependency labels to distinct values while preserving their false-accept decisions; this is deliberately a stronger counterexample showing that declared diversity is not equivalent to correctness. The two scenarios must not be conflated in reporting.
+The runner includes separate cases for stale evidence and duplicate replay, and for isolated tariff-registry compromise and a compound tariff-registry compromise plus two independently labeled false-accepting verifiers. The isolated attack is expected to be contained by the existing verifier-dependency guard in the C8 correlated-verifier family. The compound scenario changes the verifier dependency labels to distinct values while preserving their false-accept decisions; this is deliberately a stronger counterexample showing that declared diversity is not equivalent to correctness. The two scenarios must not be conflated in reporting.
 
 ## 9. Outcomes
 
