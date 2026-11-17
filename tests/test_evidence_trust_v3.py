@@ -3,7 +3,7 @@ import unittest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from src.evidence_trust_v3 import (
     issue_identity_credential, issue_witness_assertion, verify_witness_quorum,
-    verify_identity_credential,
+    verify_identity_credential, is_recoverable_verifier_false_reject,
 )
 
 
@@ -94,6 +94,38 @@ class EvidenceTrustV3Tests(unittest.TestCase):
             self.verify(self.records()[:2]),
             (False, "incomplete_or_duplicate_witness_roster", 0),
         )
+
+    def test_independent_quorum_can_recover_isolated_verifier_false_reject(self):
+        features = {
+            "risk": "HIGH", "duplicate_document_kind": False,
+            "provenance_valid": True, "complete": True,
+            "auth_present": True, "fresh": True, "doc_agree": True,
+            "external_conflict": False, "ex_matches_invoice": True,
+            "n_verifiers": 2, "indep_verifiers": 2, "v_rejects": 2,
+        }
+        self.assertTrue(is_recoverable_verifier_false_reject(features, "ESCALATE"))
+
+    def test_verifier_recovery_does_not_override_other_safety_gates(self):
+        safe_features = {
+            "risk": "HIGH", "duplicate_document_kind": False,
+            "provenance_valid": True, "complete": True,
+            "auth_present": True, "fresh": True, "doc_agree": True,
+            "external_conflict": False, "ex_matches_invoice": True,
+            "n_verifiers": 2, "indep_verifiers": 2, "v_rejects": 2,
+        }
+        for blocked_field, blocked_value in (
+            ("provenance_valid", False), ("complete", False),
+            ("auth_present", False), ("fresh", False),
+            ("doc_agree", False), ("external_conflict", True),
+            ("ex_matches_invoice", False), ("duplicate_document_kind", True),
+            ("indep_verifiers", 1),
+        ):
+            with self.subTest(blocked_field=blocked_field):
+                candidate = dict(safe_features, **{blocked_field: blocked_value})
+                self.assertFalse(is_recoverable_verifier_false_reject(candidate, "ESCALATE"))
+        self.assertFalse(is_recoverable_verifier_false_reject(safe_features, "ACT"))
+        self.assertFalse(is_recoverable_verifier_false_reject(
+            dict(safe_features, v_rejects=0), "ESCALATE"))
 
     def test_forged_identity_credential_is_rejected(self):
         credential = dict(self.credentials[0])
