@@ -65,7 +65,7 @@ The benchmark must explicitly distinguish key compromise from source forgery and
 
 These are design requirements, not implemented features.
 
-Implementation protocol: [`experiments/evidence_trust_v2/PROTOCOL.md`](../evidence_trust_v2/PROTOCOL.md). The runner evaluates all 15 non-empty compromise combinations and two separate source/dependency controls. It uses the existing `evidence_gate_v1` as an additional policy condition and models a synthetic ground-truth-derived witness. The prototype checks declared source identifiers and acquisition-domain labels, but does not authenticate administrative ownership or prove that the domains are operationally independent.\n\n## Evaluation plan
+Implementation protocol: [`experiments/evidence_trust_v2/PROTOCOL.md`](../evidence_trust_v2/PROTOCOL.md). The runner evaluates all 15 non-empty compromise combinations and two separate source/dependency controls. It uses the existing `evidence_gate_v1` as an additional policy condition and models a synthetic ground-truth-derived witness. The prototype checks declared source identifiers, acquisition-domain labels and administrative-domain labels, but does not authenticate administrative ownership or prove that the domains are operationally independent.\n\n## Evaluation plan
 
 Report at least:
 - unsafe ACT rate over all HIGH-risk cases;
