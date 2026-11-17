@@ -88,6 +88,7 @@
     "model_config_sha256": null,
     "task_manifest_sha256": null,
     "public_tasks_sha256": null,
-    "task_id_salt_sha256": null
+    "task_id_salt_sha256": null,
+    "private_evaluation_map_sha256": null
   }
 }
