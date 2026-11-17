@@ -76,6 +76,28 @@ class EvidenceTrustV3Tests(unittest.TestCase):
         )
         self.assertEqual(result, (True, "quorum_valid", 3))
 
+    def test_two_of_three_tolerates_one_invalid_credential_but_three_of_three_does_not(self):
+        credentials = list(self.credentials)
+        credentials[0] = dict(credentials[0])
+        credentials[0]["body"] = dict(credentials[0]["body"], source_id="forged-source")
+        records = self.records(credentials=credentials)
+        self.assertEqual(self.verify(records), (True, "quorum_valid", 2))
+        strict = verify_witness_quorum(
+            records, trusted_issuer_key=self.root.public_key(), tenant_id="tenant-A",
+            case_id="case-1", parent_digest="root", expected_weight=10.0,
+            expected_item_type="machine", now=150, threshold=3, total_required=3,
+        )
+        self.assertEqual(strict, (False, "insufficient_valid_witnesses", 0))
+
+    def test_three_of_three_does_not_defeat_full_roster_compromise(self):
+        result = verify_witness_quorum(
+            self.records((99.0, 99.0, 99.0)),
+            trusted_issuer_key=self.root.public_key(), tenant_id="tenant-A",
+            case_id="case-1", parent_digest="root", expected_weight=99.0,
+            expected_item_type="machine", now=150, threshold=3, total_required=3,
+        )
+        self.assertEqual(result, (True, "quorum_valid", 3))
+
     def test_all_witnesses_must_have_distinct_admin_domains(self):
         credentials = []
         for i, key in enumerate(self.witnesses, 1):
