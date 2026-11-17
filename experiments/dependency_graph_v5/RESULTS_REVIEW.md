@@ -1,116 +1,73 @@
 # Dependency-Graph v5 Results Review
 
-**Validation run:** [GitHub Actions #44163544687](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44163544687)  
-**Experiment status:** v5 regression tests, experiment runner and artifact upload passed; the full manuscript/reconstruction workflow was still running when this review was prepared.  
+**Validation run:** [GitHub Actions #44167634191](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44167634191)  
 **Benchmark:** v0.4, 700 HIGH-risk cases per scenario  
+**Scenarios:** 16  
 **Policies:** 4  
-**Scenarios:** 14  
-**Rows:** 14 × 4 × 700 = 39,200  
-**Artifact:** `ega-dependency-graph-v5`  
-**Artifact ID:** `14363334448`  
-**Source commit:** `35f136e0f5ccf587a888582943e56fc91af2cc48`
+**Rows:** 44,800 case-policy-scenario rows  
+**Artifact:** `ega-dependency-graph-v5` (artifact ID `14365958156`)
 
-## 1. Main results
+## 1. Aggregate policy comparison
 
-Unsafe ACT counts by policy:
-
-| Scenario | K2 key-unique | F2 field-distinct 2-of-3 | F3 field-distinct 3-of-3 | G2 graph-aware 2-of-3 |
+| Policy | Threshold | Unsafe ACT | Safe-ACT coverage across 1,600 safe cases | Graph-validation rejections |
 |---|---:|---:|---:|---:|
-| Honest baseline | 0 | 0 | 0 | 0 |
-| One witness compromised | 0 | 0 | 0 | 0 |
-| Two witnesses compromised | 50 | 50 | 0 | 50 |
-| All witnesses compromised | 50 | 50 | 50 | 50 |
-| Direct shared admin | 50 | 0 | 0 | 0 |
-| Hidden shared parent | 50 | 50 | 0 | 0 |
-| Hidden shared identity provider | 50 | 50 | 0 | 0 |
-| Hidden shared KMS | 50 | 50 | 0 | 0 |
-| Hidden shared firmware/build | 50 | 50 | 0 | 0 |
-| Hidden shared upstream feed | 50 | 50 | 0 | 0 |
-| Incomplete dependency manifest | 50 | 50 | 0 | 0 |
-| Missing dependency parent | 50 | 50 | 0 | 0 |
-| Graph signature tampering | 50 | 50 | 0 | 0 |
-| Registry-root compromise | 50 | 50 | 50 | 50 |
+| K2 key-unique | 2-of-3 | 700 | 100% | 0 |
+| F2 field-distinct | 2-of-3 | 650 | 100% | 0 |
+| F3 field-distinct | 3-of-3 | 50 | 93.75% | 0 |
+| G2 graph-aware | 2-of-3 | 150 | 87.5% | 1,800 |
 
-Safe-ACT coverage for the same scenarios:
+The aggregate counts are deterministic results over 16 × 700 synthetic cases. The 1,600 safe cases are the 100 safe cases in each scenario; the scenario transformations do not change the safe-case denominator for v5.
 
-| Scenario | K2 | F2 | F3 | G2 |
-|---|---:|---:|---:|---:|
-| Honest baseline | 100% | 100% | 100% | 100% |
-| One witness compromised | 100% | 100% | 100% | 100% |
-| Two witnesses compromised | 100% | 100% | 100% | 100% |
-| All witnesses compromised | 100% | 100% | 100% | 100% |
-| Direct shared admin | 100% | 100% | 0% | 100% |
-| Hidden shared parent / IDP / KMS / firmware / upstream | 100% | 100% | 100% | 100% |
-| Incomplete dependency manifest | 100% | 100% | 100% | 100% |
-| Missing dependency parent | 100% | 100% | 100% | 0% |
-| Graph signature tampering | 100% | 100% | 100% | 0% |
-| Registry-root compromise | 100% | 100% | 100% | 100% |
+## 2. Scenario findings
 
-The benchmark has 100 safe cases per scenario. In hidden-dependency scenarios, graph-aware admission preserves safe coverage because a third witness with disjoint ancestry remains available; in C4 consistent-but-wrong, only the two compromised witnesses match the false document-derived value, and their shared ancestor prevents them forming a graph-aware quorum.
+- **Honest baseline and one witness compromised:** all four policies produce zero unsafe ACT and 100% safe-case coverage.
+- **Two witnesses compromised:** K2, F2 and G2 each produce 50 unsafe ACT decisions in C4 consistent-but-wrong; F3 rejects the two-witness false quorum and retains 100% safe coverage.
+- **All three witnesses compromised:** every policy produces 50 unsafe ACT decisions in C4. A 3-of-3 threshold cannot protect against full-roster compromise.
+- **Direct shared administrative domain:** K2 produces 50 unsafe ACT decisions. F2 and G2 detect the shared administrative field and block the C4 false quorum. F3 rejects all cases because its all-three-supporter rule cannot establish three distinct administrative domains, producing 100% false blocking in this scenario.
+- **Seven hidden shared-dependency scenarios** (parent/control, identity provider, KMS, firmware/build, acquisition gateway, physical measurement source, upstream feed): K2 and F2 each produce 50 unsafe ACT decisions per scenario because direct labels are distinct. F3 rejects the two-witness false quorum. G2 rejects the 50 matching C4 cases because the signed graph declares the common ancestor, while retaining 100% safe-case coverage by selecting a different independent matching pair when all three witnesses agree.
+- **Incomplete dependency manifest:** G2 rejects the 50 C4 cases that depend on the incomplete witness manifest and retains safe coverage by using the remaining valid pair.
+- **Missing/cyclic graph structure and graph-signature tampering:** G2 fails closed on all 700 cases in each scenario (700 graph-validation rejections per scenario), causing 100% false blocking there. K2/F2 do not consume the graph and each produces 50 unsafe C4 ACT decisions; F3 rejects those two-witness cases.
+- **Registry signing-key compromise:** the attacker obtains the existing registry private key while the verifier retains the original pinned public key. Two colluding witnesses share a true parent, the third witness remains honest, and the attacker signs a graph that omits the shared parent. K2/F2/G2 each produce 50 unsafe ACT decisions in C4; F3 blocks those false actions and retains 100% safe-case coverage. The graph-aware policy cannot recover a dependency that its compromised graph authority has hidden.
 
-## 2. Findings
+## 3. Graph rejection accounting
 
-### 2.1 Flat labels miss transitive common dependencies
+G2 records 1,800 graph-validation rejections across the benchmark:
+- 7 declared shared-ancestor scenarios × 50 C4 cases = 350;
+- incomplete dependency manifest = 50;
+- unresolved/cyclic graph structure = 700;
+- invalid graph signature/schema = 700.
 
-K2 and F2 authorize 50 unsafe C4 actions in each hidden shared-parent, shared-IDP, shared-KMS, shared-firmware and shared-upstream scenario. The witness IDs, keys and direct source/admin/gateway labels are distinct, but the signed dependency graph contains a common ancestor.
+The case-level CSV separately records the ground-truth shared dependency identifier, whether the signed graph declares that dependency, and whether the registry-root scenario omits it. This prevents the signed graph's statement from being confused with the synthetic ground-truth attack label.
 
-G2 blocks those unsafe actions by checking transitive ancestor intersections among the matching supporters. It preserves 100% safe-ACT coverage in these scenarios because the third witness remains independent and agrees on the safe cases.
+## 4. Interpretation
 
-### 2.2 Strict 3-of-3 and graph-aware 2-of-3 solve different problems
+The experiment supports a narrow result: **direct identity-field diversity is insufficient when witnesses share a declared transitive dependency; graph-aware admission blocks those modeled collusions when the signed graph is accurate.** It also exposes the graph's trust assumption: a compromised registry signing key can sign a graph that omits a true shared parent, allowing a graph-aware 2-of-3 policy to be fooled.
 
-F3 blocks two-witness collusion even when the two compromised witnesses have disjoint ancestry. However, it requires all three witnesses to agree and loses all safe coverage in the direct shared-admin scenario, where a valid pair involving the third witness exists.
+The 3-of-3 policy is a useful threshold sensitivity comparator, not a universal solution. It blocks two-witness collusion but cannot stop full-roster compromise and can reduce availability when all three supporters must be mutually distinct. G2 preserves safe coverage across the declared hidden-dependency scenarios, but loses availability under graph-structure and graph-integrity failures.
 
-G2 permits a 2-of-3 quorum when it can select two directly distinct supporters with disjoint transitive ancestry. It therefore detects declared common dependencies while retaining the ability to select a valid independent pair. It does **not** prevent independent two-witness collusion: G2 still produces 50 unsafe ACTs in the ordinary two-witness-compromise scenario.
+## 5. Claim boundary and limitations
 
-### 2.3 Graph integrity and trust-root compromise remain critical
+- All identities, dependency graphs, source values and attacks are synthetic.
+- A signed dependency graph authenticates registry assertions, not their real-world completeness or truth.
+- Distinct dependency nodes do not prove independent ownership, operation, hardware or data.
+- The registry signing-key scenario assumes compromise of the existing issuer private key while the original public key remains pinned; the attacker can enroll two attacker-controlled witness keys and sign a graph omitting a true common parent.
+- The graph is a declared static dependency model; it does not discover hidden dependencies from operational telemetry.
+- The experiment does not implement production PKI, KMS/HSM, hardware attestation, distributed graph reconciliation, durable revocation, or atomic commit.
+- Deterministic counts are not real-world probabilities or production-security evidence.
 
-G2 fails closed when a dependency parent is unresolved or the graph signature is tampered with. In both scenarios it blocks all 100 safe cases (100% false-block rate). This is a deliberate fail-closed result, not an acceptable availability target.
+## 6. Integrity and reproduction
 
-When the registry root is compromised, the attacker can sign source credentials and a graph that omits the true shared dependency. G2 then produces 50 unsafe ACTs, just like the flat-field policies. A signed graph authenticates the registry's assertion; it does not prove that the graph is complete or true.
+Pinned manifest: [results/dependency_graph_v5/manifest-44167634191.json](../../results/dependency_graph_v5/manifest-44167634191.json).
 
-### 2.4 Full-roster compromise remains unsolved
+Output hashes:
+- `dependency_graph_v5_cases.csv`: `7b2f0c9b25e95a7fded1b58bf7dbca78553694e7a307b4018c3ac859700e4816`
+- `dependency_graph_v5_summary.csv`: `3171c16490ed59aa0fcea21bc59af0a34d18f036da0a758488f8c7ce88bdfdcd`
 
-All policies authorize 50 unsafe C4 actions when all three witnesses are compromised and agree on the false value. No threshold or ancestry policy can recover truth if every accepted source and the trust metadata are controlled by the attacker.
-
-## 3. Aggregate comparison
-
-Across 9,800 case-policy-scenario rows per policy (14 scenarios × 700 cases):
-
-| Policy | Unsafe ACT total | Safe-ACT coverage over 1,400 safe case-scenario instances |
-|---|---:|---:|
-| K2 key-unique | 600 | 100.0% |
-| F2 field-distinct 2-of-3 | 550 | 100.0% |
-| F3 field-distinct 3-of-3 | 100 | 92.9% |
-| G2 graph-aware 2-of-3 | 150 | 85.7% |
-
-These aggregate counts intentionally repeat the same 700 benchmark cases across attack scenarios; they are comparison totals, not estimates of deployment risk. G2's lower aggregate safe coverage is driven by fail-closed rejection of all cases when the graph itself is structurally incomplete or its signature is invalid. In the hidden shared-dependency scenarios, G2 has 100% safe coverage.
-
-## 4. Claim boundary and limitations
-
-- All identities, dependency graphs, source values, signatures and attacks are synthetic.
-- The graph is signed by the same registry trust root as source credentials; registry compromise can falsify both.
-- Dependency nodes and edges are registry assertions. Their signature does not prove actual corporate ownership, operational control, hardware/software ancestry or upstream data lineage.
-- The graph-aware rule checks pairwise ancestor intersection; it does not implement the EFD structural-cut metric and does not claim a new general quorum theory.
-- The graph-aware policy only detects shared dependencies that are represented in the graph.
-- Independent collusion, full-roster compromise, semantic falsehood by an otherwise independent source, and trust-root compromise remain residual risks.
-- The experiment uses a v1 action gate and v3 bounded recovery as the downstream policy. It is not a standalone controller.
-- No production PKI, KMS/HSM custody, cloud-provider audit, hardware attestation, SBOM/build provenance verification, secure acquisition or atomic commit is implemented.
-- Counts are deterministic synthetic outcomes, not real-world probabilities or production-security evidence.
-
-## 5. Reproduction and integrity
-
-Run:
+Reproduce with:
 
 ```bash
-python -m unittest discover -s tests -v
+python -m unittest tests.test_dependency_graph_v5 -v
 python scripts/run_dependency_graph_v5.py
 ```
 
-The artifact manifest records:
-
-- `dependency_graph_v5_cases.csv`: `b7b7e141fb7e89ad90384242024dd4113f853fbc9f440e16a48084a068d5f4ca`
-- `dependency_graph_v5_summary.csv`: `63ab93fe9fe70208f92f68fd056ec8d59e7d4ca7daa3a260c82cf1aa4341b891`
-
-## 6. Interpretation
-
-The experiment supports a narrow, falsifiable result: **direct identity and administrative-domain diversity can miss declared transitive common dependencies; a signed dependency-ancestry check detects those modeled overlaps when the graph is complete and the trust root is honest.** It does not prove real-world independence. EFD and ARP already address the general theory, so the contribution is an EXIM-specific benchmark comparison across key-only, field-distinct and graph-aware admission policies.
+The full workflow also regenerates benchmark v0.4, runs v1/v2/v3/v4 and document-root-attestation experiments, reproduces publication tables from checked-in historical result files, and compiles the manuscript.
