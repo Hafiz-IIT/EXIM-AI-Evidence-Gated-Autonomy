@@ -181,6 +181,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
             credential=credential, source_private_key=self.keys["weighbridge"],
             claim_type="gross_weight", value=42.0, unit="kg",
             subject_id=self.subject, action_id=self.action,
+            action_payload_digest=self.action_payload_digest,
             document_digest=self.doc_digest, input_digest=self.doc_digest,
             output_digest=canonical_sha256({"claim_type":"gross_weight","value":42.0,"unit":"kg"}),
             transformation_id="sensor-event", tool_version="firmware-1",
