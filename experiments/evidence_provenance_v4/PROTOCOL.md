@@ -92,7 +92,7 @@ The benchmark will distinguish attacks that the earlier v2/v3 experiments partia
 | A7 | Parser/OCR transformation input or output substituted | Transformation lineage |
 | A8 | Expired or invalid calibration record | Measurement assurance |
 | A9 | Two apparently different sources share gateway/admin domain | Dependency separation |
-| A10 | Trust-store / registry-root compromise | Trust-anchor assumption |
+| A10 | Registry signing-key compromise with attacker-controlled source re-enrollment | Issuer-key custody and source enrollment trust |
 | A11 | Multiple sensors under one compromised control plane | Common-cause compromise |
 | A12 | Action payload substituted after evidence evaluation but before authorization verification | Exact action-payload binding (not atomic TOCTOU enforcement) |
 | A13 | Missing or contradictory evidence | Fail-closed behavior and availability |
@@ -102,6 +102,10 @@ The benchmark will distinguish attacks that the earlier v2/v3 experiments partia
 | A17 | Compromised tariff registry plus two independent false-accepting verifiers | Residual semantic false-accept path even when verifier dependency labels are distinct |
 
 The adversary capabilities will be stated per attack. Compromise of a source key does not silently imply compromise of other authorities; registry compromise does not silently imply hardware compromise; a forged source document before capture is not the same as a forged capture signature.
+
+### A10 implementation detail
+
+The registry-root scenario assumes the attacker obtains the existing registry signing private key. The verifier continues to pin the original registry public key. The attacker uses the compromised issuer key to issue credentials for attacker-controlled source keys across the evidence roles. This is a combined issuer-key and source re-enrollment compromise, not a claim that an untrusted replacement public key is automatically accepted. The separate `all_sources_compromised` scenario models source-key compromise while the registry issuer remains honest.
 
 ### A2 implementation detail
 
