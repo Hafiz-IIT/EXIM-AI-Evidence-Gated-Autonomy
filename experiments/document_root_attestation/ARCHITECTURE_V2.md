@@ -1,6 +1,6 @@
 # EGA Evidence-Trust Architecture v2 — Design Proposal
 
-**Status:** Proposed architecture for the next experiment. Not implemented or validated.
+**Status:** Design proposal implemented as a deterministic synthetic four-authority experiment in `src/evidence_trust_v2.py` and `scripts/run_evidence_trust_v2.py`. CI validation and empirical results are pending. Production controls remain unimplemented.
 
 ## Decision
 
@@ -33,7 +33,7 @@ The authorization engine verifies signatures and parent links, rejects missing o
 
 ## Threat model for the next experiment
 
-The v2 experiment should independently vary compromise of:
+The v2 experiment now varies compromise of:
 - CA only;
 - IA only;
 - IWA only;
@@ -65,7 +65,7 @@ The benchmark must explicitly distinguish key compromise from source forgery and
 
 These are design requirements, not implemented features.
 
-## Evaluation plan
+Implementation protocol: [`experiments/evidence_trust_v2/PROTOCOL.md`](../evidence_trust_v2/PROTOCOL.md). The runner evaluates all 15 non-empty compromise combinations and two separate source/dependency controls. It uses the existing `evidence_gate_v1` as an additional policy condition and models a synthetic ground-truth-derived witness; this is not a production implementation of independent acquisition.\n\n## Evaluation plan
 
 Report at least:
 - unsafe ACT rate over all HIGH-risk cases;
