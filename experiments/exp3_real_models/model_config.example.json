@@ -78,7 +78,7 @@
     "max_retries": 2,
     "timeout_seconds": 90,
     "seed": 42,
-    "max_estimated_cost_usd": null
+    "max_preflight_estimated_cost_usd": null
   },
   "freeze": {
     "status": "not_frozen",
