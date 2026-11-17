@@ -348,6 +348,10 @@ def main():
         raise AssertionError("two colluding witnesses should pass the field-distinct policy under root compromise")
     if metric("registry_root_compromise", "F3_field_distinct", "unsafe_ACT") != 0:
         raise AssertionError("strict 3-of-3 should reject two colluding witnesses when the third remains honest")
+    if metric("registry_root_compromise", "F3_field_distinct", "safe_ACT_coverage") != 1.0:
+        raise AssertionError("strict 3-of-3 should retain safe coverage when the third credential remains valid under the pinned issuer key")
+    if metric("registry_root_compromise", "G2_graph_aware", "safe_ACT_coverage") != 1.0:
+        raise AssertionError("graph-aware 2-of-3 should retain safe-case coverage under the forged but valid graph")
     if metric("registry_root_compromise", "G2_graph_aware", "unsafe_ACT") <= 0:
         raise AssertionError("compromised registry root should expose graph-trust residual")
     if metric("graph_structure_attack", "G2_graph_aware", "graph_validation_rejections") != 700:
