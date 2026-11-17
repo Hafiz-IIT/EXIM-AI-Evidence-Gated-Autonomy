@@ -1,22 +1,33 @@
-# Experiment 2 source and artifact recovery
+# Experiment 2 source recovery and controller reconstruction
 
-## Recovered on 18 November 2026
+## Original archive recovery
 
-Two original archives dated 12 September 2026 were recovered from the user's Library:
+On 18 November 2026, the original 12 September 2026 research archives were recovered from the user's Library. The GitHub-ready source snapshot's 32-entry SHA-256 manifest was verified 32/32. The missing seven-row dual-lineage compromise CSV and original 2D trust-root/stochastic outputs were restored with original hashes.
 
-- evidence-gated-autonomy-github-ready.zip — SHA-256 e0003b08d7a4f72d3bfb5134af2430db82d96172e096594795eec1c59a6c2189
-- evidence_gated_autonomy_experiment2_provenance.zip — SHA-256 edbdb53e7363b1eb280ed583225f0e11b46791ed4b4d8477ff93abe8b5b45985
+The exact archived v1 `core.py` and generic Ed25519 helper `provenance.py` are preserved under `legacy/experiment2_original/src/`. They do not replace current source files.
 
-The GitHub-ready snapshot's 32 recorded file hashes were independently checked against the extracted archive: 32/32 matched. The exact archived v1 controller and generic Ed25519 helper are preserved under legacy/experiment2_original/src/ and are not substituted for the current src modules.
+## Clearly labeled v2/v3 reconstruction
 
-The missing results/exp2/dual_lineage_compromise.csv is restored with SHA-256 8eaa6f1989dd347bb5f88d230b5cb0fbe0e094b7f3841cca7f2bc7a0267a0394. The original trust-root compromise table, dual-lineage stochastic summary and 30-seed per-seed CSV are also restored. Regression tests verify all hashes and recompute the stochastic summary from the per-seed data.
+The archives did not contain the original executable Experiment 2B/2D/2E runner or the exact historical `evidence_gate_v2` / `evidence_gate_v3` functions. The user gave blanket authorization to continue the research and complete the task, so a separately labeled reconstruction was implemented under `legacy/experiment2_reconstruction/`. It is explicitly **not** represented as the original source.
 
-## Unresolved source-level gap
+The reconstruction:
+- regenerates the 500-case 2A attested dataset and 2B dual-lineage dataset from the archived benchmark and signing helper, matching both archived SHA-256 hashes;
+- reproduces the archived 16-branch, 500-case decision cache byte-for-byte (SHA-256 `7f59b47d7b62c1747897feef0cb1adc0f7e5c92f4b671b180ca3317a3c266c33`);
+- reproduces the 2B deterministic attack comparison, 2D trust-root compromise table and 2E dual-lineage compromise table byte-for-byte;
+- records the reconstruction assumptions and the limits of the historical evidence.
 
-The two archives do not contain an executable Experiment 2B/2D/2E runner or the original evidence_gate_v2 / evidence_gate_v3 controller functions. They contain the v1 core, generic signing helpers, signed sample attestations, cached case outputs, JSONL case records, protocols and result tables. This is not enough to reconstruct the exact historical v2/v3 logic without inventing implementation details.
+Run `python scripts/reconstruct_exp2.py` to create `results/exp2_reconstruction/`. The original `results/exp2/` artifacts are never overwritten.
 
-Accordingly, issue #3 is only partially resolved:
-- recovered: missing original CSV and source snapshots;
-- still missing: exact frozen v2/v3 controller/runner source and an execution path that reproduces all historical 2B/2D/2E tables.
+## Important security finding / reconstruction assumption
 
-Do not label a later implementation as the original controller. A separate, explicitly named reconstruction can be considered only after the recovered artifacts and assumptions are fully documented.
+The archived `trust_roots.json` does not list lineage_A or lineage_B. The reconstruction derives their public-key hashes from the archived deterministic test-key helper; these are reconstructed trust anchors, not recovered historical registry entries.
+
+The 2E behavior is consistent with a gate that uses two lineage signatures as the authoritative dependency-group claim but does not bind that claim to the dependency-group field inside the verifier's signed attestation. Under that reconstructed rule, compromising both lineage authorities produces 50 unsafe ACTs (10%) in the 500-case synthetic benchmark, while either one alone fails closed. This is a material common-cause weakness, not evidence that the original missing source had exactly this implementation.
+
+## Stochastic results
+
+The restored 2D 30-seed per-seed CSV recomputes its summary exactly. The 2C stochastic summary remains an archived aggregate; the exact per-seed file remains in the recovered source archive and is not yet checked into this repository.
+
+## Claim boundaries
+
+All cases, keys, identities, signatures and attacks are synthetic. The deterministic keys are test fixtures, not production cryptography. These counts are not real-world probabilities or deployment-security evidence. The reconstructed controllers must not be cited as original historical source.

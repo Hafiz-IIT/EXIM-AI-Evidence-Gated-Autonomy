@@ -1,0 +1,10 @@
+{
+  "lineage_A": {
+    "public_key_sha256": "b550fb3b3d395aaa0d3bbaf9fc78118e1accf822210b209c92d46d776a746739",
+    "reconstruction_note": "derived from archived deterministic_test_key; not present in archived trust_roots.json"
+  },
+  "lineage_B": {
+    "public_key_sha256": "ec43c176f1a8f0f14173166063d1ac0f953b1d47048384cf669cf2edbbcfd159",
+    "reconstruction_note": "derived from archived deterministic_test_key; not present in archived trust_roots.json"
+  }
+}

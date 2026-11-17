@@ -1,0 +1,8 @@
+{
+  "document_origin": {"public_key_sha256": "be3e0843b76c6555494de967727b06e6c75eec1343be89335d2fa5435ac0b57f"},
+  "external_sensor": {"public_key_sha256": "48ee9663393c9349ef9711e5b6e1f335be4cca61bee1071d874035dd93b6dba0"},
+  "authorization_authority": {"public_key_sha256": "83c7303b21cff58449c873ec381c2dd8ebd1588899e3da6eb9bdfdd731089f63"},
+  "verifier_A": {"public_key_sha256": "019e8b27aee2485d7c6dc547c375ffc1d866d209059077262f6a010ad05d413c"},
+  "verifier_B": {"public_key_sha256": "deb15fd651d1b5779188380bdabb4db83121ea1893b8d683cc96ac12d9502d45"},
+  "verifier_C": {"public_key_sha256": "95d5755db7da3c58095684be4d2cbd80a41b9592f0ad390d5f7428c9d5b05637"}
+}
