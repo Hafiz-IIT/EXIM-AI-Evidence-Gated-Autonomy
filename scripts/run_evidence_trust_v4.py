@@ -17,7 +17,6 @@ from src.core import evidence_gate_v1, visible_features
 from src.evidence_trust_v3 import (
     issue_witness_assertion,
     is_recoverable_verifier_false_reject,
-    make_source_forgery if False else issue_witness_assertion,
 )
 from src.evidence_trust_v4 import (
     DEPENDENCY_LAYERS,
