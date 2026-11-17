@@ -69,7 +69,7 @@ The full v2 experiment execution with the coherent-rewrite regression test passe
 2. Compare the new reconstruction protocol against the historical result tables and explain all differences without parameter fitting.
 3. Review the new reconstruction's model assumptions and threats to validity independently.
 4. Freeze the exact policies, stochastic assumptions, seeds, cost matrix, and attack configurations.
-5. Complete a document-root attestation experiment that signs raw document instances and normalized documents; test coherent rewrites, signer compromise, key rotation/revocation and replay.
+5. Expand document-root threat testing into independently varied capture, extraction, external-sensor and authorization trust-domain compromises; the first combined-compromise experiment is complete but synthetic.
 6. Redesign OOD transformations to test meaningful evidence-quality/dependency shifts.
 7. Expand sensitivity analysis beyond the current one-factor and selected two-factor sweeps.
 8. Reconcile all manuscript tables and claims against newly generated outputs.
@@ -81,3 +81,19 @@ The full v2 experiment execution with the coherent-rewrite regression test passe
 The work remains synthetic. It does not establish production safety, real customs performance, frontier-model performance, completed human-subject research, regulatory approval, cryptographic proof of evidence truth, or elimination of trust-root/escalation risk.
 
 Do not submit or describe this work as an arXiv preprint until the reproducibility blockers above are closed and arXiv has actually assigned an identifier.
+
+
+## Document-root attestation extension (verified 16 November 2026)
+
+The document-root attestation prototype and threat runner are now implemented:
+- Implementation: `src/provenance.py`
+- Tests: `tests/test_document_root_attestation.py`
+- Runner: `scripts/run_document_root_attestation.py`
+- Protocol: `experiments/document_root_attestation/PROTOCOL.md`
+- Results review: `experiments/document_root_attestation/RESULTS_REVIEW.md`
+
+The full workflow [43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43955044311) passed, including the document-root runner and manuscript compilation. Its archived artifact is named `ega-document-root-attestation-v1`; the output manifest records source commit `8e2dc845efefb856818ca61011395f8887249b38` and SHA-256 hashes for both CSV outputs.
+
+Across 700 HIGH-risk v0.4 cases, the verifier rejected raw tampering, unsigned coherent rewrites, revoked-key use, cross-tenant reuse and second-use nonce replay in all tested cases. Under the combined scenario of trusted document-root signer compromise plus coordinated upstream rewrites, the forged attestation verified in all 700 cases; the downstream gate authorized 350 ACT decisions, 300 unsafe against benchmark ground truth (42.86% of all HIGH-risk cases; 85.71% of ACT decisions). The 300 unsafe decisions occurred in C1, C2, C4, C6, C9 and C13 (50 each).
+
+This is a conditional synthetic attack outcome under coordinated compromise of the signing authority and upstream evidence channels. It is not a real-world probability or a result about signer-key theft alone. The implementation uses deterministic test keys and process-local replay state; production key custody, authenticated signer enrollment, secure capture, distributed replay protection and operational key management remain unimplemented. The manuscript remains **not ready for arXiv submission**.
