@@ -86,7 +86,7 @@ class EvidenceTrustV3Tests(unittest.TestCase):
         # third witness dissents and must not make the colluding pair look independent.
         self.assertEqual(
             self.verify(self.records((10.0, 10.0, 99.0), credentials=credentials)),
-            (False, "insufficient_identity_independence", 2),
+            (False, "insufficient_identity_independence:administrative_domain", 0),
         )
 
     def test_quorum_requires_the_configured_distinct_witness_roster(self):
