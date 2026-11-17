@@ -103,6 +103,11 @@ The benchmark will distinguish attacks that the earlier v2/v3 experiments partia
 
 The adversary capabilities will be stated per attack. Compromise of a source key does not silently imply compromise of other authorities; registry compromise does not silently imply hardware compromise; a forged source document before capture is not the same as a forged capture signature.
 
+### A2 implementation detail
+
+The pre-capture forgery scenario changes quantity, gross weight, and HS values in the source documents before capture. The capture digest and parser extraction are then honestly recomputed over those forged documents, so the provenance integrity check remains valid. The independent weighbridge, RFID counter, and tariff registry retain the original benchmark ground truth. The transformed case is labelled unsafe to authorize while its physical/benchmark ground truth is unchanged. The expected result is a claim-value conflict or external mismatch and no ACT. This is intentionally different from post-signature tampering: a valid capture signature can authenticate forged source content without making that content true.
+
+
 ## 7. Baselines and ablations
 
 - **B0 — Existing policy gate:** current evidence-gate v1 without signed provenance.
