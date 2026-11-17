@@ -91,13 +91,21 @@ The v0.4 SHA-256 document-set digest is unkeyed. A regression test coherently re
 
 ## Required next work
 
-1. Add a document-root signer covering raw document instances and normalized documents.
-2. Test coherent document-set rewrite, signer compromise, key rotation/revocation and cross-tenant replay.
-3. Redesign OOD transformations so they represent evidence-quality and dependency shifts rather than perturbations that trigger easy escalation.
-4. Add broader factorial/global sensitivity analysis and a prespecified cost/utility analysis.
-5. Inspect per-case false accepts and false blocks by family and severity.
-6. Recover or retire historical Experiment 1A's downstream-resolution claims.
-7. Reconcile the manuscript against this new reconstruction without fitting parameters to historical numbers.
-8. Perform an independent literature/novelty and methods review.
+1. Analyze document-root attestation under independent and combined trust-domain compromises; the initial v1 results are now reported in [document-root RESULTS_REVIEW.md](../document_root_attestation/RESULTS_REVIEW.md).
+2. Redesign OOD transformations so they represent evidence-quality and dependency shifts rather than perturbations that trigger easy escalation.
+3. Add broader factorial/global sensitivity analysis and a prespecified cost/utility analysis.
+4. Inspect per-case false accepts and false blocks by family and severity beyond the document-root compromise breakdown.
+5. Recover or retire historical Experiment 1A's downstream-resolution claims.
+6. Reconcile the manuscript against this new reconstruction without fitting parameters to historical numbers.
+7. Perform an independent literature/novelty and methods review.
 
 **Do not replace historical manuscript tables with these outputs until the above review and independent validation are complete.**
+
+
+## Document-root attestation threat experiment v1 (subsequent extension)
+
+The dedicated document-root attestation experiment is now implemented and CI-validated in [run 43955044311](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/43955044311). It is a subsequent synthetic extension, not part of the v2 reconstruction tables above. See [protocol](../document_root_attestation/PROTOCOL.md) and [results review](../document_root_attestation/RESULTS_REVIEW.md).
+
+Across 700 HIGH-risk v0.4 cases, raw document-instance tampering, unsigned coherent rewrite, revoked-key use, cross-tenant reuse and second-use nonce replay were rejected in all 700 cases each. Valid baseline and rotated-key attestations were accepted in all 700 cases each. Under the deliberately strong combined scenario of trusted document-root signer compromise plus coordinated rewrites to document, extraction, classification and measured-weight channels, all 700 forged attestations verified; the existing gate issued 350 ACT decisions, of which 300 were unsafe (42.86% of all HIGH-risk cases; 85.71% of ACT decisions). The 300 unsafe ACTs occurred in C1, C2, C4, C6, C9 and C13 (50 each).
+
+This does not estimate real-world risk and does not show that signer-key theft alone causes the same result. It demonstrates that signatures cannot establish semantic truth when the signer and corroborating upstream channels are jointly compromised. The v1 attestation remains a synthetic protocol prototype: no KMS/HSM, independent signer enrollment, durable distributed replay store, secure capture or production key custody is implemented.
