@@ -85,7 +85,9 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
             tenant_id=self.tenant, expected_claim=claim,
             expected_subject_id=self.subject, expected_action_id=self.action,
             expected_action_payload_digest=self.action_payload_digest,
-            expected_document_digest=self.doc_digest, now=self.now, **kwargs)
+            expected_document_digest=self.doc_digest,
+            expected_unit={"gross_weight": "kg", "quantity": "count", "hs_code": "code"}[claim],
+            now=self.now, **kwargs)
 
     def test_gross_weight_requires_document_parser_and_calibrated_scale(self):
         ok, reason, _ = evaluate_claim(
@@ -94,7 +96,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
             trusted_issuer_key=self.root.public_key(), tenant_id=self.tenant,
             claim_type="gross_weight", expected_subject_id=self.subject,
             expected_action_id=self.action,
-            expected_action_payload_digest=self.action_payload_digest, expected_document_digest=self.doc_digest,
+            expected_action_payload_digest=self.action_payload_digest, expected_document_digest=self.doc_digest, expected_unit="kg",
             now=self.now, required_source_types=frozenset({"document_parser", "weighbridge"}),
             tolerance=0.01,
         )
@@ -112,6 +114,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
                 claim_type=claim, expected_subject_id=self.subject,
                 expected_action_id=self.action,
             expected_action_payload_digest=self.action_payload_digest, expected_document_digest=self.doc_digest,
+                expected_unit="count" if claim == "quantity" else "code",
                 now=self.now, required_source_types=frozenset({"document_parser", external_type}),
             )
             self.assertEqual((ok, reason), (True, "claim_supported"))
@@ -159,7 +162,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
             trusted_issuer_key=self.root.public_key(), tenant_id=self.tenant,
             claim_type="gross_weight", expected_subject_id=self.subject,
             expected_action_id=self.action,
-            expected_action_payload_digest=self.action_payload_digest, expected_document_digest=self.doc_digest,
+            expected_action_payload_digest=self.action_payload_digest, expected_document_digest=self.doc_digest, expected_unit="kg",
             now=self.now, required_source_types=frozenset({"document_parser", "weighbridge"}),
             tolerance=0.01,
         )
@@ -209,7 +212,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
             expected_claim="gross_weight", expected_subject_id=self.subject,
             expected_action_id=self.action,
             expected_action_payload_digest=self.action_payload_digest, expected_document_digest=self.doc_digest,
-            now=self.now, consumed_nonces=nonces, last_sequences=sequences,
+            expected_unit="kg", now=self.now, consumed_nonces=nonces, last_sequences=sequences,
         )
         self.assertTrue(verify_claim_evidence(pair[0], pair[1], **kwargs)[0])
         self.assertEqual(verify_claim_evidence(pair[0], pair[1], **kwargs)[1], "replay")
@@ -249,6 +252,48 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
             evidence_digests=digests, now=self.now,
         )
         self.assertEqual(changed_payload, (False, "action_binding_mismatch"))
+
+    def test_unit_mismatch_is_rejected(self):
+        pair = self.evidence("weighbridge", "gross_weight", 42.0, unit="lb")
+        ok, reason, _ = self.verify(pair, "gross_weight")
+        self.assertFalse(ok)
+        self.assertEqual(reason, "unit_mismatch")
+
+    def test_evidence_must_be_issued_within_credential_validity(self):
+        pair = self.evidence("weighbridge", "gross_weight", 42.0, issued_at=99)
+        ok, reason, _ = self.verify(pair, "gross_weight")
+        self.assertFalse(ok)
+        self.assertEqual(reason, "evidence_outside_credential_window")
+
+    def test_action_payload_digest_is_checked_on_each_evidence_item(self):
+        pair = self.evidence("weighbridge", "gross_weight", 42.0)
+        ok, reason, _ = verify_claim_evidence(
+            pair[0], pair[1], trusted_issuer_key=self.root.public_key(),
+            tenant_id=self.tenant, expected_claim="gross_weight",
+            expected_subject_id=self.subject, expected_action_id=self.action,
+            expected_action_payload_digest=canonical_sha256({"operation": "different"}),
+            expected_document_digest=self.doc_digest, expected_unit="kg", now=self.now,
+        )
+        self.assertFalse(ok)
+        self.assertEqual(reason, "action_payload_mismatch")
+
+    def test_replay_state_can_be_shared_across_claim_evaluations(self):
+        pairs = [
+            self.evidence("document_parser", "gross_weight", 42.0),
+            self.evidence("weighbridge", "gross_weight", 42.0),
+        ]
+        consumed, sequences = set(), {}
+        kwargs = dict(
+            trusted_issuer_key=self.root.public_key(), tenant_id=self.tenant,
+            claim_type="gross_weight", expected_subject_id=self.subject,
+            expected_action_id=self.action,
+            expected_action_payload_digest=self.action_payload_digest,
+            expected_document_digest=self.doc_digest, expected_unit="kg",
+            now=self.now, required_source_types=frozenset({"document_parser", "weighbridge"}),
+            consumed_nonces=consumed, last_sequences=sequences,
+        )
+        self.assertTrue(evaluate_claim(pairs, **kwargs)[0])
+        self.assertEqual(evaluate_claim(pairs, **kwargs)[1], "replay")
 
     def test_forged_source_credential_is_rejected(self):
         pair = self.evidence("weighbridge", "gross_weight", 42.0)
