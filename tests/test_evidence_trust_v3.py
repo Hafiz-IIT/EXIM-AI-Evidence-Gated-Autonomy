@@ -55,6 +55,24 @@ class EvidenceTrustV3Tests(unittest.TestCase):
         self.assertEqual(self.verify(self.records((99.0, 99.0, 10.0))),
                          (False, "quorum_disagreement", 1))
 
+    def test_three_of_three_requires_every_witness_to_match(self):
+        result = verify_witness_quorum(
+            self.records((10.0, 10.0, 99.0)),
+            trusted_issuer_key=self.root.public_key(), tenant_id="tenant-A",
+            case_id="case-1", parent_digest="root", expected_weight=10.0,
+            expected_item_type="machine", now=150, threshold=3, total_required=3,
+        )
+        self.assertEqual(result, (False, "quorum_disagreement", 2))
+
+    def test_three_of_three_succeeds_when_all_independent_witnesses_match(self):
+        result = verify_witness_quorum(
+            self.records(),
+            trusted_issuer_key=self.root.public_key(), tenant_id="tenant-A",
+            case_id="case-1", parent_digest="root", expected_weight=10.0,
+            expected_item_type="machine", now=150, threshold=3, total_required=3,
+        )
+        self.assertEqual(result, (True, "quorum_valid", 3))
+
     def test_all_witnesses_must_have_distinct_admin_domains(self):
         credentials = []
         for i, key in enumerate(self.witnesses, 1):
