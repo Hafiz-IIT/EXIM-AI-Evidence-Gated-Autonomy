@@ -8,7 +8,7 @@ Can a threshold of multiple witnesses reduce the unsafe-authorization exposure o
 
 ## Changes from v2
 
-- Three witness identities are enrolled by a pinned synthetic registry root.
+- Three-witness (2-of-3 and 3-of-3) and five-witness (3-of-5) configurations are enrolled by a pinned synthetic registry root.
 - Each registry-signed credential binds witness ID, key ID, public-key bytes, source ID, acquisition domain, administrative domain, tenant, serial, and validity window.
 - Each witness signs a case-scoped measurement assertion bound to its credential digest and evidence parent.
 - Authorization requires two matching assertions from at least two distinct witness IDs, key IDs, source IDs, acquisition domains, and administrative domains. Independence is evaluated on the matching supporters themselves; a dissenting third witness cannot lend independence to a colluding pair.
@@ -25,8 +25,9 @@ Can a threshold of multiple witnesses reduce the unsafe-authorization exposure o
 6. Source forgery before capture, separately from signer/credential compromise.
 7. Disclosed shared administrative domain.
 8. Registry signing-key compromise: the attacker's control of the existing issuer private key is assumed, while the verifier retains the original pinned public key.
+9. Combined attack: two witnesses are compromised and a third witness's identity credential is invalid.
 
-The deterministic HIGH-risk benchmark v0.4 subset is reused. Outputs are a separate v3 result set and do not overwrite v2 artifacts or historical results. In the pre-capture source-forgery scenario, the document set is changed relative to the unchanged physical ground truth and the transformed case is relabeled unsafe-to-authorize. Safe-action coverage and false-block rate are therefore undefined for that scenario; the relevant metric is whether the policy issues any unsafe ACT.
+The deterministic HIGH-risk benchmark v0.4 subset is reused. Outputs are a separate v3 result set and do not overwrite v2 artifacts or historical results. The 2-of-3 and 3-of-3 policies use the same three-witness roster; 3-of-5 uses a separately enrolled five-witness roster on the same benchmark cases. In the pre-capture source-forgery scenario, the document set is changed relative to the unchanged physical ground truth and the transformed case is relabeled unsafe-to-authorize. Safe-action coverage and false-block rate are therefore undefined for that scenario; the relevant metric is whether the policy issues any unsafe ACT.
 
 ## Interpretation
 
@@ -44,30 +45,33 @@ The v3 controller may recover an isolated machine-verifier false rejection only 
 
 The recovery policy is tested against all eight v3 threat scenarios. Results report the number of recoveries separately. Because the benchmark's C7 family is deliberately labeled as a false-reject case, any improved coverage there is a benchmark-specific result, not evidence that real-world verifier rejections are generally safe to override.
 
-## Threshold sensitivity: 2-of-3 versus 3-of-3
+## Threshold sensitivity: 2-of-3, 3-of-3, and 3-of-5
 
-The runner evaluates the same signed assertions twice: the primary 2-of-3 policy and a strict 3-of-3 sensitivity policy. Both use the same bounded verifier-false-reject recovery rule and the same synthetic cases. The comparison isolates the effect of requiring unanimity among the three enrolled witnesses. A 3-of-3 quorum is expected to block a two-witness collusion when the third honest witness disagrees. It loses availability when any credential is invalid; compromise of the registry signing private key alone does not invalidate the third honest credential when the original public key remains pinned. Three compromised witnesses can still authorize a jointly fabricated measurement. These are benchmark-specific deterministic comparisons, not universal threshold recommendations.
+The runner compares three configurations on the same benchmark cases. The 2-of-3 and 3-of-3 policies use the same three-witness roster and signed assertions. The 3-of-5 policy uses a separately enrolled five-witness roster, with the same compromise pattern applied to the first two witnesses and the same bounded verifier-false-reject recovery rule.
+
+A 3-of-3 quorum blocks two-witness collusion but loses availability when even one credential is invalid. A 3-of-5 quorum can retain a valid threshold after one invalid credential and can block two colluding witnesses when the other three honest witnesses agree. The combined attack tests the boundary: two compromised witnesses plus one invalid credential leave only two honest valid witnesses, so a 3-of-5 quorum fails closed on the consistent-but-wrong cases. Five-witness enrollment adds governance, key-management and operational overhead. Three compromised witnesses are not sufficient to control 3-of-5, but compromise of all five can still authorize a jointly fabricated measurement. These are benchmark-specific deterministic comparisons, not universal threshold recommendations.
 
 ## Pre-registered acceptance profile
 
 The deterministic runner includes assertions for the following expected ACT / unsafe-ACT counts (out of 700 cases per scenario). These are executable regression expectations, not empirical probability estimates.
 
-| Scenario | 2-of-3 ACT | 2-of-3 unsafe ACT | 3-of-3 ACT | 3-of-3 unsafe ACT |
-|---|---:|---:|---:|---:|
-| Honest baseline | 100 | 0 | 100 | 0 |
-| One witness compromised | 100 | 0 | 100 | 0 |
-| Two witnesses compromised | 150 | 50 | 100 | 0 |
-| All witnesses compromised | 150 | 50 | 150 | 50 |
-| Forged source identity | 100 | 0 | 0 | 0 |
-| Source forgery before capture | 0 | 0 | 0 | 0 |
-| Shared administrative domain | 0 | 0 | 0 | 0 |
-| Registry-root compromise | 150 | 50 | 100 | 0 |
+| Scenario | 2-of-3 ACT | 2-of-3 unsafe | 3-of-3 ACT | 3-of-3 unsafe | 3-of-5 ACT | 3-of-5 unsafe |
+|---|---:|---:|---:|---:|---:|---:|
+| Honest baseline | 100 | 0 | 100 | 0 | 100 | 0 |
+| One witness compromised | 100 | 0 | 100 | 0 | 100 | 0 |
+| Two witnesses compromised | 150 | 50 | 100 | 0 | 100 | 0 |
+| All witnesses compromised | 150 | 50 | 150 | 50 | 150 | 50 |
+| Forged source identity | 100 | 0 | 0 | 0 | 100 | 0 |
+| Source forgery before capture | 0 | 0 | 0 | 0 | 0 | 0 |
+| Shared administrative domain | 0 | 0 | 0 | 0 | 0 | 0 |
+| Registry-root compromise | 150 | 50 | 100 | 0 | 100 | 0 |
+| Two compromised + one invalid credential | 150 | 50 | 0 | 0 | 100 | 0 |
 
-The 100 honest ACTs comprise 50 clean cases plus 50 deliberately constructed safe cases with isolated verifier false rejection (C7), recovered only after a valid witness quorum and all other policy guards pass. The 50 unsafe ACTs in two-witness collusion, full-roster compromise and registry-root compromise arise in C4 consistent-but-wrong. Strict 3-of-3 blocks the two-witness and registry signing-key compromise scenarios while retaining safe-case coverage because the third honest credential remains valid under the pinned issuer key. It cannot defend against compromise of all three enrolled witnesses. It loses availability when one credential is invalid, as shown by the forged-source-identity control. CI must fail if these deterministic acceptance profiles drift.
+The 100 honest ACTs comprise 50 clean cases plus 50 deliberately constructed safe cases with isolated verifier false rejection (C7), recovered only after a valid witness quorum and all other policy guards pass. The 50 unsafe ACTs in two-witness collusion, full-roster compromise and registry-root compromise arise in C4 consistent-but-wrong. The 3-of-3 policy blocks two-witness collusion but loses availability when one credential is invalid. The 3-of-5 policy blocks two-witness collusion and tolerates one invalid credential while retaining safe-case coverage. Under the combined attack, two colluding witnesses plus one invalid credential leave only two honest valid witnesses, so 3-of-5 correctly fails closed on C4 while retaining safe C0/C7 authorizations. All three policies fail under full-roster compromise. CI must fail if these deterministic acceptance profiles drift.
 
 ## Claim boundary
 
-All keys, identities, measurements and source records are synthetic. Deterministic benchmark counts are not real-world probabilities. The implementation does not provide production CA governance, KMS/HSM custody, hardware-backed device identity, secure enrollment, trusted time, durable distributed revocation, or proof of operational independence. Results must not be described as production security validation.
+All keys, identities, measurements and source records are synthetic. Deterministic benchmark counts are not real-world probabilities. The implementation does not provide production CA governance, KMS/HSM custody, hardware-backed device identity, secure enrollment, trusted time, durable distributed revocation, or proof of operational independence. The five-witness configuration also adds operational enrollment, monitoring and key-management cost. Results must not be described as production security validation.
 
 ## Reproduction
 
