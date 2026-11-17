@@ -213,7 +213,43 @@ def prepare_tasks(benchmark_path: Path, output_dir: Path) -> dict:
         "note": "PRIVATE. Never upload or expose this file to model providers.",
     }
     (private_dir / "private_metadata.json").write_text(json.dumps(private_metadata, indent=2) + "\n", encoding="utf-8")
+    verify_prepared_package(output_dir)
     return manifest
+
+def verify_prepared_package(prepared_dir: Path) -> tuple[dict, dict, list[dict], list[dict]]:
+    """Verify public and private task-package hashes before estimating or running models."""
+    public_dir = prepared_dir / "public"
+    private_dir = prepared_dir / "private"
+    task_manifest_path = public_dir / "task_manifest.json"
+    public_tasks_path = public_dir / "tasks.jsonl"
+    private_map_path = private_dir / "evaluation_map.jsonl"
+    private_metadata_path = private_dir / "private_metadata.json"
+    task_manifest = json.loads(task_manifest_path.read_text(encoding="utf-8"))
+    private_metadata = json.loads(private_metadata_path.read_text(encoding="utf-8"))
+    if sha256_file(public_tasks_path) != task_manifest["public_tasks_sha256"]:
+        raise ValueError("public task file hash does not match task manifest")
+    if sha256_file(task_manifest_path) != private_metadata["task_manifest_sha256"]:
+        raise ValueError("task manifest hash does not match private preparation metadata")
+    if sha256_file(public_tasks_path) != private_metadata["public_tasks_sha256"]:
+        raise ValueError("public task hash does not match private preparation metadata")
+    if sha256_file(private_map_path) != private_metadata["private_evaluation_map_sha256"]:
+        raise ValueError("private evaluation map hash does not match private preparation metadata")
+    if private_metadata["task_id_salt_sha256"] != task_manifest["task_id_salt_sha256"]:
+        raise ValueError("private task-ID salt hash differs from public task manifest")
+    if sha256_bytes(private_metadata["task_id_salt"].encode("utf-8")) != task_manifest["task_id_salt_sha256"]:
+        raise ValueError("private task-ID salt does not match its committed hash")
+    public_tasks = read_jsonl(public_tasks_path)
+    private_map = read_jsonl(private_map_path)
+    public_ids = [row["task_id"] for row in public_tasks]
+    private_ids = [row["task_id"] for row in private_map]
+    if len(public_ids) != len(set(public_ids)) or len(private_ids) != len(set(private_ids)):
+        raise ValueError("duplicate task IDs detected in prepared package")
+    if set(public_ids) != set(private_ids):
+        raise ValueError("public task IDs and private evaluation-map IDs do not match")
+    if len(public_tasks) != task_manifest["public_task_count"]:
+        raise ValueError("public task count differs from task manifest")
+    return task_manifest, private_metadata, public_tasks, private_map
+
 
 def load_prompt(name: str) -> str:
     return (PROMPT_DIR / name).read_text(encoding="utf-8").strip()
@@ -494,9 +530,9 @@ def run_condition(
     public_dir = prepared_dir / "public"
     private_dir = prepared_dir / "private"
     task_manifest_path = public_dir / "task_manifest.json"
-    task_manifest = json.loads(task_manifest_path.read_text(encoding="utf-8"))
-    public_tasks = {x["task_id"]: x for x in read_jsonl(public_dir / "tasks.jsonl")}
-    private_rows = [x for x in read_jsonl(private_dir / "evaluation_map.jsonl") if x["split"] == split]
+    task_manifest, private_metadata, public_task_rows, private_map = verify_prepared_package(prepared_dir)
+    public_tasks = {x["task_id"]: x for x in public_task_rows}
+    private_rows = [x for x in private_map if x["split"] == split]
     if condition.get("holdout_only") and not split.startswith("final_holdout"):
         raise ValueError("holdout-only model condition cannot run on development/validation")
     if any(config["models"][name].get("holdout_only") for name in [condition["extractor_model"], *condition["verifier_models"]]) and not split.startswith("final_holdout"):
@@ -551,6 +587,8 @@ def run_condition(
             raise ValueError("final holdout public tasks differ from frozen value")
         if freeze.get("task_id_salt_sha256") != task_manifest["task_id_salt_sha256"]:
             raise ValueError("final holdout task-ID salt differs from frozen value")
+        if freeze.get("private_evaluation_map_sha256") != private_metadata["private_evaluation_map_sha256"]:
+            raise ValueError("final holdout private evaluation map differs from frozen value")
     if split.startswith("final_holdout") and output_dir.exists() and any(output_dir.iterdir()):
         raise FileExistsError("final-holdout output directory already contains a run; do not rerun the frozen holdout")
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -677,6 +715,7 @@ def run_condition(
         "task_manifest_sha256": sha256_file(task_manifest_path),
         "public_tasks_sha256": task_manifest["public_tasks_sha256"],
         "task_id_salt_sha256": task_manifest["task_id_salt_sha256"],
+        "private_evaluation_map_sha256": private_metadata["private_evaluation_map_sha256"],
         "prompt_sha256": prompt_hashes,
         "model_config_sha256": model_hash,
         "cost_estimate": cost_estimate,
