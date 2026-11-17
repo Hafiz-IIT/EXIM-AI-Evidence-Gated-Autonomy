@@ -38,7 +38,7 @@ def issue_source_credential(*, issuer_id: str, source_id: str, source_type: str,
     if not isinstance(issued_at, int) or not isinstance(expires_at, int) or expires_at <= issued_at:
         raise ValueError("invalid credential validity window")
     body = {
-        "schema": CREDENTIAL_SCHEMA, "issuer_id": issuer_id,
+        "schema": CREDENTIAL_SCHEMA, "issuer_id": issuer_id, "trust_root_id": issuer_id,
         "source_id": source_id, "source_type": source_type, "key_id": key_id,
         "public_key_b64": base64.b64encode(_pubkey_bytes(public_key)).decode("ascii"),
         "allowed_claims": claims, "acquisition_domain": acquisition_domain,
@@ -177,7 +177,7 @@ def verify_claim_evidence(record: dict, credential: dict, *,
             "acquisition_domain": identity["acquisition_domain"],
             "administrative_domain": identity["administrative_domain"],
             "gateway_id": identity["gateway_id"],
-            "key_admin_domain": identity["key_admin_domain"],
+            "key_admin_domain": identity["key_admin_domain"],\n            "trust_root_id": identity["trust_root_id"],
         }}
     except (KeyError, TypeError, ValueError, InvalidSignature):
         return False, "invalid_evidence", None
