@@ -15,7 +15,7 @@ import time
 from pathlib import Path
 
 from experiments.exp3_real_models.harness import (
-    PROMPT_DIR, canonical_json, sha256_bytes, sha256_file
+    PROMPT_DIR, canonical_json, sha256_bytes, sha256_file, verify_prepared_package
 )
 
 
@@ -54,7 +54,7 @@ def main():
     for name, spec in models.items():
         if spec.get("holdout_only") and name not in used_holdout:
             raise SystemExit(f"holdout-only model {name} is not used by a holdout-only condition")
-    task_manifest = json.loads((args.prepared_dir / "public" / "task_manifest.json").read_text(encoding="utf-8"))
+    task_manifest, private_metadata, _, _ = verify_prepared_package(args.prepared_dir)
     prompt_hashes = {
         "extract_v1.txt": sha256_file(PROMPT_DIR / "extract_v1.txt"),
         "verify_v1.txt": sha256_file(PROMPT_DIR / "verify_v1.txt"),
@@ -67,6 +67,7 @@ def main():
         "task_manifest_sha256": sha256_file(args.prepared_dir / "public" / "task_manifest.json"),
         "public_tasks_sha256": task_manifest["public_tasks_sha256"],
         "task_id_salt_sha256": task_manifest["task_id_salt_sha256"],
+        "private_evaluation_map_sha256": private_metadata["private_evaluation_map_sha256"],
         "prompt_sha256": prompt_hashes,
         "model_config_sha256": model_hash,
     }
