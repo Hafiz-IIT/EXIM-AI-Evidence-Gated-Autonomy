@@ -13,6 +13,7 @@ import json
 import math
 import os
 import re
+import secrets
 import time
 import urllib.error
 import urllib.request
@@ -51,8 +52,8 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
     path.write_text("".join(json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8")
 
 
-def _opaque_task_id(case_id: str, layout: str) -> str:
-    return hashlib.sha256(f"exp3-task-v1|{case_id}|{layout}".encode()).hexdigest()[:20]
+def _opaque_task_id(case_id: str, layout: str, task_salt: str) -> str:
+    return hashlib.sha256(f"exp3-task-v1|{task_salt}|{case_id}|{layout}".encode()).hexdigest()[:24]
 
 
 def _render_document(kind: str, document: dict | None, layout: str) -> str:
@@ -112,13 +113,14 @@ def assign_splits(high_risk_cases: list[dict]) -> dict[str, str]:
     return assignments
 
 
-def build_public_task(case: dict, layout: str) -> dict:
-    """Build a model-facing task from allowed observable evidence only."""
+def build_public_task(case: dict, layout: str, task_salt: str | None = None) -> dict:
+    """Build a model-facing task using a per-preparation secret task-ID salt."""
     observable = case["observable"]
+    task_salt = task_salt or secrets.token_hex(32)
     external = observable["external"]
     auth = external["authorization"]
     task = {
-        "task_id": _opaque_task_id(case["case_id"], layout),
+        "task_id": _opaque_task_id(case["case_id"], layout, task_salt),
         "action_context": {
             "risk_level": case["action"]["risk_level"],
             "reversibility": case["action"]["reversibility"],
@@ -158,6 +160,8 @@ def prepare_tasks(benchmark_path: Path, output_dir: Path) -> dict:
     if not high:
         raise ValueError("benchmark contains no HIGH-risk cases")
     split_map = assign_splits(high)
+    task_salt = secrets.token_hex(32)
+    task_salt_sha256 = sha256_bytes(task_salt.encode("utf-8"))
     public_tasks = []
     private_map = []
     for case in high:
@@ -168,19 +172,14 @@ def prepare_tasks(benchmark_path: Path, output_dir: Path) -> dict:
             else [("final_holdout_id", "canonical"), ("final_holdout_ood", "ood")]
         )
         for split_name, layout in layouts:
-            task = build_public_task(case, layout)
+            task = build_public_task(case, layout, task_salt)
             public_tasks.append(task)
             private_map.append({
-                "task_id": task["task_id"],
-                "case_id": case["case_id"],
-                "pair_id": case["pair_id"],
-                "family": case["family"],
-                "severity": case["severity"],
-                "split": split_name,
-                "safe_to_act": case["safe_to_act"],
-                "ground_truth": case["ground_truth"],
-                "action": case["action"],
-                "observable": case["observable"],
+                "task_id": task["task_id"], "case_id": case["case_id"],
+                "pair_id": case["pair_id"], "family": case["family"],
+                "severity": case["severity"], "split": split_name,
+                "safe_to_act": case["safe_to_act"], "ground_truth": case["ground_truth"],
+                "action": case["action"], "observable": case["observable"],
             })
     public_dir = output_dir / "public"
     private_dir = output_dir / "private"
@@ -196,18 +195,25 @@ def prepare_tasks(benchmark_path: Path, output_dir: Path) -> dict:
         "public_task_count": len(public_tasks),
         "split_counts": dict(sorted(counts.items())),
         "public_tasks_sha256": sha256_file(public_dir / "tasks.jsonl"),
-        "prompt_sha256": {
-            name: sha256_file(PROMPT_DIR / name)
-            for name in ("extract_v1.txt", "verify_v1.txt")
-        },
+        "task_id_salt_sha256": task_salt_sha256,
+        "prompt_sha256": {name: sha256_file(PROMPT_DIR / name) for name in ("extract_v1.txt", "verify_v1.txt")},
         "split_rule": "deterministic SHA-256 ordering within benchmark family; 60% development, 20% validation, 20% final holdout by pair_id",
-        "model_facing_blinding": "no case_id, pair_id, family, severity, fault, ground_truth, safe_to_act or fingerprint fields",
+        "model_facing_blinding": "no case_id, pair_id, family, severity, fault, ground_truth, safe_to_act or fingerprint fields; task IDs use a per-preparation secret salt",
         "layouts": {"development": "canonical", "validation": "table", "final_holdout_id": "canonical", "final_holdout_ood": "ood"},
         "status": "prepared_only_no_model_calls",
     }
-    (public_dir / "task_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    manifest_path = public_dir / "task_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    private_metadata = {
+        "protocol": "exp3-real-models-v1", "task_id_salt": task_salt,
+        "task_id_salt_sha256": task_salt_sha256,
+        "private_evaluation_map_sha256": sha256_file(private_dir / "evaluation_map.jsonl"),
+        "public_tasks_sha256": manifest["public_tasks_sha256"],
+        "task_manifest_sha256": sha256_file(manifest_path),
+        "note": "PRIVATE. Never upload or expose this file to model providers.",
+    }
+    (private_dir / "private_metadata.json").write_text(json.dumps(private_metadata, indent=2) + "\n", encoding="utf-8")
     return manifest
-
 
 def load_prompt(name: str) -> str:
     return (PROMPT_DIR / name).read_text(encoding="utf-8").strip()
