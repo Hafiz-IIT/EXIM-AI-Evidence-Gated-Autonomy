@@ -482,7 +482,57 @@ The defensible contribution remains an EXIM-inspired synthetic security evaluati
 
 [2] Santiago Torres-Arias, Hammad Afzali, Trishank Karthik Kuppusamy, Reza Curtmola, and Justin Cappos. *in-toto: Providing farm-to-table guarantees for bits and bytes*. 28th USENIX Security Symposium, 2019.
 
-[3] SLSA Project. *Supply-chain Levels for Software Artifacts (SLSA): Provenance*. https://slsa.dev/\n\n[4] Zachary Kenton et al. *On scalable oversight with weak LLMs judging strong LLMs*. arXiv:2407.04622, 2024.\n\n[5] Yuyang Jiang et al. *Collaborative Disagreement Resolution for Scalable Oversight*. arXiv:2607.01251, 2026.\n\n[6] Rayne Holland, Liming Zhu, and Jason Xue. *When Honesty is Not Enough in AI Debate*. arXiv:2609.29189, 2026.
+[3] SLSA Project. *Supply-chain Levels for Software Artifacts (SLSA): Provenance*. https://slsa.dev/
+
+[4] Zachary Kenton et al. *On scalable oversight with weak LLMs judging strong LLMs*. arXiv:2407.04622, 2024.
+
+[5] Yuyang Jiang et al. *Collaborative Disagreement Resolution for Scalable Oversight*. arXiv:2607.01251, 2026.
+
+[6] Rayne Holland, Liming Zhu, and Jason Xue. *When Honesty is Not Enough in AI Debate*. arXiv:2609.29189, 2026.
+
+[7] Kilian Hendrickx, Lorenzo Perini, Dries Van der Plas, Wannes Meert, and Jesse J. Davis. *Machine learning with a reject option: a survey*. Machine Learning 113, 3073–3110, 2024. https://doi.org/10.1007/s10994-024-06534-3
+
+[8] Joao Sedoc, Baotong Zhang, and Dean P. Foster. *Trust but Verify: Prover-Verifier Deliberation for Selective LLM Prediction*. arXiv:2605.25133, 2026.
+
+[9] Jun He and Deying Yu. *The Illusion of Independent Quorums: Epistemic Fault Domains and Correlated Cognitive Failures in Agentic Quorums*. arXiv:2609.02925, 2026.
+
+[10] Zihao Zheng, Baichuan Li, Junyi Yao, and Jiayu Long. *Engineering Reliable Commit Gates for Agentic AI: Cost-Aware Verification Portfolios under Common-Mode Data Failures*. arXiv:2609.10969, 2026.
+
+[11] Meitong Chen et al. *Artificial Intelligence-Driven Sensing of Cross-Border Trade Risks Through Declaration-to-Physical-Fact Alignment and Evidence-Grounded Question Answering*. Sensors 26(16), 5272, 2026. https://doi.org/10.3390/s26165272
+
+[12] Bo Wu, Lin Wang, Yong Zhang, and Jiang Deng. *From Intent to Execution Grant: An Execution-Boundary Conformance Profile for High-Risk AI Actions*. arXiv:2609.11596, 2026.
+
+[13] Jason D. Rhodes and George Kang. *Proof of Execution: Runtime Verification for Governed AI Agent Actions*. arXiv:2607.05397, 2026.
+
+[14] Igor Santos-Grueiro. *Temporary Authority, Permanent Effects: Commit-Time Authorization for LLM Agents*. arXiv:2607.10487, 2026.
+
+[15] Edward Y. Chang and Longling Geng. *Mnemosyne: Agentic Transaction Processing for Validating and Repairing AI-generated Workflows*. arXiv:2607.00269, 2026.
+
+[16] Bofeng Pan, Natalia Stakhanova, and Suprio Ray. *Data Provenance in Security and Privacy*. ACM Computing Surveys 55(14s), 2023. https://doi.org/10.1145/3593294
+
+[17] Omair Faraj, David Megias, and Joaquin Garcia-Alfaro. *Security Approaches for Data Provenance in the Internet of Things: A Systematic Literature Review*. ACM Computing Surveys 57(10), 2025. https://doi.org/10.1145/3718735
+
+[18] Amir Dirin, Ian Oliver, and Teemu H. Laine. *A Security Framework for Increasing Data and Device Integrity in Internet of Things Systems*. Sensors 23(17), 7532, 2023. https://doi.org/10.3390/s23177532
+
+[19] Eduardo Brito, Fernando Castillo, Amnir Hadachi, Ulrich Norbisrath, and Jonathan Heiss. *Decentralized Proof-of-Location for Content Provenance: Towards Capture-Time Authenticity*. arXiv:2603.27883, 2026.
+
+[20] Ron Triepels, Hennie Daniels, and Ad Feelders. *Data-driven fraud detection in international shipping*. Expert Systems with Applications 99, 193–202, 2018. https://doi.org/10.1016/j.eswa.2018.01.007
+
+[21] Hao Chen et al. *The use of machine learning to identify the correctness of HS Code for the customs import declarations*. IEEE DSAA, 2021. https://doi.org/10.1109/DSAA53316.2021.9564203
+
+[22] Clifford Kahn. *Tolerating Penetrations and Insider Attacks by Requiring Independent Corroboration*. New Security Paradigms Workshop, 1998. https://www.nspw.org/papers/1998/nspw1998-kahn.pdf
+
+[23] Stefan Buijsman and Herman Veluwenkamp. *Spotting When Algorithms Are Wrong*. Minds and Machines 33, 541–562, 2023. https://doi.org/10.1007/s11023-022-09591-0
+
+[24] UK National Protective Security Authority. *Claims, Arguments and Evidence (CAE) Concepts*. https://www.npsa.gov.uk/system/files/documents/npsa-concepts-and-their-applicationcae-concepts1.pdf
+
+[25] IETF. *RFC 9943: An Architecture for Trustworthy and Transparent Digital Supply Chains (SCITT Architecture)*, March 2026. https://www.rfc-editor.org/rfc/rfc9943.html
+
+[26] Christian Janbjer. *Deterministic Intent Verification (DIV) Protocol Specification*, draft-janbjer-div-01, work in progress, 19 October 2026. https://datatracker.ietf.org/doc/html/draft-janbjer-div-01
+
+[27] Christian Janbjer. *Deterministic Evidence & Witness Protocol (DEWP) Specification*, draft-janbjer-dewp-01, work in progress, 19 October 2026. https://datatracker.ietf.org/doc/html/draft-janbjer-dewp-01
+
+[28] Joel Hillier. *Attestation Reconciliation Protocol*, draft-hillier-scitt-arp-06, work in progress, 23 October 2026. https://datatracker.ietf.org/doc/html/draft-hillier-scitt-arp-06
 
 ## Citation
 
