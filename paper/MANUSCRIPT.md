@@ -534,6 +534,16 @@ The defensible contribution remains an EXIM-inspired synthetic security evaluati
 
 [28] Joel Hillier. *Attestation Reconciliation Protocol*, draft-hillier-scitt-arp-06, work in progress, 23 October 2026. https://datatracker.ietf.org/doc/html/draft-hillier-scitt-arp-06
 
+[29] Jun He and Deying Yu. *Verifiable Agentic Infrastructure: Proof-Derived Authorization for Sovereign AI Systems*. arXiv:2605.15228, 2026. https://arxiv.org/abs/2605.15228
+
+[30] Jun He, Openkedge Io, and Deying Yu. *When AI Agents Commit: Cognitive Serializability Across Data, Evidence, Policy, and Authority*. arXiv:2609.20261, 2026. https://arxiv.org/abs/2609.20261
+
+[31] Elias Calboreanu. *LATTICE: A Governance-First Architecture for Authorized Autonomous AI Operations*. Frontiers in Artificial Intelligence 9, 2026. https://doi.org/10.3389/frai.2026.1800407
+
+[32] M. Llambí-Morillas and D. Fernández-Fernández. *Cryptographically Verifiable Authorization for Autonomous AI Agents: A Falsifiable Hypothesis and Proof of Concept*. Frontiers in Computer Science 8, 2026. https://doi.org/10.3389/fcomp.2026.1966725
+
+[33] Dekun Yang. *Calibrated Selective Fact-Checking via Evidence Chain Evaluation*. arXiv:2607.18240, 2026. https://arxiv.org/abs/2607.18240
+
 ## Citation
 
 Ali, Syed Hafiz. "Evidence-Gated Autonomy: A Synthetic Benchmark for Consequential Action Authorization Under Uncertain and Compromised Evidence." Preprint, 2026.
