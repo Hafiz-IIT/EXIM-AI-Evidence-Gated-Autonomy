@@ -136,7 +136,7 @@ The numerical and security claims in the manuscript are tied to the repository's
 | Provenance attacks | Demonstrate that provenance mechanisms can fail under compromised trust assumptions |
 | Ed25519 experiments | Blocked direct unsafe ACT for several unsigned-metadata attacks; valid signatures over false claims remain dangerous under trust-root compromise |
 | Four-authority v2 | Witness-only compromise produced 50/700 unsafe ACT; capture+witness and key-admin trust-store poisoning produced 300/700; AA compromise produced 600/700 |
-| Authenticated witness quorum v3 | 2-of-3 tolerated one compromised witness; two-witness collusion and registry-root compromise produced 50/700 unsafe ACT; strict 3-of-3 blocked those cases but not full-roster compromise |
+| Authenticated witness quorum v3 | 2-of-3 tolerated one compromised witness; two-witness collusion and registry signing-key compromise produced 50/700 unsafe ACT under 2-of-3; strict 3-of-3 blocked those cases while preserving safe-case coverage; strict 3-of-3 blocked those cases but not full-roster compromise |
 
 These are **synthetic computational results under the documented experimental assumptions**, not evidence of deployed-system safety.
 
@@ -198,7 +198,7 @@ The v1 attestation binds raw document instances and normalized document slots. A
 - [Experiment runner](scripts/run_evidence_trust_v3.py)
 - [Regression tests](tests/test_evidence_trust_v3.py)
 - [Results review](experiments/evidence_trust_v3/RESULTS_REVIEW.md)
-- [Pinned artifact manifest and output hashes](results/evidence_trust_v3/manifest-44164029203.json)
+- [Pinned artifact manifest and output hashes](results/evidence_trust_v3/manifest-44168377670.json)
 - [Preliminary novelty audit](research/NOVELTY_AUDIT.md)
 - [Related-work comparison](experiments/evidence_trust_v3/RELATED_WORK_AND_NOVELTY.md)
 - [Draft pull request #6](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/pull/6)
