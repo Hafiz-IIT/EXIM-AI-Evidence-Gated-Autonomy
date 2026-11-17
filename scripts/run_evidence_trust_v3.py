@@ -258,7 +258,8 @@ def main():
         "status": "synthetic threat experiment; not production validation",
         "benchmark_version": "0.4", "high_risk_cases_per_scenario": len(cases),
         "scenario_count": len(scenarios), "case_scenario_rows": len(rows),
-        "witness_quorum": "2-of-3 primary; 3-of-3 sensitivity",\n        "threshold_sensitivity": "same cases and assertions evaluated at thresholds 2 and 3",
+        "witness_quorum": "2-of-3 primary; 3-of-3 sensitivity",
+        "threshold_sensitivity": "same cases and assertions evaluated at thresholds 2 and 3",
         "identity_binding": "registry-root-signed credential binds public key to source and domain claims",
         "scenarios": list(scenarios),
         "limitations": [
