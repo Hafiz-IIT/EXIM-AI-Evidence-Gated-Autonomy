@@ -120,6 +120,31 @@ def verify_witness_assertion(record: dict, credential: dict, *,
         return False, "invalid_witness_assertion", None
 
 
+
+def is_recoverable_verifier_false_reject(features: dict, gate_action: str) -> bool:
+    """Permit a witness-backed recovery only for an isolated verifier rejection.
+
+    Every earlier evidence_gate_v1 guard must already pass. This deliberately
+    does not override missing/stale evidence, document disagreement, extraction
+    mismatch, external conflict, duplicate documents, invalid provenance, or
+    insufficient verifier independence.
+    """
+    return (
+        gate_action == "ESCALATE"
+        and features.get("risk") == "HIGH"
+        and features.get("duplicate_document_kind") is False
+        and features.get("provenance_valid") is True
+        and features.get("complete") is True
+        and features.get("auth_present") is True
+        and features.get("fresh") is True
+        and features.get("doc_agree") is True
+        and features.get("external_conflict") is False
+        and features.get("ex_matches_invoice") is True
+        and features.get("n_verifiers", 0) >= 2
+        and features.get("indep_verifiers", 0) >= 2
+        and features.get("v_rejects", 0) > 0
+    )
+
 def verify_witness_quorum(items: Iterable[tuple[dict, dict]], *,
                           trusted_issuer_key: Ed25519PublicKey,
                           tenant_id: str, case_id: str, parent_digest: str,
