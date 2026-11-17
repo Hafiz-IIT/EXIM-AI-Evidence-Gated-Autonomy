@@ -109,6 +109,9 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         self.assertEqual(estimate["api_call_count"], 3)
         self.assertTrue(estimate["cost_known"])
         self.assertGreater(estimate["preflight_estimated_cost_usd"], 0)
+        self.assertEqual(estimate["configured_output_token_cap"], 300)
+        self.assertIn("not guaranteed bounds", estimate["method"])
+        self.assertNotIn("upper_bound_cost_usd", json.dumps(estimate))
 
     def test_provider_or_schema_failures_force_escalation(self):
         case = self.make_case("C0", "U-00-000")
