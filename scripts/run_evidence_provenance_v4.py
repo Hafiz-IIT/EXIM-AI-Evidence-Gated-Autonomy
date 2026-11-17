@@ -166,6 +166,7 @@ def run_one(case, scenario):
     parsed = obs["machine"]["extraction"]
     parsed_hs = obs["machine"]["classification"]["hs"]
     doc_digest = canonical_sha256(obs["document_instances"])
+    action_payload_digest = canonical_sha256(case["action"])
     subject_id = case["case_id"]
     action_id = "submit:" + case["case_id"]
     case_for_gate = copy.deepcopy(case)
