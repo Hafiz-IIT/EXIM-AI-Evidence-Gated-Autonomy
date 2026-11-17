@@ -6,6 +6,6 @@
 3. Run a small development pilot:
    `python scripts/run_exp3_real_models.py --config /path/to/private-model-config.json --prepared-dir results/exp3_real_models --split development --condition same_model_self_verification --max-tasks 10`
 4. Freeze prompt/config/benchmark hashes before validation and final holdout.
-5. Final holdout requires an explicit confirmation flag and exact freeze-hash matches. Partial final-holdout runs are refused.
+5. Freeze the exact provider/model and prompt/benchmark identities with `python scripts/freeze_exp3_config.py --config /path/to/private-model-config.json --prepared-dir results/exp3_real_models --output /path/to/frozen-config.json`. Final holdout requires an explicit confirmation flag and exact freeze-hash matches. Partial final-holdout runs are refused.
 
 The adapter supports OpenAI-compatible Chat Completions. It does not create API keys, select paid providers, or make calls in CI. No real-model results are claimed until actual provider responses and run artifacts exist.

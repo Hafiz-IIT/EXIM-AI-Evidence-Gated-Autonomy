@@ -236,9 +236,9 @@ def build_verifier_messages(task: dict, extraction: dict) -> list[dict]:
 
 def parse_json_object(content: str) -> dict:
     text = content.strip()
-    if text.startswith("```"):
-        text = re.sub(r"^\`\`\`(?:json)?\s*", "", text)
-        text = re.sub(r"\s*\`\`\`$", "", text)
+    if text.startswith(chr(96) * 3):
+        text = re.sub(r"^\x60\x60\x60(?:json)?\s*", "", text)
+        text = re.sub(r"\s*\x60\x60\x60$", "", text)
     value = json.loads(text)
     if not isinstance(value, dict):
         raise ValueError("model response must be a JSON object")
@@ -469,13 +469,13 @@ def run_condition(
     def persist_raw(record):
         raw_records.append(record)
         with raw_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\\n")
+            handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n")
 
     def persist_errors(records):
         for record in records:
             error_records.append(record)
             with errors_path.open("a", encoding="utf-8") as handle:
-                handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\\n")
+                handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n")
     for private in private_rows:
         task = public_tasks[private["task_id"]]
         assert_public_task_blinded(task)
