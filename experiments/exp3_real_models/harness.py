@@ -362,7 +362,14 @@ def extraction_matches_truth(extraction: dict, truth: dict) -> bool:
     )
 
 
-def evaluate_case(case: dict, extraction: dict, verifier_results: list[dict]) -> dict:
+def evaluate_case(
+    case: dict,
+    extraction: dict,
+    verifier_results: list[dict],
+    *,
+    extraction_parse_ok: bool = True,
+    provider_error: bool = False,
+) -> dict:
     observable = json.loads(json.dumps(case["observable"]))
     observable.setdefault("machine", {})
     observable["machine"]["extraction"] = extraction
@@ -377,7 +384,8 @@ def evaluate_case(case: dict, extraction: dict, verifier_results: list[dict]) ->
         }
         for result in verifier_results
     ]
-    action = evidence_gate_v1({"observable": observable, "action": case["action"]})
+    schema_valid = extraction_parse_ok and len(verifier_results) == 2 and all(x.get("parse_ok", False) for x in verifier_results)
+    action = "ESCALATE" if provider_error or not schema_valid else evidence_gate_v1({"observable": observable, "action": case["action"]})
     safe = bool(case["safe_to_act"])
     extraction_correct = extraction_matches_truth(extraction, case["ground_truth"])
     accepts = [item["normalized"]["accept"] for item in verifier_results]
@@ -391,8 +399,9 @@ def evaluate_case(case: dict, extraction: dict, verifier_results: list[dict]) ->
         "verifier_count": len(accepts),
         "verifier_cofailure": len(accepts) >= 2 and all(accepts) and not extraction_correct,
         "verifier_family_count": len({x["family_id"] for x in verifier_results}),
+        "provider_error": provider_error,
+        "schema_valid": schema_valid,
     }
-
 
 def summarize_results(rows: list[dict]) -> dict:
     n = len(rows)
@@ -426,8 +435,12 @@ def run_condition(
     max_tasks: int | None = None,
     transport: Callable | None = None,
 ) -> dict:
-    public_tasks = {x["task_id"]: x for x in read_jsonl(prepared_dir / "public" / "tasks.jsonl")}
-    private_rows = [x for x in read_jsonl(prepared_dir / "private" / "evaluation_map.jsonl") if x["split"] == split]
+    public_dir = prepared_dir / "public"
+    private_dir = prepared_dir / "private"
+    task_manifest_path = public_dir / "task_manifest.json"
+    task_manifest = json.loads(task_manifest_path.read_text(encoding="utf-8"))
+    public_tasks = {x["task_id"]: x for x in read_jsonl(public_dir / "tasks.jsonl")}
+    private_rows = [x for x in read_jsonl(private_dir / "evaluation_map.jsonl") if x["split"] == split]
     if condition.get("holdout_only") and not split.startswith("final_holdout"):
         raise ValueError("holdout-only model condition cannot run on development/validation")
     if any(config["models"][name].get("holdout_only") for name in [condition["extractor_model"], *condition["verifier_models"]]) and not split.startswith("final_holdout"):
@@ -441,6 +454,10 @@ def run_condition(
     verifier_specs = [models[name] for name in condition["verifier_models"]]
     if len(verifier_specs) != 2:
         raise ValueError("Experiment 3 requires exactly two verifier roles")
+    required_models = [condition["extractor_model"], *condition["verifier_models"]]
+    missing_env = [models[name]["api_key_env"] for name in required_models if not os.environ.get(models[name]["api_key_env"])]
+    if missing_env:
+        raise RuntimeError("missing API credential environment variables: " + ", ".join(sorted(set(missing_env))))
     prompt_hashes = {
         name: sha256_file(PROMPT_DIR / name)
         for name in ("extract_v1.txt", "verify_v1.txt")
@@ -450,27 +467,33 @@ def run_condition(
         "verifiers": condition["verifier_models"],
         "families": [extractor_spec["family_id"]] + [x["family_id"] for x in verifier_specs],
     }
+    model_hash = sha256_bytes(canonical_json({"models": models, "conditions": config["conditions"]}))
     if split.startswith("final_holdout"):
         freeze = config.get("freeze", {})
-        expected_model_hash = sha256_bytes(canonical_json({"models": models, "conditions": config["conditions"]}))
-        task_manifest = json.loads((prepared_dir / "public" / "task_manifest.json").read_text(encoding="utf-8"))
         if freeze.get("status") != "frozen" or not freeze.get("frozen_at"):
             raise ValueError("final holdout requires a frozen configuration with frozen_at")
         if freeze.get("prompt_sha256") != prompt_hashes:
             raise ValueError("final holdout prompt hashes differ from frozen values")
         if freeze.get("benchmark_sha256") != task_manifest["benchmark_sha256"]:
             raise ValueError("final holdout benchmark hash differs from frozen value")
-        if freeze.get("model_config_sha256") != expected_model_hash:
+        if freeze.get("model_config_sha256") != model_hash:
             raise ValueError("final holdout model/condition configuration differs from frozen value")
+        if freeze.get("task_manifest_sha256") != sha256_file(task_manifest_path):
+            raise ValueError("final holdout task manifest differs from frozen value")
+        if freeze.get("public_tasks_sha256") != task_manifest["public_tasks_sha256"]:
+            raise ValueError("final holdout public tasks differ from frozen value")
+        if freeze.get("task_id_salt_sha256") != task_manifest["task_id_salt_sha256"]:
+            raise ValueError("final holdout task-ID salt differs from frozen value")
+    if split.startswith("final_holdout") and output_dir.exists() and any(output_dir.iterdir()):
+        raise FileExistsError("final-holdout output directory already contains a run; do not rerun the frozen holdout")
     output_dir.mkdir(parents=True, exist_ok=True)
     run_started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     raw_path = output_dir / "raw_responses.jsonl"
     errors_path = output_dir / "retry_errors.jsonl"
-    rows = []
-    raw_records = []
-    error_records = []
-    raw_path.write_text("", encoding="utf-8")
-    errors_path.write_text("", encoding="utf-8")
+    provider_errors_path = output_dir / "provider_errors.jsonl"
+    rows, raw_records, error_records, provider_errors = [], [], [], []
+    for path in (raw_path, errors_path, provider_errors_path):
+        path.write_text("", encoding="utf-8")
 
     def persist_raw(record):
         raw_records.append(record)
@@ -482,16 +505,34 @@ def run_condition(
             error_records.append(record)
             with errors_path.open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n")
+
+    def safe_call(spec, messages, task_id, role):
+        try:
+            return call_openai_compatible(spec, messages, config["settings"], transport)
+        except Exception as exc:
+            record = {"task_id": task_id, "role": role, "error_type": type(exc).__name__, "message": str(exc)[:500]}
+            provider_errors.append(record)
+            with provider_errors_path.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n")
+            return {
+                "content": "", "raw_response": None, "usage": {}, "latency_ms": 0.0,
+                "estimated_cost_usd": None, "attempts": 0, "errors": [],
+                "provider_error": record["error_type"] + ": " + record["message"],
+            }
+
     for private in private_rows:
-        task = public_tasks[private["task_id"]]
+        task = public_tasks.get(private["task_id"])
+        if task is None:
+            raise KeyError("private evaluation map references a task absent from public task file")
         assert_public_task_blinded(task)
-        extractor_call = call_openai_compatible(extractor_spec, build_extraction_messages(task), config["settings"], transport)
+        extractor_call = safe_call(extractor_spec, build_extraction_messages(task), task["task_id"], "extractor")
         persist_raw({
             "task_id": task["task_id"], "role": "extractor", "model_id": condition["extractor_model"],
             "family_id": extractor_spec["family_id"], "prompt_sha256": prompt_hashes["extract_v1.txt"],
             "content": extractor_call["content"], "raw_response": extractor_call["raw_response"],
             "usage": extractor_call["usage"], "latency_ms": extractor_call["latency_ms"],
             "estimated_cost_usd": extractor_call["estimated_cost_usd"], "attempts": extractor_call["attempts"],
+            "provider_error": extractor_call.get("provider_error"),
         })
         persist_errors([{"task_id": task["task_id"], "role": "extractor", **e} for e in extractor_call["errors"]])
         try:
@@ -499,37 +540,47 @@ def run_condition(
             extraction, extraction_ok = normalize_extraction(extraction_raw)
         except Exception:
             extraction, extraction_ok = normalize_extraction({})
-        verifier_results = []
-        for index, (model_name, spec) in enumerate(zip(condition["verifier_models"], verifier_specs), start=1):
-            call = call_openai_compatible(spec, build_verifier_messages(task, extraction), config["settings"], transport)
-            try:
-                verifier_raw = parse_json_object(call["content"])
-                normalized, verifier_ok = normalize_verifier(verifier_raw)
-            except Exception:
-                normalized, verifier_ok = normalize_verifier({})
-            result = {"model_id": model_name, "family_id": spec["family_id"], "normalized": normalized, "parse_ok": verifier_ok}
-            verifier_results.append(result)
-            persist_raw({
-                "task_id": task["task_id"], "role": f"verifier_{index}", "model_id": model_name,
-                "family_id": spec["family_id"], "prompt_sha256": prompt_hashes["verify_v1.txt"],
-                "content": call["content"], "raw_response": call["raw_response"],
-                "usage": call["usage"], "latency_ms": call["latency_ms"],
-                "estimated_cost_usd": call["estimated_cost_usd"], "attempts": call["attempts"],
-            })
-            persist_errors([{"task_id": task["task_id"], "role": f"verifier_{index}", **e} for e in call["errors"]])
-        metrics = evaluate_case(private, extraction, verifier_results)
-        calls = [extractor_call]
-        # The verifier calls are present in raw_records; recover their per-case metrics from raw records.
+        verifier_results, verifier_calls = [], []
+        if not extractor_call.get("provider_error"):
+            for index, (model_name, spec) in enumerate(zip(condition["verifier_models"], verifier_specs), start=1):
+                call = safe_call(spec, build_verifier_messages(task, extraction), task["task_id"], f"verifier_{index}")
+                verifier_calls.append(call)
+                try:
+                    verifier_raw = parse_json_object(call["content"])
+                    normalized, verifier_ok = normalize_verifier(verifier_raw)
+                except Exception:
+                    normalized, verifier_ok = normalize_verifier({})
+                verifier_results.append({
+                    "model_id": model_name, "family_id": spec["family_id"],
+                    "normalized": normalized, "parse_ok": verifier_ok,
+                    "provider_error": call.get("provider_error"),
+                })
+                persist_raw({
+                    "task_id": task["task_id"], "role": f"verifier_{index}", "model_id": model_name,
+                    "family_id": spec["family_id"], "prompt_sha256": prompt_hashes["verify_v1.txt"],
+                    "content": call["content"], "raw_response": call["raw_response"],
+                    "usage": call["usage"], "latency_ms": call["latency_ms"],
+                    "estimated_cost_usd": call["estimated_cost_usd"], "attempts": call["attempts"],
+                    "provider_error": call.get("provider_error"),
+                })
+                persist_errors([{"task_id": task["task_id"], "role": f"verifier_{index}", **e} for e in call["errors"]])
+        provider_error = bool(extractor_call.get("provider_error") or any(x.get("provider_error") for x in verifier_calls))
+        metrics = evaluate_case(
+            private, extraction, verifier_results,
+            extraction_parse_ok=extraction_ok, provider_error=provider_error,
+        )
         case_raw = [x for x in raw_records if x["task_id"] == task["task_id"]]
         total_latency = sum(float(x["latency_ms"]) for x in case_raw)
         costs = [x["estimated_cost_usd"] for x in case_raw]
         total_cost = None if any(x is None for x in costs) else sum(float(x) for x in costs)
+        provider_error_roles = sorted({x["role"] for x in provider_errors if x["task_id"] == task["task_id"]})
         rows.append({
             "task_id": task["task_id"], "case_id": private["case_id"], "split": split,
             "condition": condition["condition_id"], "controller_action": metrics["controller_action"],
             "safe_to_act": metrics["safe_to_act"], "unsafe_act": metrics["unsafe_act"],
             "false_block": metrics["false_block"], "extraction_correct": metrics["extraction_correct"],
-            "extraction_parse_ok": extraction_ok,
+            "extraction_parse_ok": extraction_ok, "schema_valid": metrics["schema_valid"],
+            "provider_error": provider_error, "provider_error_roles": ";".join(provider_error_roles),
             "verifier_accept_count": metrics["verifier_accept_count"], "verifier_count": metrics["verifier_count"],
             "verifier_cofailure": metrics["verifier_cofailure"], "verifier_family_count": metrics["verifier_family_count"],
             "verifier_families": ";".join(x["family_id"] for x in verifier_results),
@@ -542,29 +593,37 @@ def run_condition(
             writer.writeheader()
             writer.writerows(rows)
     summary = summarize_results(rows)
-    summary.update({"split": split, "condition": condition["condition_id"], "model_identity": model_identity})
+    schema_failure_count = sum(not row["schema_valid"] for row in rows)
+    summary.update({
+        "split": split, "condition": condition["condition_id"], "model_identity": model_identity,
+        "provider_error_count": len(provider_errors),
+        "provider_error_rate": len(provider_errors) / len(raw_records) if raw_records else 0.0,
+        "schema_failure_count": schema_failure_count,
+    })
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    task_manifest = json.loads((prepared_dir / "public" / "task_manifest.json").read_text(encoding="utf-8"))
     run_manifest = {
         "protocol": "exp3-real-models-v1",
-        "status": "completed" if rows else "empty",
+        "status": "completed_with_provider_errors" if provider_errors else "completed_with_schema_failures" if schema_failure_count else "completed" if rows else "empty",
         "started_at_utc": run_started_at,
         "benchmark_sha256": task_manifest["benchmark_sha256"],
-        "task_manifest_sha256": sha256_file(prepared_dir / "public" / "task_manifest.json"),
+        "task_manifest_sha256": sha256_file(task_manifest_path),
+        "public_tasks_sha256": task_manifest["public_tasks_sha256"],
+        "task_id_salt_sha256": task_manifest["task_id_salt_sha256"],
         "prompt_sha256": prompt_hashes,
+        "model_config_sha256": model_hash,
         "model_identity": model_identity,
-        "model_specs": {
-            name: {k: v for k, v in spec.items() if k != "api_key"}
-            for name, spec in models.items()
-        },
+        "model_specs": {name: {k: v for k, v in spec.items() if k != "api_key"} for name, spec in models.items()},
         "settings": config["settings"],
-        "split": split,
-        "condition": condition["condition_id"],
-        "n_cases": len(rows),
+        "split": split, "condition": condition["condition_id"], "n_cases": len(rows),
+        "raw_response_count": len(raw_records),
         "raw_responses_sha256": sha256_file(raw_path),
         "case_results_sha256": sha256_file(csv_path) if csv_path.exists() else None,
         "summary_sha256": sha256_file(output_dir / "summary.json"),
         "retry_error_count": len(error_records),
+        "provider_error_count": len(provider_errors),
+        "provider_error_rate": len(provider_errors) / len(raw_records) if raw_records else 0.0,
+        "provider_errors_sha256": sha256_file(provider_errors_path),
+        "schema_failure_count": schema_failure_count,
         "note": "Family IDs are configuration labels, not proof of independent training, ownership, data or infrastructure.",
     }
     (output_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2) + "\n", encoding="utf-8")
