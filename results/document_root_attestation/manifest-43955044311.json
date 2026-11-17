@@ -1,0 +1,36 @@
+{
+  "protocol": "document-root-attestation-threat-experiment-v1",
+  "benchmark_version": "0.4",
+  "high_risk_cases": 700,
+  "scenarios": [
+    "coherent_rewrite_without_root_key",
+    "cross_tenant_replay",
+    "nonce_replay_first_use",
+    "nonce_replay_second_use",
+    "raw_instance_tamper",
+    "revoked_old_key",
+    "rotated_new_key",
+    "trusted_root_signer_compromise",
+    "valid_baseline"
+  ],
+  "test_key_derivation": "SHA-256 deterministic test-only keys; not production keys",
+  "tenant_binding": true,
+  "case_binding": true,
+  "raw_document_instances_bound": true,
+  "normalized_document_map_bound": true,
+  "key_rotation_and_revocation_tested": true,
+  "replay_detection_tested": true,
+  "trusted_root_compromise_tested": true,
+  "source_commit": "8e2dc845efefb856818ca61011395f8887249b38",
+  "workflow_run_id": "43955044311",
+  "python_version": "3.11.18",
+  "generated_files": [
+    "document_root_attestation_cases.csv",
+    "document_root_attestation_summary.csv"
+  ],
+  "outputs_sha256": {
+    "document_root_attestation_cases.csv": "7fdd2beb3527784b9bcf4498a6168889b831795ae01ee49b1b2be30ebd6c7903",
+    "document_root_attestation_summary.csv": "eb496501b3e99d9442866d3b098c2ee83db87616de9696aae781b475ac498a93"
+  },
+  "note": "Synthetic cryptographic protocol test. Replay-state persistence, KMS/HSM operation, signer identity enrollment and operational key custody are not implemented."
+}
