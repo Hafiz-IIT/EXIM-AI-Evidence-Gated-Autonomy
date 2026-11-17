@@ -34,3 +34,12 @@ All current performance results remain synthetic or Monte Carlo simulations. No 
 ## Reproducibility qualification
 
 The historical 1B–2E result CSVs do not have their original experiment runners or complete parameter configurations in the repository history. The new `reconstruction_v1` outputs are generated from an explicit new protocol and are not historical reproductions. Experiment 1A's original downstream-resolution implementation is also missing. The historical numerical claims therefore remain pending source-level reconciliation.
+
+
+## Supplementary document-root attestation experiment (benchmark v0.4)
+
+This is a subsequent synthetic extension and is not merged into the historical v0.3 benchmark or original Experiment 2 tables. On 700 HIGH-risk v0.4 cases, the document-root verifier rejected raw document-instance tampering, coherent rewrites without the trusted private key, revoked-key use, cross-tenant reuse, and second-use nonce replay in all 700 cases per scenario. Valid baseline and rotated-key attestations were accepted in all 700 cases per scenario.
+
+The combined compromise scenario assumes both possession of the trusted document-root private key and coordinated modification of raw document instances, normalized document slots, machine extraction, HS classification, and external measured weight. All 700 forged attestations verified. The downstream gate authorized ACT in 350 cases, of which 300 were unsafe against benchmark ground truth: 42.86% of all HIGH-risk cases and 85.71% of ACT decisions in this synthetic scenario. The 300 unsafe ACTs occurred in C1, C2, C4, C6, C9 and C13 (50 per family); the other 50 ACTs were safe cases in C0.
+
+This is a conditional result under an intentionally strong combined-compromise assumption, not an estimate of real-world probability and not evidence that signer-key theft alone causes the same outcome. It shows that signatures bind payloads to keys but do not establish semantic truth when signing authority and corroborating channels are jointly compromised. The design implication is to separate capture attestation from extraction/normalization, external sensing and action authorization, and to require corroboration from independently acquired sources. See [the protocol](../experiments/document_root_attestation/PROTOCOL.md) and [the complete results review](../experiments/document_root_attestation/RESULTS_REVIEW.md).
