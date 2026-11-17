@@ -46,7 +46,7 @@ The recovery policy is tested against all eight v3 threat scenarios. Results rep
 
 ## Threshold sensitivity: 2-of-3 versus 3-of-3
 
-The runner evaluates the same signed assertions twice: the primary 2-of-3 policy and a strict 3-of-3 sensitivity policy. Both use the same bounded verifier-false-reject recovery rule and the same synthetic cases. The comparison isolates the effect of requiring unanimity among the three enrolled witnesses. A 3-of-3 quorum is expected to block a two-witness collusion when the third honest witness disagrees, but it also loses availability when any credential is invalid or the trust anchor is compromised. Three compromised witnesses can still authorize a jointly fabricated measurement. These are benchmark-specific deterministic comparisons, not universal threshold recommendations.
+The runner evaluates the same signed assertions twice: the primary 2-of-3 policy and a strict 3-of-3 sensitivity policy. Both use the same bounded verifier-false-reject recovery rule and the same synthetic cases. The comparison isolates the effect of requiring unanimity among the three enrolled witnesses. A 3-of-3 quorum is expected to block a two-witness collusion when the third honest witness disagrees. It loses availability when any credential is invalid; compromise of the registry signing private key alone does not invalidate the third honest credential when the original public key remains pinned. Three compromised witnesses can still authorize a jointly fabricated measurement. These are benchmark-specific deterministic comparisons, not universal threshold recommendations.
 
 ## Pre-registered acceptance profile
 
