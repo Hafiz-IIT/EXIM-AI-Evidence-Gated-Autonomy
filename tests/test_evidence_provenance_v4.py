@@ -348,5 +348,36 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
         )
 
 
+    def test_pre_capture_forgery_uses_available_document_when_invoice_is_missing(self):
+        case = {
+            "case_id": "forgery-no-invoice",
+            "safe_to_act": False,
+            "ground_truth": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+            "observable": {
+                "documents": {
+                    "invoice": None,
+                    "packing_list": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                    "declaration": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                },
+                "document_instances": [
+                    {"kind": kind, "fields": {
+                        "quantity": 10, "gross_weight": 20.0, "hs": "1234",
+                    }}
+                    for kind in ("packing_list", "declaration")
+                ],
+                "provenance": {"integrity_status": "valid", "document_set_sha256": ""},
+                "machine": {
+                    "extraction": {"quantity": 10, "gross_weight": 20.0, "hs": "1234"},
+                    "classification": {"hs": "1234"},
+                },
+            },
+        }
+        forged = make_source_forgery(case)
+        self.assertEqual(forged["observable"]["documents"]["packing_list"]["quantity"], 17)
+        self.assertEqual(forged["observable"]["machine"]["extraction"]["quantity"], 17)
+        self.assertEqual(forged["observable"]["machine"]["classification"]["hs"], "9999")
+        self.assertFalse(forged["safe_to_act"])
+
+
 if __name__ == "__main__":
     unittest.main()
