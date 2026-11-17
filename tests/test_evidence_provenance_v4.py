@@ -16,6 +16,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
         self.subject = "shipment-123"
         self.action = "file-declaration-123"
         self.doc_digest = canonical_sha256({"invoice": "synthetic-doc-v1"})
+        self.action_payload_digest = canonical_sha256({"operation": "submit_declaration", "subject": self.subject})
         self.now = 200
         self.sources = {
             "document_parser": {
@@ -62,6 +63,7 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
         fields = dict(
             claim_type=claim, value=value, unit="kg" if claim == "gross_weight" else "count" if claim == "quantity" else "code",
             subject_id=self.subject, action_id=self.action,
+            action_payload_digest=self.action_payload_digest,
             document_digest=digest, input_digest=digest,
             output_digest=canonical_sha256({"claim_type": claim, "value": value,
                                             "unit": "kg" if claim == "gross_weight" else "count" if claim == "quantity" else "code"}),
@@ -212,21 +214,21 @@ class EvidenceProvenanceV4Tests(unittest.TestCase):
         ]
         digests = [canonical_sha256(record["envelope"]) for record, _ in evidence_pairs]
         binding = issue_action_binding(
-            action_id=self.action, subject_id=self.subject, document_digest=self.doc_digest,
+            action_id=self.action, action_payload_digest=self.action_payload_digest, subject_id=self.subject, document_digest=self.doc_digest,
             policy_version="v4-policy-1", required_claims=["gross_weight"],
             evidence_digests=digests, issued_at=190, expires_at=300,
             private_key=self.authorizer,
         )
         valid = verify_action_binding(
             binding, trusted_authorizer_key=self.authorizer.public_key(),
-            action_id=self.action, subject_id=self.subject,
+            action_id=self.action, action_payload_digest=self.action_payload_digest, subject_id=self.subject,
             document_digest=self.doc_digest, policy_version="v4-policy-1",
             required_claims=["gross_weight"], evidence_digests=digests, now=self.now,
         )
         self.assertEqual(valid, (True, "valid_action_binding"))
         changed = verify_action_binding(
             binding, trusted_authorizer_key=self.authorizer.public_key(),
-            action_id="different-action", subject_id=self.subject,
+            action_id="different-action", action_payload_digest=self.action_payload_digest, subject_id=self.subject,
             document_digest=self.doc_digest, policy_version="v4-policy-1",
             required_claims=["gross_weight"], evidence_digests=digests, now=self.now,
         )
