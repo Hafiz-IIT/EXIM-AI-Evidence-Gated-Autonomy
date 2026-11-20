@@ -135,7 +135,7 @@
       "case_id": "DR-04",
       "stage": "V2",
       "family": "Z",
-      "depends_on": 9
+      "depends_on": 10
     },
     {
       "sequence": 12,
@@ -151,7 +151,7 @@
       "case_id": "DR-04",
       "stage": "V2",
       "family": "O",
-      "depends_on": 11
+      "depends_on": 12
     },
     {
       "sequence": 14,
@@ -167,7 +167,7 @@
       "case_id": "DR-04",
       "stage": "V2",
       "family": "G",
-      "depends_on": 13
+      "depends_on": 14
     },
     {
       "sequence": 16,
@@ -183,7 +183,7 @@
       "case_id": "DR-05",
       "stage": "V1",
       "family": "Z",
-      "depends_on": 15
+      "depends_on": 16
     },
     {
       "sequence": 18,
@@ -191,7 +191,7 @@
       "case_id": "DR-05",
       "stage": "V2",
       "family": "O",
-      "depends_on": 15
+      "depends_on": 16
     },
     {
       "sequence": 19,
@@ -207,7 +207,7 @@
       "case_id": "DR-05",
       "stage": "V1",
       "family": "O",
-      "depends_on": 18
+      "depends_on": 19
     },
     {
       "sequence": 21,
@@ -215,7 +215,7 @@
       "case_id": "DR-05",
       "stage": "V2",
       "family": "G",
-      "depends_on": 18
+      "depends_on": 19
     },
     {
       "sequence": 22,
@@ -231,7 +231,7 @@
       "case_id": "DR-05",
       "stage": "V1",
       "family": "G",
-      "depends_on": 21
+      "depends_on": 22
     },
     {
       "sequence": 24,
@@ -239,7 +239,7 @@
       "case_id": "DR-05",
       "stage": "V2",
       "family": "Z",
-      "depends_on": 21
+      "depends_on": 22
     },
     {
       "sequence": 25,
@@ -255,7 +255,7 @@
       "case_id": "DR-06",
       "stage": "V1",
       "family": "Z",
-      "depends_on": 24
+      "depends_on": 25
     },
     {
       "sequence": 27,
@@ -263,7 +263,7 @@
       "case_id": "DR-06",
       "stage": "V2",
       "family": "O",
-      "depends_on": 24
+      "depends_on": 25
     },
     {
       "sequence": 28,
@@ -271,7 +271,7 @@
       "case_id": "DR-06",
       "stage": "RECOVERY",
       "family": "G",
-      "depends_on": 24
+      "depends_on": 25
     }
   ],
   "blocking_issues": [
