@@ -4,7 +4,7 @@ import math
 
 
 def _canonical_hash(value):
-    raw = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
 
 
@@ -35,6 +35,14 @@ def visible_features(r):
             provenance.get("integrity_status") == "valid"
             and provenance.get("document_set_sha256") == _canonical_hash(instances or [])
         )
+    verifiers = vs if isinstance(vs, list) else []
+    verifier_schema_valid = isinstance(vs, list) and all(
+        isinstance(verifier, dict)
+        and isinstance(verifier.get("accept"), bool)
+        and isinstance(verifier.get("dependency_group"), str)
+        and bool(verifier["dependency_group"].strip())
+        for verifier in verifiers
+    )
 
     return {
         "confidence": ex["confidence"],
@@ -47,9 +55,15 @@ def visible_features(r):
         and ex["quantity"] == inv["quantity"]
         and abs(ex["gross_weight"] - inv["gross_weight"]) < 1e-9
         and ex["hs"] == inv["hs"],
-        "v_rejects": sum(not bool(v["accept"]) for v in vs),
-        "n_verifiers": len(vs),
-        "indep_verifiers": len({v["dependency_group"] for v in vs}),
+        "verifier_schema_valid": verifier_schema_valid,
+        "v_rejects": sum(v["accept"] is False for v in verifiers if isinstance(v, dict) and isinstance(v.get("accept"), bool)),
+        "n_verifiers": len(verifiers),
+        "indep_verifiers": len({
+            v["dependency_group"] for v in verifiers
+            if isinstance(v, dict)
+            and isinstance(v.get("dependency_group"), str)
+            and v["dependency_group"].strip()
+        }),
         "duplicate_document_kind": duplicate_document_kind,
         "provenance_valid": provenance_valid,
         "risk": r["action"]["risk_level"],
@@ -58,10 +72,12 @@ def visible_features(r):
 
 def evidence_gate_v1(r):
     f = visible_features(r)
+    # Integrity and provenance are non-bypassable invariants, including for
+    # low-risk consignments. Risk tier must not authorize corrupted evidence.
+    if f["duplicate_document_kind"] or not f["provenance_valid"] or not f["verifier_schema_valid"]:
+        return "ESCALATE"
     if f["risk"] == "LOW":
         return "ACT"
-    if f["duplicate_document_kind"] or not f["provenance_valid"]:
-        return "ESCALATE"
     if not f["complete"] or not f["auth_present"] or not f["fresh"]:
         return "REQUEST_EVIDENCE"
     if not f["doc_agree"]:
