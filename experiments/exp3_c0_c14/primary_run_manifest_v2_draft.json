@@ -52,7 +52,8 @@
     "All 30 registry rows lack an explicit reversibility-description field required by Prompt Pack v1; no prompt may be rendered until source-backed descriptions are added.",
     "The 3B/3C single-verifier role and 3E V1/V2 family assignment are operationalized in this draft because frozen v1 leaves them underspecified. This v2 interpretation must be explicitly frozen before scored calls.",
     "Account-level Free entitlement, quota and billing/overage state are unverified for Google AI Studio, GroqCloud and Cloudflare Workers AI.",
-    "Prompt pack v1 and execution harness contract still require end-to-end dry-run acceptance; this file alone is not execution authorization."
+    "Prompt pack v1 and execution harness contract still require end-to-end dry-run acceptance; this file alone is not execution authorization.",
+    "The exact deterministic B1–B8 controller implementations and thresholds are not recovered in the frozen source set. The high-level baseline descriptions are insufficient to implement them without inventing policy behavior; do not reuse the unrelated v0.4 Evidence Gate."
   ],
   "calls": [
     {
@@ -8245,5 +8246,6 @@
       "depends_on": "3A-E3-C4-H1-A-P",
       "sequence": 630
     }
-  ]
+  ],
+  "execution_gate": "NO SCORED EXECUTION until reversibility descriptions are sourced for all 30 cases, the v2 role interpretation is frozen, exact B1-B8 controller rules are recovered and regression-tested, all three accounts are verified Free/no-overage, and both dry-run tracks pass."
 }
