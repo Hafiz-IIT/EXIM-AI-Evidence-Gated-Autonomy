@@ -9,9 +9,9 @@ This directory is deliberately separate from `experiments/exp3_real_models/`, wh
 
 ## Important reconciliation stop
 
-The original route manifest names its disposable cases DR-01…DR-06. The companion Dry-Run Suite v1 names six mechanical scenarios DRY-01…DRY-06. The suite assigns recovery to DRY-02 and parser-format testing to DRY-06, while the 28-call route ends with a DR-06 recovery call. No source mapping between these identifier systems is specified. The harness must not guess this mapping. Therefore the replacement manifest is marked `BLOCKED_NOT_EXECUTABLE`.
+The sources define two separate, complementary dry-run tracks, not one mismatched case bank. The 28-call routing manifest uses DR-01…DR-06 to exercise same-family verification, cross-family routing, heterogeneous verifier pairs and one recovery route. The companion mechanical suite uses DRY-01…DRY-06 to test clean proposer output, evidence recovery, conflicts, stale authorization, transport retries and parser behavior. There is no source-defined row-by-row mapping between these namespaces, and none is needed: keep them separate and validate both. The route manifest remains blocked because the source materials recovered so far do not supply the actual DR-01…DR-06 input packets, and provider account Free status is unverified.
 
-The companion suite also requires transport-failure injection and local malformed-JSON tests beyond the 28 provider-call route. These need their own explicit test records and cannot be represented as successful provider calls by implication.
+The companion DRY suite requires its own ledger records: provider proposer/verifier/recovery calls plus adapter-level transport-failure injection and local parser tests. These are additional mechanical checks, not extra rows to silently append to the frozen 28-call routing manifest.
 
 ## Frozen protocol anchors
 
