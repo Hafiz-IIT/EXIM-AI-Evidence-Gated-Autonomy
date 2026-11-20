@@ -298,7 +298,7 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             benchmark = root / "cases.jsonl"
-            benchmark.write_text("".join(json.dumps(x) + "\\n" for x in cases))
+            benchmark.write_text("".join(json.dumps(x) + "\n" for x in cases))
             prepared = root / "prepared"
             prepare_tasks(benchmark, prepared)
             models = {
@@ -347,6 +347,34 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
                     prepared_dir=prepared, output_dir=root / "should-not-run", max_tasks=1,
                 )
             self.assertFalse((root / "should-not-run").exists())
+
+    def test_nonfinite_preflight_budget_is_rejected(self):
+        cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            benchmark = root / "cases.jsonl"
+            benchmark.write_text("".join(json.dumps(x) + "\n" for x in cases))
+            prepared = root / "prepared"
+            prepare_tasks(benchmark, prepared)
+            models = {
+                name: {
+                    "model": "mock-" + name, "provider": "mock",
+                    "base_url": "https://example.invalid/v1", "family_id": family,
+                    "api_key_env": "EXP3_INVALID_BUDGET_UNUSED",
+                    "input_usd_per_1k_tokens": 1.0, "output_usd_per_1k_tokens": 1.0,
+                }
+                for name, family in [("extractor", "a"), ("verifier_a", "b"), ("verifier_b", "c")]
+            }
+            condition = {"condition_id": "invalid-budget", "extractor_model": "extractor", "verifier_models": ["verifier_a", "verifier_b"]}
+            config = {
+                "models": models, "conditions": [condition],
+                "settings": {"max_preflight_estimated_cost_usd": float("nan")},
+            }
+            with self.assertRaisesRegex(ValueError, "finite non-negative number"):
+                run_condition(
+                    config=config, condition=condition, split="development",
+                    prepared_dir=prepared, output_dir=root / "invalid-budget", max_tasks=1,
+                )
 
     def test_provider_failure_is_logged_and_forces_escalation(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
