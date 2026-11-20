@@ -27,6 +27,7 @@ jobs:
         run: python scripts/generate_benchmark_v04.py
       - name: Verify benchmark v0.4 integrity
         run: python scripts/verify_benchmark_v04.py
-      - name: Run documented deterministic checks
-        run: |
-          python scripts/verify_benchmark.py
+      - name: Generate parent benchmark v0.3 fixtures
+        run: python scripts/generate_benchmark.py
+      - name: Verify parent benchmark v0.3 integrity
+        run: python scripts/verify_benchmark.py
