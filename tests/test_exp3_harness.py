@@ -376,6 +376,21 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
                     prepared_dir=prepared, output_dir=root / "invalid-budget", max_tasks=1,
                 )
 
+    def test_run_rejects_inline_credentials_in_any_config_section(self):
+        invalid_configs = [
+            {"models": {"m": {"api_token": "do-not-log"}}, "settings": {}},
+            {"models": {}, "settings": {"authorization": "Bearer do-not-log"}},
+            {"models": {}, "settings": {"nested": {"client_secret": "do-not-log"}}},
+        ]
+        for config in invalid_configs:
+            with self.subTest(config=config):
+                with self.assertRaisesRegex(ValueError, "inline credential material is prohibited"):
+                    run_condition(
+                        config=config, condition={}, split="development",
+                        prepared_dir=Path("missing-prepared-package"),
+                        output_dir=Path("must-not-be-created"),
+                    )
+
     def test_provider_failure_is_logged_and_forces_escalation(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
         with tempfile.TemporaryDirectory() as temp:
