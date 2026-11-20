@@ -18,6 +18,8 @@ def _boolean(value,field,errors):
 
 def map_evidence_features(case:dict,proposer:dict,v1:dict|None,v2:dict|None)->dict:
     errors=[]
+    if v1 is None: errors.append("v1:missing_verifier_output")
+    if v2 is None: errors.append("v2:missing_verifier_output")
     p_missing=_strings(proposer.get("missing_evidence"),"proposer.missing_evidence",errors)
     p_conflicts=_strings(proposer.get("conflicts_detected"),"proposer.conflicts_detected",errors)
     p_fresh=_strings(proposer.get("freshness_concerns"),"proposer.freshness_concerns",errors)
