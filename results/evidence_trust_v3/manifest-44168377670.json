@@ -1,0 +1,36 @@
+{
+  "protocol": "ega-evidence-trust-architecture-v3",
+  "status": "synthetic threat experiment; not production validation",
+  "benchmark_version": "0.4",
+  "high_risk_cases_per_scenario": 700,
+  "scenario_count": 8,
+  "case_scenario_rows": 5600,
+  "witness_quorum": "2-of-3 primary; 3-of-3 sensitivity",
+  "threshold_sensitivity": "same cases and assertions evaluated at thresholds 2 and 3",
+  "identity_binding": "registry-root-signed credential binds public key to source and domain claims",
+  "scenarios": [
+    "honest_baseline",
+    "one_witness_compromised",
+    "two_witnesses_compromised",
+    "all_witnesses_compromised",
+    "forged_source_identity",
+    "source_forgery_before_capture",
+    "shared_administrative_domain",
+    "registry_root_compromise"
+  ],
+  "limitations": [
+    "All keys, identities, measurements and source records are synthetic.",
+    "Registry signing private key is assumed compromised in the registry_root_compromise scenario while the original public key remains pinned; the attacker enrolls two attacker-controlled witness keys.",
+    "Registry signature authenticates the issuer's credential, not real-world source truth.",
+    "Distinct domain labels do not prove operational independence.",
+    "No production PKI, KMS/HSM, hardware identity, durable revocation or trusted time.",
+    "Deterministic benchmark counts are not real-world probabilities."
+  ],
+  "source_commit": "966fa5e69bd828224a6553c6eaabedb1cceb805a",
+  "workflow_run_id": "44168377670",
+  "python_version": "3.11.18",
+  "outputs_sha256": {
+    "evidence_trust_v3_cases.csv": "3f91c67f40b276d900062008de72d9221cbf289dd5b979a82c941624730fff5e",
+    "evidence_trust_v3_summary.csv": "ff1b4ae6462b8b3a6253941564028fb94c9d0842b5d7f247a692c9bab27ab83b"
+  }
+}

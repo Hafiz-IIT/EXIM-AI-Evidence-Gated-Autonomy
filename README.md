@@ -121,7 +121,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the action-authorization ar
 
 ## Key claims and claim ledger
 
-The numerical and security claims in the manuscript are tied to the repository's explicit claim ledger and experiment outputs. See [paper/claims.md](paper/claims.md) before interpreting any result.
+The numerical and security claims in the manuscript are tied to the repository's explicit claim ledger and experiment outputs. See [paper/PRIOR_ART_AUDIT_2026.md](paper/PRIOR_ART_AUDIT_2026.md) and [paper/ARXIV_SUBMISSION_CHECKLIST.md](paper/ARXIV_SUBMISSION_CHECKLIST.md) before interpreting any result.
 
 ## Results summary
 
@@ -136,6 +136,7 @@ The numerical and security claims in the manuscript are tied to the repository's
 | Provenance attacks | Demonstrate that provenance mechanisms can fail under compromised trust assumptions |
 | Ed25519 experiments | Blocked direct unsafe ACT for several unsigned-metadata attacks; valid signatures over false claims remain dangerous under trust-root compromise |
 | Four-authority v2 | Witness-only compromise produced 50/700 unsafe ACT; capture+witness and key-admin trust-store poisoning produced 300/700; AA compromise produced 600/700 |
+| Authenticated witness quorum v3 | 2-of-3 tolerated one compromised witness; two-witness collusion and registry signing-key compromise produced 50/700 unsafe ACT under 2-of-3; strict 3-of-3 blocked those cases while preserving safe-case coverage; strict 3-of-3 blocked those cases but not full-roster compromise |
 
 These are **synthetic computational results under the documented experimental assumptions**, not evidence of deployed-system safety.
 
@@ -190,10 +191,27 @@ The experiment tests all 15 non-empty combinations of capture, interpretation, w
 
 The v1 attestation binds raw document instances and normalized document slots. Across 700 HIGH-risk v0.4 cases, raw tampering, unsigned coherent rewrite, revoked-key use, cross-tenant reuse and second-use nonce replay were rejected in all tested cases. Under the combined scenario of trusted-root signer compromise plus coordinated upstream rewrites, 300 of 700 cases (42.86%) resulted in unsafe ACT; 300 of 350 ACT decisions (85.71%) were unsafe. This is a conditional synthetic stress test, not a real-world risk estimate or a result about key theft alone. See the results review for assumptions and limitations.
 
+## Authenticated Evidence-Trust v3 witness-quorum experiment
+
+- [Protocol and threat matrix](experiments/evidence_trust_v3/PROTOCOL.md)
+- [Source implementation](src/evidence_trust_v3.py)
+- [Experiment runner](scripts/run_evidence_trust_v3.py)
+- [Regression tests](tests/test_evidence_trust_v3.py)
+- [Results review](experiments/evidence_trust_v3/RESULTS_REVIEW.md)
+- [Pinned artifact manifest and output hashes](results/evidence_trust_v3/manifest-44168377670.json)
+- [Preliminary novelty audit](research/NOVELTY_AUDIT.md)
+- [Related-work comparison](experiments/evidence_trust_v3/RELATED_WORK_AND_NOVELTY.md)
+- [Draft pull request #6](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/pull/6)
+- [Successful full CI run 44164029203](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44164029203)
+
+The v3 study compares 2-of-3 and strict 3-of-3 thresholds across eight scenarios and 5,600 case-scenario rows. Bounded recovery from an isolated verifier false rejection restores all 100 safe cases in the honest baseline with zero unsafe ACT. Two-witness collusion still produces 50 unsafe C4 actions under 2-of-3; strict 3-of-3 blocks this modeled case but not full-roster compromise. Strict 3-of-3 also blocks all safe cases when one credential is invalid. The witness is derived from synthetic benchmark ground truth, not a deployed sensor.
+
+The repository's novelty boundary has been updated to account for EFD, VP-CONTROL, TradeSense-EQA, execution-boundary authorization, provenance-security, SCITT, DIV, DEWP and ARP. The project does not claim a new quorum theory, generic trade anomaly detector, generic provenance framework, or general execution-gating architecture.
+
 ## One-command reproduction
 
 ```bash
 python scripts/reproduce_all.py
 ```
 
-This regenerates and verifies benchmark v0.3 and v0.4, runs both explicitly parameterized reconstruction suites, the v0.4 sensitivity sweeps and the document-root attestation and four-authority evidence-trust v2 threat experiments, and displays the historical result tables without overwriting them. Outputs are stored separately under `results/reconstruction_v1/` and `results/reconstruction_v2/`. Neither reconstruction reproduces the historical 1B–2E results. Experiment 1A's original downstream-resolution implementation also remains unrecovered. Full manuscript compilation is exercised by GitHub Actions.
+This regenerates and verifies benchmark v0.3 and v0.4, runs both explicitly parameterized reconstruction suites, the v0.4 sensitivity sweeps and the document-root attestation, four-authority evidence-trust v2, and authenticated witness-quorum v3 threat experiments, and displays the historical result tables without overwriting them. Outputs are stored separately under `results/reconstruction_v1/` and `results/reconstruction_v2/`. Neither reconstruction reproduces the historical 1B–2E results. Experiment 1A's original downstream-resolution implementation also remains unrecovered. Full manuscript compilation is exercised by GitHub Actions.

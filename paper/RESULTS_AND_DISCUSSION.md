@@ -54,3 +54,26 @@ The honest baseline produced 50 ACT decisions, all safe, with 50% safe-ACT cover
 The source-forgery-before-capture control and disclosed shared-dependency-witness control produced no ACT decisions. The latter is rejected because the witness discloses the same source identifier and acquisition/administrative-domain labels as capture. These checks do not authenticate the labels: a compromised witness can sign false values and claim a separate source identity. The independent witness itself is simulated from benchmark ground truth; no real external source was used.
 
 The result therefore does not show that role separation eliminates trust-root risk. It shows that some isolated compromises are contained at the cost of coverage, while compromise of the witness authority, trust registry or final authorization boundary can still produce unsafe action. The complete scenario table, family-level breakdown, threat assumptions, output hashes and limitations are in [the v2 results review](../experiments/evidence_trust_v2/RESULTS_REVIEW.md). The successful CI execution is [run 44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491).
+
+## 6. Evidence-Trust v3: Authenticated Witness Quorum and Bounded Recovery
+
+The v3 experiment runs 700 HIGH-risk benchmark v0.4 cases under eight threat scenarios, producing 5,600 case-scenario rows. It compares a 2-of-3 witness threshold with a strict 3-of-3 sensitivity condition. The v3 runner uses registry-signed witness identity credentials, case-scoped signed assertions, and a controller path that consumes only the verified quorum measurement. Invalid quorum results force escalation rather than falling back to the original unverified measurement.
+
+| Scenario | 2-of-3 ACT | 2-of-3 unsafe ACT | 3-of-3 ACT | 3-of-3 unsafe ACT |
+|---|---:|---:|---:|---:|
+| Honest baseline | 100 | 0 | 100 | 0 |
+| One witness compromised | 100 | 0 | 100 | 0 |
+| Two witnesses compromised | 150 | 50 | 100 | 0 |
+| All witnesses compromised | 150 | 50 | 150 | 50 |
+| Forged source identity | 100 | 0 | 0 | 0 |
+| Source forgery before capture | 0 | 0 | 0 | 0 |
+| Shared administrative domain | 0 | 0 | 0 | 0 |
+| Registry-root compromise | 150 | 50 | 0 | 0 |
+
+The v3 policy adds a bounded recovery path for isolated verifier false rejection. It recovers 50 safe C7 cases only when the quorum is valid and every other existing policy guard passes. The honest baseline therefore reaches 100/100 safe-action coverage with zero unsafe ACT. Under two-witness collusion, 2-of-3 produces 50 unsafe ACT decisions in the C4 consistent-but-wrong family; strict 3-of-3 blocks those cases. When all three witnesses are compromised, both thresholds produce 50 unsafe ACT decisions.
+
+The 3-of-3 policy has an availability cost: it blocks all safe cases when one credential is invalid and under registry-root compromise. The shared-administration control also fails closed and blocks all safe cases. These results are not free security improvements.
+
+All keys, identities, measurements and witness assertions are synthetic. The witness derives its value from benchmark ground truth, so it is an idealized oracle rather than an independent physical sensor. Registry signatures authenticate a credential issuer, not the real-world truth of source identity or measurements. Administrative-domain labels do not prove actual operational independence. No production PKI, KMS/HSM custody, hardware identity, trusted time, durable revocation or secure acquisition is implemented. The results are deterministic benchmark outcomes, not real-world probabilities.
+
+The full protocol and hashes are in [experiments/evidence_trust_v3/PROTOCOL.md](../experiments/evidence_trust_v3/PROTOCOL.md), the artifact-backed scenario review is [experiments/evidence_trust_v3/RESULTS_REVIEW.md](../experiments/evidence_trust_v3/RESULTS_REVIEW.md), and the latest validated full workflow for this result set is [44164029203](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44164029203). The v3 mechanism is treated as an implementation and sensitivity experiment, not as a novel quorum theory; EFD and VP-CONTROL directly address correlated dependencies and verification portfolios.

@@ -8,7 +8,7 @@ GitHub: https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy
 
 As AI systems are given greater autonomy, a central deployment question is not only whether a model can produce a plausible answer, but whether the available evidence is sufficient to authorize a consequential action. This work introduces **Evidence-Gated Autonomy (EGA)**, a synthetic benchmark and action-authorization framework that maps observable evidence states to one of five outcomes: **ACT, VERIFY, REQUEST EVIDENCE, DEFER, or ESCALATE**. The benchmark contains 500 underlying evidence situations paired across low- and high-consequence actions, producing 1,000 cases across ten controlled failure families.
 
-In an idealized deterministic testbed, EGA produced 0/500 unsafe high-consequence ACT decisions, compared with 50/500 for tested Risk-Gate and Always-Verify baselines. This result did not survive realistic imperfections unchanged: under stochastic verification, retrieval, and escalation, the high-risk incorrect-action rate increased from 1.86% in an optimistic regime to 6.10% in a moderate regime and 13.09% in a harsh regime. Adversarial tests further showed that spoofed dependency metadata and masked external evidence could defeat the original gate. Cryptographically binding provenance claims with Ed25519 attestations prevented direct unsafe ACTs under several unsigned metadata attacks, but valid signatures over false claims remained dangerous under trust-root compromise. A dual-lineage separation-of-duties design raised the compromise threshold for fabricated evidence independence. A subsequent four-authority stress test on benchmark v0.4 found that witness-authority compromise alone produced 50 unsafe ACT decisions among 700 HIGH-risk cases; capture-plus-witness and key-administration trust-store compromise each produced 300, while compromise of the final authorization authority produced 600. These are deterministic synthetic outcomes under explicit capabilities, not real-world risk estimates.
+In an idealized deterministic testbed, EGA produced 0/500 unsafe high-consequence ACT decisions, compared with 50/500 for tested Risk-Gate and Always-Verify baselines. This result did not survive realistic imperfections unchanged: under stochastic verification, retrieval, and escalation, the high-risk incorrect-action rate increased from 1.86% in an optimistic regime to 6.10% in a moderate regime and 13.09% in a harsh regime. Adversarial tests further showed that spoofed dependency metadata and masked external evidence could defeat the original gate. Cryptographically binding provenance claims with Ed25519 attestations prevented direct unsafe ACTs under several unsigned metadata attacks, but valid signatures over false claims remained dangerous under trust-root compromise. A dual-lineage separation-of-duties design raised the compromise threshold for fabricated evidence independence. A subsequent four-authority stress test on benchmark v0.4 found that witness-authority compromise alone produced 50 unsafe ACT decisions among 700 HIGH-risk cases; capture-plus-witness and key-administration trust-store compromise each produced 300, while compromise of the final authorization authority produced 600. These are deterministic synthetic outcomes under explicit capabilities, not real-world risk estimates. A separate authenticated witness-quorum sensitivity study with bounded false-reject recovery reached 100/100 safe-action coverage in its honest baseline, but 2-of-3 still admitted 50/700 unsafe ACTs under two-witness collusion and registry-root compromise; 3-of-3 blocked those modeled cases but not full-roster compromise and failed closed when a credential was invalid. These are deterministic synthetic outcomes, not real-world probabilities.
 
 The results support a narrow conclusion: consequential action authorization depends not merely on model confidence or verifier agreement, but on the structure, provenance, independence, and trustworthiness of the evidence chain. All current results are synthetic or simulated and do not establish production safety.
 
@@ -449,13 +449,100 @@ These results identify both the value and limits of role separation. Capture-onl
 
 The complete protocol, threat assumptions and limitations are in [experiments/evidence_trust_v2/PROTOCOL.md](../experiments/evidence_trust_v2/PROTOCOL.md). The full family-level review is in [experiments/evidence_trust_v2/RESULTS_REVIEW.md](../experiments/evidence_trust_v2/RESULTS_REVIEW.md), and pinned output hashes are in [results/evidence_trust_v2/manifest-44025577491.json](../results/evidence_trust_v2/manifest-44025577491.json). CI run [44025577491](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44025577491) passed the full test suite, benchmark generation/verification, all experiment runners, artifact uploads, historical table loading and manuscript compilation. This is synthetic threat evidence only; production KMS/HSM custody, authenticated signer enrollment, durable replay storage, secure capture, and operational revocation are not implemented. The manuscript remains not ready for arXiv submission.
 
+## 23. Supplementary Experiment: Authenticated Witness Quorum and Bounded Recovery (v3)
+
+The v3 experiment evaluates 700 HIGH-risk v0.4 cases across eight threat scenarios (5,600 case-scenario rows). It introduces registry-signed witness identity credentials and case-scoped assertions, then evaluates the same assertions under 2-of-3 and strict 3-of-3 thresholds. It is an implementation and sensitivity study, not a new quorum theory. EFD and VP-CONTROL already directly study correlated evidence dependencies and quorum/verification-portfolio failure modes `[He and Yu, 2026; Zheng et al., 2026]`.
+
+The v3 policy also permits a narrow recovery from an isolated verifier false rejection only when the witness quorum is valid and all other v1 policy guards pass. This recovers the 50 safe C7 cases in the synthetic fixture.
+
+| Scenario | 2-of-3 ACT | 2-of-3 unsafe ACT | 3-of-3 ACT | 3-of-3 unsafe ACT |
+|---|---:|---:|---:|---:|
+| Honest baseline | 100 | 0 | 100 | 0 |
+| One witness compromised | 100 | 0 | 100 | 0 |
+| Two witnesses compromised | 150 | 50 | 100 | 0 |
+| All witnesses compromised | 150 | 50 | 150 | 50 |
+| Forged source identity | 100 | 0 | 0 | 0 |
+| Source forgery before capture | 0 | 0 | 0 | 0 |
+| Shared administrative domain | 0 | 0 | 0 | 0 |
+| Registry-root compromise | 150 | 50 | 0 | 0 |
+
+The honest baseline recovers all 100 safe cases (50 C0 plus 50 C7) with zero unsafe ACT. Under two-witness collusion, 2-of-3 produces 50 unsafe ACTs in C4 consistent-but-wrong; strict 3-of-3 rejects those cases. When all three witnesses are compromised, both thresholds produce 50 unsafe ACTs. Strict 3-of-3 also loses availability under a single invalid credential and registry-root compromise, while the shared-administration control blocks all safe cases.
+
+All keys, identities and measurements are synthetic. The witness is derived from benchmark ground truth, so it is an idealized oracle rather than a real independent sensor. Registry signatures authenticate an issuer's credential, not the real-world truth of source identity or measurement. Distinct domain labels do not prove operational independence. The protocol and output hashes are in [experiments/evidence_trust_v3/PROTOCOL.md](../experiments/evidence_trust_v3/PROTOCOL.md); the preliminary novelty audit is in [research/NOVELTY_AUDIT.md](../research/NOVELTY_AUDIT.md). The full CI run and artifact are [44159840913](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/44159840913).
+
+## 24. Updated Related-Work and Novelty Boundary
+
+The broad ideas of independent quorums and common-source failure are directly addressed by EFD and VP-CONTROL. TradeSense-EQA already integrates trade declarations, physical sensing, evidence chains and abstention. Commit-time authorization, execution-boundary contracts, runtime proof of execution, IoT provenance, remote attestation, capture-time authenticity, reject-option prediction and assurance-case defeaters also have substantial prior art. The current work therefore does not claim a new quorum theory, generic trade anomaly detector, generic provenance framework, or general execution-gating architecture.
+
+The defensible contribution remains an EXIM-inspired synthetic security evaluation of how document extraction, physical evidence, claim applicability, provenance, freshness, source dependence and action authorization interact under explicit compromise assumptions. A follow-on dependency-ancestry study is required before making stronger claims about witness independence. See [the expanded prior-art audit](PRIOR_ART_AUDIT_2026.md) and [the v3 related-work review](../experiments/evidence_trust_v3/RELATED_WORK_AND_NOVELTY.md).
+
 ## References
 
 [1] Ryan Greenblatt, Buck Shlegeris, Kshitij Sachan, and Fabien Roger. *AI Control: Improving Safety Despite Intentional Subversion*. arXiv:2312.06942, 2023.
 
 [2] Santiago Torres-Arias, Hammad Afzali, Trishank Karthik Kuppusamy, Reza Curtmola, and Justin Cappos. *in-toto: Providing farm-to-table guarantees for bits and bytes*. 28th USENIX Security Symposium, 2019.
 
-[3] SLSA Project. *Supply-chain Levels for Software Artifacts (SLSA): Provenance*. https://slsa.dev/\n\n[4] Zachary Kenton et al. *On scalable oversight with weak LLMs judging strong LLMs*. arXiv:2407.04622, 2024.\n\n[5] Yuyang Jiang et al. *Collaborative Disagreement Resolution for Scalable Oversight*. arXiv:2607.01251, 2026.\n\n[6] Rayne Holland, Liming Zhu, and Jason Xue. *When Honesty is Not Enough in AI Debate*. arXiv:2609.29189, 2026.
+[3] SLSA Project. *Supply-chain Levels for Software Artifacts (SLSA): Provenance*. https://slsa.dev/
+
+[4] Zachary Kenton et al. *On scalable oversight with weak LLMs judging strong LLMs*. arXiv:2407.04622, 2024.
+
+[5] Yuyang Jiang et al. *Collaborative Disagreement Resolution for Scalable Oversight*. arXiv:2607.01251, 2026.
+
+[6] Rayne Holland, Liming Zhu, and Jason Xue. *When Honesty is Not Enough in AI Debate*. arXiv:2609.29189, 2026.
+
+[7] Kilian Hendrickx, Lorenzo Perini, Dries Van der Plas, Wannes Meert, and Jesse J. Davis. *Machine learning with a reject option: a survey*. Machine Learning 113, 3073–3110, 2024. https://doi.org/10.1007/s10994-024-06534-3
+
+[8] Joao Sedoc, Baotong Zhang, and Dean P. Foster. *Trust but Verify: Prover-Verifier Deliberation for Selective LLM Prediction*. arXiv:2605.25133, 2026.
+
+[9] Jun He and Deying Yu. *The Illusion of Independent Quorums: Epistemic Fault Domains and Correlated Cognitive Failures in Agentic Quorums*. arXiv:2609.02925, 2026.
+
+[10] Zihao Zheng, Baichuan Li, Junyi Yao, and Jiayu Long. *Engineering Reliable Commit Gates for Agentic AI: Cost-Aware Verification Portfolios under Common-Mode Data Failures*. arXiv:2609.10969, 2026.
+
+[11] Meitong Chen et al. *Artificial Intelligence-Driven Sensing of Cross-Border Trade Risks Through Declaration-to-Physical-Fact Alignment and Evidence-Grounded Question Answering*. Sensors 26(16), 5272, 2026. https://doi.org/10.3390/s26165272
+
+[12] Bo Wu, Lin Wang, Yong Zhang, and Jiang Deng. *From Intent to Execution Grant: An Execution-Boundary Conformance Profile for High-Risk AI Actions*. arXiv:2609.11596, 2026.
+
+[13] Jason D. Rhodes and George Kang. *Proof of Execution: Runtime Verification for Governed AI Agent Actions*. arXiv:2607.05397, 2026.
+
+[14] Igor Santos-Grueiro. *Temporary Authority, Permanent Effects: Commit-Time Authorization for LLM Agents*. arXiv:2607.10487, 2026.
+
+[15] Edward Y. Chang and Longling Geng. *Mnemosyne: Agentic Transaction Processing for Validating and Repairing AI-generated Workflows*. arXiv:2607.00269, 2026.
+
+[16] Bofeng Pan, Natalia Stakhanova, and Suprio Ray. *Data Provenance in Security and Privacy*. ACM Computing Surveys 55(14s), 2023. https://doi.org/10.1145/3593294
+
+[17] Omair Faraj, David Megias, and Joaquin Garcia-Alfaro. *Security Approaches for Data Provenance in the Internet of Things: A Systematic Literature Review*. ACM Computing Surveys 57(10), 2025. https://doi.org/10.1145/3718735
+
+[18] Amir Dirin, Ian Oliver, and Teemu H. Laine. *A Security Framework for Increasing Data and Device Integrity in Internet of Things Systems*. Sensors 23(17), 7532, 2023. https://doi.org/10.3390/s23177532
+
+[19] Eduardo Brito, Fernando Castillo, Amnir Hadachi, Ulrich Norbisrath, and Jonathan Heiss. *Decentralized Proof-of-Location for Content Provenance: Towards Capture-Time Authenticity*. arXiv:2603.27883, 2026.
+
+[20] Ron Triepels, Hennie Daniels, and Ad Feelders. *Data-driven fraud detection in international shipping*. Expert Systems with Applications 99, 193–202, 2018. https://doi.org/10.1016/j.eswa.2018.01.007
+
+[21] Hao Chen et al. *The use of machine learning to identify the correctness of HS Code for the customs import declarations*. IEEE DSAA, 2021. https://doi.org/10.1109/DSAA53316.2021.9564203
+
+[22] Clifford Kahn. *Tolerating Penetrations and Insider Attacks by Requiring Independent Corroboration*. New Security Paradigms Workshop, 1998. https://www.nspw.org/papers/1998/nspw1998-kahn.pdf
+
+[23] Stefan Buijsman and Herman Veluwenkamp. *Spotting When Algorithms Are Wrong*. Minds and Machines 33, 541–562, 2023. https://doi.org/10.1007/s11023-022-09591-0
+
+[24] UK National Protective Security Authority. *Claims, Arguments and Evidence (CAE) Concepts*. https://www.npsa.gov.uk/system/files/documents/npsa-concepts-and-their-applicationcae-concepts1.pdf
+
+[25] IETF. *RFC 9943: An Architecture for Trustworthy and Transparent Digital Supply Chains (SCITT Architecture)*, March 2026. https://www.rfc-editor.org/rfc/rfc9943.html
+
+[26] Christian Janbjer. *Deterministic Intent Verification (DIV) Protocol Specification*, draft-janbjer-div-01, work in progress, 19 October 2026. https://datatracker.ietf.org/doc/html/draft-janbjer-div-01
+
+[27] Christian Janbjer. *Deterministic Evidence & Witness Protocol (DEWP) Specification*, draft-janbjer-dewp-01, work in progress, 19 October 2026. https://datatracker.ietf.org/doc/html/draft-janbjer-dewp-01
+
+[28] Joel Hillier. *Attestation Reconciliation Protocol*, draft-hillier-scitt-arp-06, work in progress, 23 October 2026. https://datatracker.ietf.org/doc/html/draft-hillier-scitt-arp-06
+
+[29] Jun He and Deying Yu. *Verifiable Agentic Infrastructure: Proof-Derived Authorization for Sovereign AI Systems*. arXiv:2605.15228, 2026. https://arxiv.org/abs/2605.15228
+
+[30] Jun He and Deying Yu. *When AI Agents Commit: Cognitive Serializability Across Data, Evidence, Policy, and Authority*. arXiv:2609.20261, 2026. https://arxiv.org/abs/2609.20261
+
+[31] Elias Calboreanu. *LATTICE: A Governance-First Architecture for Authorized Autonomous AI Operations*. Frontiers in Artificial Intelligence 9, 2026. https://doi.org/10.3389/frai.2026.1800407
+
+[32] M. Llambí-Morillas and D. Fernández-Fernández. *Cryptographically Verifiable Authorization for Autonomous AI Agents: A Falsifiable Hypothesis and Proof of Concept*. Frontiers in Computer Science 8, 2026. https://doi.org/10.3389/fcomp.2026.1966725
+
+[33] Dekun Yang. *Calibrated Selective Fact-Checking via Evidence Chain Evaluation*. arXiv:2607.18240, 2026. https://arxiv.org/abs/2607.18240
 
 ## Citation
 
