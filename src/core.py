@@ -57,7 +57,12 @@ def visible_features(r):
         "verifier_schema_valid": verifier_schema_valid,
         "v_rejects": sum(v["accept"] is False for v in vs if isinstance(v, dict) and isinstance(v.get("accept"), bool)),
         "n_verifiers": len(vs),
-        "indep_verifiers": len({v["dependency_group"] for v in vs}),
+        "indep_verifiers": len({
+            v["dependency_group"] for v in vs
+            if isinstance(v, dict)
+            and isinstance(v.get("dependency_group"), str)
+            and v["dependency_group"].strip()
+        }),
         "duplicate_document_kind": duplicate_document_kind,
         "provenance_valid": provenance_valid,
         "risk": r["action"]["risk_level"],
