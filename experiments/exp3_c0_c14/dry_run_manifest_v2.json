@@ -275,10 +275,9 @@
     }
   ],
   "blocking_issues": [
-    "Account-level Free entitlement, quota and billing/overage state are unverified for Google AI Studio, GroqCloud and Cloudflare Workers AI. Public free-tier documentation is not account-level proof.",
-    "The frozen 28-call manifest uses DR-01…DR-06 identifiers, while the companion Dry-Run Suite v1 defines DRY-01…DRY-06. Their scenario mapping is not specified.",
-    "The 28-call manifest's final DR-06-G-REC is a recovery call, but the companion suite places the recovery exercise under DRY-02 and the parser-format exercise under DRY-06. Do not infer that these identifiers are interchangeable.",
-    "The companion suite's required coverage (DRY-01…DRY-04 on every family, V1/V2 on DRY-03, recovery on DRY-02, transport injection per adapter, parser tests locally) is broader than the 28-call route table. This manifest alone cannot establish full suite completion."
+    "The recovered source set does not include the actual exposed input packets for DR-01…DR-06. The 28-call manifest defines routing, not complete case payloads; do not invent them.",
+    "Account-level Free entitlement, quota and billing/overage state remain unverified for Google AI Studio, GroqCloud and Cloudflare Workers AI. Public free-tier documentation is not account-level proof.",
+    "The separate DRY-01…DRY-06 mechanical suite must also be completed and recorded in its own disposable ledger. It is complementary to, not a remapping of, the DR-01…DR-06 routing manifest."
   ],
   "execution_gate": "NO EXECUTION until case-ID reconciliation is documented, all three accounts are verified Free with no paid fallback, and provider smoke tests succeed under the zero-spend policy.",
   "calls_total": 28
