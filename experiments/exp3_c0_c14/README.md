@@ -63,10 +63,14 @@ The v2 draft makes two underspecified role assignments explicit rather than sile
 - [x] Add CI coverage for both the existing 700-case v0.4 harness and this separate C0–C14 track.
 - [ ] Source explicit reversibility descriptions for the 30 scored cases; do not infer them.
 - [ ] Freeze the 3B/3C/3E role interpretation in a versioned protocol amendment.
-- [ ] Implement and validate the provider transport adapters.
+- [x] Implement direct-provider request adapters and API-free contract tests.
+- [x] Implement deterministic explicit-field feature mapping and fail-closed tests.
 - [ ] Recover the exact deterministic B1–B8 controller definitions/thresholds; do not reuse the unrelated v0.4 Evidence Gate.
 - [ ] Verify all three provider accounts are Free with no paid fallback.
 - [ ] Complete the 28-call provider dry run and separate DRY-01…DRY-06 mechanical suite.
 - [ ] Freeze hashes and execute the 630-call scored matrix only after every gate passes.
 
 No external model calls have been made. No API spend or billing activation has occurred.
+
+
+The adapters are deliberately not invoked by CI. They require local credentials and a separately verified account entitlement. The current code has no scored-run execution command, and the B1–B8 decision policies remain blocked pending recovery of their exact frozen rules.
