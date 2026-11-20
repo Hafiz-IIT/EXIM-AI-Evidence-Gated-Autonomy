@@ -1,0 +1,38 @@
+{
+  "provider_families": {
+    "G": {
+      "provider": "Google AI Studio / Gemini API",
+      "model": "gemini-2.5-flash",
+      "family": "Google Gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "credential_env": "GEMINI_API_KEY",
+      "account_free_tier_verified": false
+    },
+    "Z": {
+      "provider": "Cloudflare Workers AI",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "family": "Z.ai GLM",
+      "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+      "credential_env": "CLOUDFLARE_API_TOKEN",
+      "account_free_tier_verified": false
+    },
+    "O": {
+      "provider": "GroqCloud",
+      "model": "openai/gpt-oss-120b",
+      "family": "OpenAI GPT-OSS",
+      "base_url": "https://api.groq.com/openai/v1",
+      "credential_env": "GROQ_API_KEY",
+      "account_free_tier_verified": false
+    }
+  },
+  "defaults": {
+    "temperature": 0,
+    "max_output_tokens": 2048,
+    "timeout_seconds": 60,
+    "external_tools": false,
+    "paid_fallback": false,
+    "api_spend_usd_max": 0
+  },
+  "execution_enabled": false,
+  "warning": "Example only. Account Free entitlement is unverified. No credentials or API calls are included."
+}
