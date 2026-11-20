@@ -78,3 +78,6 @@ No external model calls have been made. No API spend or billing activation has o
 
 
 The adapters are deliberately not invoked by CI. They require local credentials and a separately verified account entitlement. The current code has no scored-run execution command, and the B1–B8 decision policies remain blocked pending recovery of their exact frozen rules.
+
+
+Provider configuration uses canonical family labels A/B/C (Gemini/GLM/GPT-OSS). The disposable 28-call routing manifest retains its historical G/Z/O labels; the adapter normalizes G→A, Z→B and O→C without changing provider/model identity.
