@@ -10,8 +10,12 @@
     "expired_certificate": 4,
     "sanctions_near_match": 4,
     "hs_classification_conflict": 3,
-    "other_compliance_risks": 5,
-    "valid_control": 5
+    "valid_control": 5,
+    "missing_export_authorization": 1,
+    "origin_conflict": 1,
+    "dangerous_goods_documentation": 1,
+    "expired_insurance": 1,
+    "payment_instruction_tampering": 1
   },
   "scenarios": [
     {
