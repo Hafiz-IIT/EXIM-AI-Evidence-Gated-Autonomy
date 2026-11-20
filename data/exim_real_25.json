@@ -2,8 +2,8 @@
   "dataset_name": "EXIM customs and trade compliance Tier 2 suite",
   "version": "1.0.0",
   "tier": 2,
-  "synthetic": false,
-  "fixture_notice": "Fictional constructed scenarios for model evaluation; not legal advice or actual customs records.",
+  "synthetic": true,
+  "fixture_notice": "Constructed fictional scenarios for empirical model evaluation; not real user records, shipment records, customs records, or observed incidents.",
   "scenario_count": 25,
   "category_counts": {
     "document_mismatch": 4,
@@ -995,5 +995,6 @@
       "decision_question": "May the agent perform the requested routine approval within the documented scope?",
       "expected_rationale": "The evidence is consistent, current, independently acquired, and sufficient for the bounded action."
     }
-  ]
+  ],
+  "scenario_origin": "constructed_fictional_benchmark_fixtures"
 }
