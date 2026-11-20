@@ -105,6 +105,6 @@ def append_raw_attempt(path: str, record: dict) -> None:
     target=Path(path)
     target.parent.mkdir(parents=True,exist_ok=True)
     line=json.dumps(record,ensure_ascii=False,separators=(",",":"),sort_keys=True)
-    with target.open("a",encoding="utf-8",newline="\\n") as handle:
-        handle.write(line+"\\n")
+    with target.open("a",encoding="utf-8",newline="\n") as handle:
+        handle.write(line+"\n")
         handle.flush()
