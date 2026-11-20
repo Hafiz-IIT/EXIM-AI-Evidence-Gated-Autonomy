@@ -61,6 +61,7 @@ The v2 draft makes two underspecified role assignments explicit rather than sile
 - [x] Draft a 630-call manifest with explicit role/family assignments and fixed random seed.
 - [x] Add offline prompt/parser/schema core and disposable mechanical checks.
 - [x] Add CI coverage for both the existing 700-case v0.4 harness and this separate C0–C14 track.
+- [x] Separate model-facing case packets from pair/condition metadata and recovery targets; add regression tests against prompt leakage.
 - [ ] Source explicit reversibility descriptions for the 30 scored cases; do not infer them.
 - [ ] Freeze the 3B/3C/3E role interpretation in a versioned protocol amendment.
 - [x] Implement direct-provider request adapters and API-free contract tests.
