@@ -48,7 +48,7 @@ def run_offline_checks():
     checks["DRY-05"]=len(attempts)==3 and result=={"ok":True}
 
     # DRY-06: exact outer fence is removable; malformed JSON remains a failure.
-    fence_ok=normalize_json('```json\\n{"ok":true}\\n```')=={"ok":True}
+    fence_ok=normalize_json('```json\n{"ok":true}\n```')=={"ok":True}
     try:
         normalize_json('{"ok":')
         malformed_fails=False
