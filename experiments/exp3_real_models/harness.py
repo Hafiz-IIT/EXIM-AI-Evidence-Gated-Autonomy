@@ -566,6 +566,7 @@ def run_condition(
     max_tasks: int | None = None,
     transport: Callable | None = None,
 ) -> dict:
+    reject_inline_secrets(config)
     public_dir = prepared_dir / "public"
     private_dir = prepared_dir / "private"
     task_manifest_path = public_dir / "task_manifest.json"
