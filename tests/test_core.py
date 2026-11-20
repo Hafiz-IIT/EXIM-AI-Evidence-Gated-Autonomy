@@ -20,6 +20,19 @@ class EvidenceGateCompletenessTests(unittest.TestCase):
         self.assertTrue(visible_features(case)["complete"])
         self.assertEqual(evidence_gate_v1(case), "ACT")
 
+    def test_string_false_verifier_decisions_fail_closed(self):
+        case = clean_high_risk_case()
+        for verifier in case["observable"]["machine"]["verifiers"]:
+            verifier["accept"] = "false"
+        self.assertFalse(visible_features(case)["verifier_schema_valid"])
+        self.assertEqual(evidence_gate_v1(case), "ESCALATE")
+
+    def test_missing_verifier_dependency_group_fails_closed(self):
+        case = clean_high_risk_case()
+        del case["observable"]["machine"]["verifiers"][0]["dependency_group"]
+        self.assertFalse(visible_features(case)["verifier_schema_valid"])
+        self.assertEqual(evidence_gate_v1(case), "ESCALATE")
+
     def test_low_risk_cannot_bypass_invalid_provenance(self):
         case = clean_high_risk_case()
         case["action"]["risk_level"] = "LOW"
