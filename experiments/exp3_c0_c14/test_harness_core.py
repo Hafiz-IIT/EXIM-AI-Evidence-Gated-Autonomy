@@ -1,6 +1,8 @@
 import json
 import unittest
-from harness_core import normalize_json, validate_role_payload, render_prompt, build_execution_plan
+import tempfile
+from pathlib import Path
+from harness_core import normalize_json, validate_role_payload, render_prompt, build_execution_plan, make_idempotency_key, retryable_transport_failure, append_raw_attempt
 
 class HarnessCoreTests(unittest.TestCase):
     def test_plain_json(self):
@@ -37,4 +39,27 @@ class HarnessCoreTests(unittest.TestCase):
         self.assertEqual(p["status"],"PLAN_ONLY_NO_NETWORK")
         self.assertFalse(p["execution_enabled"])
 
-if __name__=="__main__": unittest.main()
+
+    def test_retry_only_transport_failures(self):
+        self.assertTrue(retryable_transport_failure(http_status=429))
+        self.assertTrue(retryable_transport_failure(http_status=503))
+        self.assertTrue(retryable_transport_failure(error_type="timeout_before_complete_response"))
+        self.assertFalse(retryable_transport_failure(http_status=200))
+        self.assertFalse(retryable_transport_failure(error_type="malformed_json"))
+
+    def test_idempotency_key_stable_and_attempt_specific(self):
+        args=("E3-v2","C0-L","A","gemini-2.5-flash","PROPOSER","none","Prompt Pack v1")
+        a=make_idempotency_key(*args,0)
+        self.assertEqual(a,make_idempotency_key(*args,0))
+        self.assertNotEqual(a,make_idempotency_key(*args,1))
+
+    def test_raw_attempts_append_without_overwrite(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=str(Path(folder)/"raw.jsonl")
+            append_raw_attempt(path,{"run_id":"r1","attempt":0,"raw_text":"first"})
+            append_raw_attempt(path,{"run_id":"r1","attempt":1,"raw_text":"second"})
+            lines=Path(path).read_text(encoding="utf-8").splitlines()
+            self.assertEqual(len(lines),2)
+            self.assertEqual(json.loads(lines[0])["raw_text"],"first")
+            self.assertEqual(json.loads(lines[1])["raw_text"],"second")
+\nif __name__=="__main__": unittest.main()
