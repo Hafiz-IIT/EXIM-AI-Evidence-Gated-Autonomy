@@ -23,6 +23,8 @@ def assert_free_only_entitlements(provider_config:dict)->None:
             raise RuntimeError(f"provider {code} account Free entitlement is not verified")
         if account.get("billing_state") != "free_no_paid_overage":
             raise RuntimeError(f"provider {code} billing state is not verified as Free/no-overage")
+        if account.get("quota_verified") is not True:
+            raise RuntimeError(f"provider {code} quota is not verified")
 
 def build_request(family:str,provider:dict,messages:list[dict],env:dict|None=None,temperature:float=0.0,max_output_tokens:int=2048)->Request:
     env=os.environ if env is None else env
@@ -82,3 +84,8 @@ def extract_text(family:str,response_json:dict)->dict:
     content=message.get("content")
     if not isinstance(content,str): raise ValueError("provider message content is not plain text")
     return {"raw_text":content,"finish_reason":choices[0].get("finish_reason"),"usage":response_json.get("usage"),"provider_model":response_json.get("model"),"provider_request_id":response_json.get("id")}
+
+def dispatch_free_only(request:Request,provider_config:dict,timeout_seconds:int=60,opener=urlopen)->dict:
+    """The only supported network entry point; requires all three Free/no-overage attestations."""
+    assert_free_only_entitlements(provider_config)
+    return dispatch(request,timeout_seconds=timeout_seconds,opener=opener)
