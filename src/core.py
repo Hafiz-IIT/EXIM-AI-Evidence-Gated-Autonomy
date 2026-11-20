@@ -58,10 +58,12 @@ def visible_features(r):
 
 def evidence_gate_v1(r):
     f = visible_features(r)
-    if f["risk"] == "LOW":
-        return "ACT"
+    # Document uniqueness and provenance integrity are non-bypassable, even
+    # when the action is labelled LOW consequence.
     if f["duplicate_document_kind"] or not f["provenance_valid"]:
         return "ESCALATE"
+    if f["risk"] == "LOW":
+        return "ACT"
     if not f["complete"] or not f["auth_present"] or not f["fresh"]:
         return "REQUEST_EVIDENCE"
     if not f["doc_agree"]:
