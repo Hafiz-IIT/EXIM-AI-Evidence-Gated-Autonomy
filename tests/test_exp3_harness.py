@@ -174,6 +174,37 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         self.assertFalse(valid)
         self.assertFalse(normalized["accept"])
 
+    def test_extreme_numeric_model_outputs_fail_closed(self):
+        huge = 10 ** 10000
+        extraction, extraction_valid = normalize_extraction({
+            "quantity": huge, "gross_weight": 7.5, "hs": "8542", "confidence": 0.9
+        })
+        verifier, verifier_valid = normalize_verifier({
+            "accept": True, "confidence": huge, "reason_codes": []
+        })
+        self.assertFalse(extraction_valid)
+        self.assertIsNone(extraction["quantity"])
+        self.assertFalse(verifier_valid)
+        self.assertFalse(verifier["accept"])
+
+    def test_cost_estimator_rejects_nonfinite_or_negative_prices(self):
+        task = build_public_task(self.make_case("C0", "PRICE-001"), "canonical", "price-test")
+        condition = {
+            "condition_id": "price-check", "extractor_model": "extractor",
+            "verifier_models": ["verifier_a", "verifier_b"],
+        }
+        for invalid_price in (float("nan"), float("inf"), -0.01):
+            models = {
+                name: {
+                    "family_id": family,
+                    "input_usd_per_1k_tokens": invalid_price if name == "extractor" else 1.0,
+                    "output_usd_per_1k_tokens": 1.0,
+                }
+                for name, family in [("extractor", "a"), ("verifier_a", "b"), ("verifier_b", "c")]
+            }
+            with self.assertRaisesRegex(ValueError, "token prices must be finite and non-negative"):
+                estimate_condition_cost([task], condition, {"models": models, "settings": {"max_tokens": 100}})
+
     def test_freeze_rejects_inline_provider_secrets(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -262,6 +293,32 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
             self.assertEqual(report["runs"][0]["api_call_count"], 18)
             self.assertGreater(report["total_preflight_estimated_cost_usd"], 0)
 
+    def test_max_tasks_must_be_a_positive_integer(self):
+        cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            benchmark = root / "cases.jsonl"
+            benchmark.write_text("".join(json.dumps(x) + "\\n" for x in cases))
+            prepared = root / "prepared"
+            prepare_tasks(benchmark, prepared)
+            models = {
+                name: {
+                    "model": "mock-" + name, "provider": "mock",
+                    "base_url": "https://example.invalid/v1", "family_id": family,
+                    "api_key_env": "EXP3_MAX_TASKS_UNUSED",
+                }
+                for name, family in [("extractor", "a"), ("verifier_a", "b"), ("verifier_b", "c")]
+            }
+            condition = {"condition_id": "max-tasks", "extractor_model": "extractor", "verifier_models": ["verifier_a", "verifier_b"]}
+            config = {"models": models, "conditions": [condition], "settings": {}}
+            for invalid in (0, -1, True):
+                with self.assertRaisesRegex(ValueError, "max_tasks must be a positive integer"):
+                    run_condition(
+                        config=config, condition=condition, split="development",
+                        prepared_dir=prepared, output_dir=root / f"invalid-{invalid}",
+                        max_tasks=invalid,
+                    )
+
     def test_preflight_budget_blocks_before_api_key_check(self):
         cases = [self.make_case("C0", f"U-00-{i:03d}") for i in range(10)]
         with tempfile.TemporaryDirectory() as temp:
@@ -321,7 +378,8 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
                     os.environ.pop("EXP3_TEST_KEY", None)
                 else:
                     os.environ["EXP3_TEST_KEY"] = previous
-            rows = list(csv.DictReader((root / "run/case_results.csv").open()))
+            with (root / "run/case_results.csv").open(encoding="utf-8", newline="") as handle:
+                rows = list(csv.DictReader(handle))
             manifest = json.loads((root / "run/run_manifest.json").read_text())
             provider_errors = (root / "run/provider_errors.jsonl").read_text().splitlines()
             self.assertEqual(rows[0]["controller_action"], "ESCALATE")
