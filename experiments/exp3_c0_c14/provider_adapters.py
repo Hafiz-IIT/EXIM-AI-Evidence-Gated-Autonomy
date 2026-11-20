@@ -40,6 +40,10 @@ def build_request(family:str,provider:dict,messages:list[dict],env:dict|None=Non
         key=env.get(provider.get("credential_env"))
         if not key: raise RuntimeError(f"{family} API key environment variable is missing")
         base=provider["base_url"].rstrip("/")
+        if family=="B" and "${CLOUDFLARE_ACCOUNT_ID}" in base:
+            account_id=env.get("CLOUDFLARE_ACCOUNT_ID")
+            if not account_id: raise RuntimeError("CLOUDFLARE_ACCOUNT_ID environment variable is missing")
+            base=base.replace("${CLOUDFLARE_ACCOUNT_ID}",account_id)
         url=base+"/chat/completions"
         body={"model":model,"messages":messages,"temperature":temperature,"max_tokens":max_output_tokens}
         headers={"Content-Type":"application/json","Authorization":"Bearer "+key}
