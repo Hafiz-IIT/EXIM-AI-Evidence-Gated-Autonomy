@@ -108,3 +108,66 @@ Gemini and Groq-hosted GPT-OSS remain conditional candidates. Mistral is exclude
 5. Freeze and execute the 630-call primary manifest only after dry-run acceptance, exact model identities, prompt hashes, quota evidence, and zero-cost safeguards are verified.
 
 This reconciliation is a research protocol artifact, not a portfolio audit, benchmark result, or claim that real-model calls have occurred.
+
+
+## Third-family candidate qualification — Cloudflare Workers AI / Z.ai GLM-4.7-Flash (2026-11-21)
+
+**Decision: public-policy qualified candidate C; account-level qualification remains pending.** This is the strongest third-family candidate found in this pass and is preferable to a dynamic OpenRouter :free route for reproducibility.
+
+### Exact identity and endpoint
+
+- Model developer/family: Z.ai (Zhipu AI), GLM family.
+- Exact pinned model ID: `@cf/zai-org/glm-4.7-flash`.
+- Inference provider: Cloudflare Workers AI.
+- OpenAI-compatible base URL: `https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1`.
+- Chat endpoint: `/chat/completions`.
+- Model documentation lists a 131,072-token context window, text generation, and OpenAI-compatible Chat Completions support.
+- Do not confuse this with GLM-5.2/5.3 variants; the official Cloudflare changelog explicitly lists GLM-4.7-Flash among models still accessible on Workers Free when certain larger models were moved behind Workers Paid.
+
+### Zero-cost evidence
+
+Cloudflare's official Workers AI pricing page (updated 2026-11-18) states:
+- Workers Free includes 10,000 Neurons per day at no charge.
+- Limits reset daily at 00:00 UTC.
+- On Workers Free, exceeding the free allocation causes further operations to fail; it does not automatically charge for overage.
+- Exceeding the free allowance requires upgrading to Workers Paid for paid overage. **Do not upgrade.**
+- The pricing page lists GLM-4.7-Flash at approximately 5,500 Neurons per million input tokens and 36,400 Neurons per million output tokens (pricing page's current model table; verify exact live values again before execution).
+
+Cloudflare's official July 28, 2026 model-access changelog explicitly says `@cf/zai-org/glm-4.7-flash` remains available on Workers Free, while `glm-5.2` and selected other large models require Workers Paid. This is the critical free-plan eligibility evidence.
+
+### Qualification result
+
+| Gate | Result |
+|---|---|
+| Distinct model family from Google Gemini | **Pass** — Z.ai / GLM |
+| Distinct model family from OpenAI GPT-OSS | **Pass** — Z.ai / GLM |
+| Exact stable model ID published | **Pass** — `@cf/zai-org/glm-4.7-flash` |
+| Officially listed on Workers Free | **Pass (public policy)** |
+| OpenAI-compatible Chat Completions documented | **Pass** |
+| Published free daily allowance | **Pass** — 10,000 Neurons/day |
+| User's Cloudflare account is on Workers Free | **Not yet verified** |
+| User's account has no paid billing/usage mode | **Not yet verified** |
+| Minimal synthetic smoke call and returned model identity | **Not run** |
+| No-paid-fallback behavior verified on user's account | **Not yet verified** |
+
+Thus the study now has three public-policy candidate families: Google Gemini, OpenAI GPT-OSS (hosted by Groq), and Z.ai GLM-4.7-Flash (hosted by Cloudflare). This resolves the *public provider/model-family discovery* blocker, but does not authorize a dry run until the account checks and smoke tests pass.
+
+### Account-side safety gate before first request
+
+In Cloudflare dashboard, confirm Workers plan is **Free**, not Paid; do not add a payment method, switch plans, or enable paid AI Gateway credits. Confirm Workers AI is enabled and the account shows the free daily neuron allowance. Record the account's usage/billing mode privately. Use only the exact model ID above. Set a strict short output cap, disable tools and streaming for the initial smoke, and send only synthetic text. If the account prompts for an upgrade or payment method, stop immediately. Do not retry through a different model or provider automatically.
+
+The Cloudflare token should be stored locally in an environment variable and scoped to the minimum Workers AI permissions needed. Never paste the token into chat or commit it. The account ID and token remain private.
+
+### Remaining compatibility work
+
+The current GitHub harness assumes a generic OpenAI-compatible Chat Completions endpoint with an API key environment variable. Cloudflare's documented endpoint is compatible, but requires an account-specific base URL. Before integrating it into the dedicated C0–C14 runner, test that the provider adapter preserves the returned exact model ID, usage fields, response IDs, errors and relevant headers. Record Cloudflare's account-specific endpoint separately from the model-family label.
+
+### Official sources
+
+- Cloudflare Workers AI pricing (updated 2026-11-18): https://developers.cloudflare.com/workers-ai/platform/pricing/
+- Cloudflare model access changelog (2026-07-28): https://developers.cloudflare.com/changelog/post/2026-07-28-models-require-workers-paid/
+- Cloudflare GLM-4.7-Flash model page: https://developers.cloudflare.com/workers-ai/models/glm-4.7-flash/
+- Cloudflare OpenAI-compatible API endpoints: https://developers.cloudflare.com/workers-ai/configuration/open-ai-compatibility/
+- Z.ai model family identity and Cloudflare's provider attribution are shown on the official model page.
+
+**Updated status:** three distinct model-family candidates are now identified and publicly documented. Account entitlement, smoke validation, replacement dry-run manifest, and the dedicated 630-call runner remain pending. No API request was made and no spend occurred in this qualification pass.
