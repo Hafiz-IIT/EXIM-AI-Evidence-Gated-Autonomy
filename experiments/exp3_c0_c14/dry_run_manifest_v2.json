@@ -271,7 +271,11 @@
       "case_id": "DR-06",
       "stage": "RECOVERY",
       "family": "G",
-      "depends_on": 25
+      "depends_on": [
+        25,
+        26,
+        27
+      ]
     }
   ],
   "blocking_issues": [
