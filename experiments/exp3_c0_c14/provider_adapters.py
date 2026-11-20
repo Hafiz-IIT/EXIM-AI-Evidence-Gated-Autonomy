@@ -28,6 +28,7 @@ def assert_free_only_entitlements(provider_config:dict)->None:
 
 def build_request(family:str,provider:dict,messages:list[dict],env:dict|None=None,temperature:float=0.0,max_output_tokens:int=2048)->Request:
     env=os.environ if env is None else env
+    family={"G":"A","Z":"B","O":"C"}.get(family,family)
     model=provider["model"]
     if family=="A":
         key=env.get(provider.get("credential_env","GEMINI_API_KEY"))
@@ -72,6 +73,7 @@ def dispatch(request:Request,timeout_seconds:int=60,opener=urlopen)->dict:
 
 def extract_text(family:str,response_json:dict)->dict:
     """Extract only explicit final text and provider metadata; never infer/repair."""
+    family={"G":"A","Z":"B","O":"C"}.get(family,family)
     if family=="A":
         candidates=response_json.get("candidates") or []
         if not candidates: raise ValueError("Gemini response has no candidates")
