@@ -36,7 +36,7 @@ def normalize_json(raw: str) -> Any:
     if not isinstance(raw, str):
         raise TypeError("raw response must be text")
     text=raw.lstrip("\ufeff").strip()
-    match=re.fullmatch(r"```(?:json)?[ \\t]*\\r?\\n(.*?)\\r?\\n```", text, flags=re.IGNORECASE|re.DOTALL)
+    match=re.fullmatch(r"```(?:json)?[ \t]*\r?\n(.*?)\r?\n```", text, flags=re.IGNORECASE|re.DOTALL)
     if match:
         text=match.group(1).strip()
     return json.loads(text)
@@ -79,7 +79,7 @@ def render_prompt(role: str, case: dict, proposer_output: dict|None=None, interv
         payload.update({"original_model_output":proposer_output,"controller_intervention_category":intervention,"newly_supplied_evidence":new_evidence})
     messages=[
       {"role":"system","content":PROMPTS[role]["system"]},
-      {"role":"user","content":PROMPTS[role]["instruction"]+"\\n\\nINPUTS:\\n"+json.dumps(payload,ensure_ascii=False,separators=(",",":"),sort_keys=True)}
+      {"role":"user","content":PROMPTS[role]["instruction"]+"\n\nINPUTS:\n"+json.dumps(payload,ensure_ascii=False,separators=(",",":"),sort_keys=True)}
     ]
     canonical=json.dumps(messages,ensure_ascii=False,separators=(",",":"),sort_keys=True)
     return {"messages":messages,"prompt_version":"Prompt Pack v1","prompt_sha256":hashlib.sha256(canonical.encode("utf-8")).hexdigest()}
