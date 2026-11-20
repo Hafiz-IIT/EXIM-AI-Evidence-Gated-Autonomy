@@ -63,4 +63,10 @@ class HarnessCoreTests(unittest.TestCase):
             self.assertEqual(json.loads(lines[0])["raw_text"],"first")
             self.assertEqual(json.loads(lines[1])["raw_text"],"second")
 
+    def test_case_id_not_leaked_into_prompt(self):
+        case={"case_id":"SECRET-C14-H1","task":"synthetic task","consequence":"HIGH","evidence_packet":"visible evidence","reversibility":"unspecified"}
+        prompt=render_prompt("PROPOSER",case)
+        self.assertNotIn("SECRET-C14-H1",json.dumps(prompt["messages"]))
+        self.assertNotIn("case_id",prompt["messages"][1]["content"])
+
 if __name__=="__main__": unittest.main()
