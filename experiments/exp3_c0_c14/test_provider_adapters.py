@@ -1,6 +1,6 @@
 import json
 import unittest
-from provider_adapters import build_request, extract_text, assert_free_only_entitlements
+from provider_adapters import build_request, extract_text, assert_free_only_entitlements, dispatch_free_only
 
 class ProviderAdapterTests(unittest.TestCase):
     def test_gemini_key_is_header_not_url(self):
@@ -43,5 +43,25 @@ class ProviderAdapterTests(unittest.TestCase):
         result=extract_text("C",{"id":"req1","model":"openai/gpt-oss-120b","choices":[{"message":{"content":"{\"ok\":true}"},"finish_reason":"stop"}],"usage":{"prompt_tokens":2}})
         self.assertEqual(result["raw_text"],'{"ok":true}')
         self.assertEqual(result["provider_request_id"],"req1")
+
+
+    def test_free_dispatch_requires_all_three_verified_accounts_before_network(self):
+        class NeverCall:
+            def __call__(self,*args,**kwargs):
+                raise AssertionError("network must not be reached")
+        provider={"model":"gemini-2.5-flash","base_url":"https://example.invalid/v1","credential_env":"GEMINI_API_KEY"}
+        request=build_request("A",provider,[{"role":"user","content":"test"}],{"GEMINI_API_KEY":"test"})
+        config={"defaults":{"api_spend_usd_max":0,"paid_fallback":False},"provider_families":{x:{"account_free_tier_verified":True,"billing_state":"free_no_paid_overage","quota_verified":True} for x in ("A","B","C")}}
+        # The gate passes, then a fake transport deliberately returns a synthetic response.
+        class FakeResponse:
+            status=200
+            def __enter__(self): return self
+            def __exit__(self,*args): return False
+            def read(self): return b'{"candidates":[{"content":{"parts":[{"text":"ok"}]}}]}'
+        result=dispatch_free_only(request,config,opener=lambda *a,**k:FakeResponse())
+        self.assertEqual(result["http_status"],200)
+        config["provider_families"]["B"]["quota_verified"]=False
+        with self.assertRaisesRegex(RuntimeError,"quota"):
+            dispatch_free_only(request,config,opener=NeverCall())
 
 if __name__=="__main__": unittest.main()
