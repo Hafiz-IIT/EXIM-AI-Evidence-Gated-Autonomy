@@ -35,12 +35,13 @@ def visible_features(r):
             provenance.get("integrity_status") == "valid"
             and provenance.get("document_set_sha256") == _canonical_hash(instances or [])
         )
+    verifiers = vs if isinstance(vs, list) else []
     verifier_schema_valid = isinstance(vs, list) and all(
         isinstance(verifier, dict)
         and isinstance(verifier.get("accept"), bool)
         and isinstance(verifier.get("dependency_group"), str)
         and bool(verifier["dependency_group"].strip())
-        for verifier in vs
+        for verifier in verifiers
     )
 
     return {
@@ -55,10 +56,10 @@ def visible_features(r):
         and abs(ex["gross_weight"] - inv["gross_weight"]) < 1e-9
         and ex["hs"] == inv["hs"],
         "verifier_schema_valid": verifier_schema_valid,
-        "v_rejects": sum(v["accept"] is False for v in vs if isinstance(v, dict) and isinstance(v.get("accept"), bool)),
-        "n_verifiers": len(vs),
+        "v_rejects": sum(v["accept"] is False for v in verifiers if isinstance(v, dict) and isinstance(v.get("accept"), bool)),
+        "n_verifiers": len(verifiers),
         "indep_verifiers": len({
-            v["dependency_group"] for v in vs
+            v["dependency_group"] for v in verifiers
             if isinstance(v, dict)
             and isinstance(v.get("dependency_group"), str)
             and v["dependency_group"].strip()
