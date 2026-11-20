@@ -31,6 +31,24 @@ FORBIDDEN_PUBLIC_KEYS = {
 }
 
 
+SENSITIVE_CONFIG_KEYS = {
+    "api_key", "api_token", "access_token", "secret", "authorization",
+    "password", "client_secret", "private_key", "bearer_token",
+}
+
+
+def reject_inline_secrets(value: Any, path: str = "config") -> None:
+    """Reject credential material anywhere in a run config; only env-var names are allowed."""
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if str(key).casefold() in SENSITIVE_CONFIG_KEYS and child not in (None, ""):
+                raise ValueError(f"inline credential material is prohibited at {path}.{key}; use an environment variable name")
+            reject_inline_secrets(child, f"{path}.{key}")
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            reject_inline_secrets(child, f"{path}[{index}]")
+
+
 def canonical_json(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
 
@@ -218,6 +236,7 @@ def prepare_tasks(benchmark_path: Path, output_dir: Path) -> dict:
 
 def verify_prepared_package(prepared_dir: Path) -> tuple[dict, dict, list[dict], list[dict]]:
     """Verify public and private task-package hashes before estimating or running models."""
+    reject_inline_secrets(config)
     public_dir = prepared_dir / "public"
     private_dir = prepared_dir / "private"
     task_manifest_path = public_dir / "task_manifest.json"
@@ -752,7 +771,18 @@ def run_condition(
         "cost_estimate": cost_estimate,
         "configured_budget_limit_usd": budget_limit,
         "model_identity": model_identity,
-        "model_specs": {name: {k: v for k, v in spec.items() if k != "api_key"} for name, spec in models.items()},
+        "model_specs": {
+            name: {
+                key: spec[key]
+                for key in (
+                    "provider", "base_url", "model", "family_id", "api_key_env",
+                    "json_mode", "holdout_only", "input_usd_per_1k_tokens",
+                    "output_usd_per_1k_tokens",
+                )
+                if key in spec
+            }
+            for name, spec in models.items()
+        },
         "settings": config["settings"],
         "split": split, "condition": condition["condition_id"], "n_cases": len(rows),
         "raw_response_count": len(raw_records),
