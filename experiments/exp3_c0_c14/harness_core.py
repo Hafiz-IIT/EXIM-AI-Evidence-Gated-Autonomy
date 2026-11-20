@@ -70,7 +70,7 @@ def render_prompt(role: str, case: dict, proposer_output: dict|None=None, interv
     if role in {"V1","V2","RECOVERY"} and proposer_output is None:
         raise ValueError(f"{role} requires the frozen proposer output")
     payload={
-      "case_id":case["case_id"],"task":case["task"],"consequence":case["consequence"],
+      "task":case["task"],"consequence":case["consequence"],
       "reversibility":case["reversibility"],"evidence_packet":case["evidence_packet"]
     }
     if role in {"V1","V2"}: payload["frozen_proposer_output"]=proposer_output
