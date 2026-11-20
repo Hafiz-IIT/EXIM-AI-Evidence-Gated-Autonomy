@@ -101,7 +101,7 @@ def assign_splits(high_risk_cases: list[dict]) -> dict[str, str]:
     grouped: dict[str, set[str]] = defaultdict(set)
     for case in high_risk_cases:
         grouped[case["family"]].add(case["pair_id"])
-    assignments = {}
+    assignments: dict[tuple[str, str], str] = {}
     for family, pair_ids in grouped.items():
         ordered = sorted(pair_ids, key=lambda p: hashlib.sha256(f"exp3-split-v1|{family}|{p}".encode()).hexdigest())
         n = len(ordered)
@@ -109,7 +109,7 @@ def assign_splits(high_risk_cases: list[dict]) -> dict[str, str]:
         n_val = int(n * 0.20)
         for index, pair_id in enumerate(ordered):
             split = "development" if index < n_dev else "validation" if index < n_dev + n_val else "final_holdout"
-            assignments[pair_id] = split
+            assignments[(family, pair_id)] = split
     return assignments
 
 
@@ -165,7 +165,7 @@ def prepare_tasks(benchmark_path: Path, output_dir: Path) -> dict:
     public_tasks = []
     private_map = []
     for case in high:
-        split = split_map[case["pair_id"]]
+        split = split_map[(case["family"], case["pair_id"])]
         layouts = (
             [("development", "canonical")] if split == "development"
             else [("validation", "table")] if split == "validation"
@@ -294,7 +294,12 @@ def normalize_extraction(value: dict) -> tuple[dict, bool]:
         quantity = value.get("quantity")
         weight = value.get("gross_weight")
         hs = value.get("hs")
-        confidence = float(value.get("confidence", 0.0))
+        raw_confidence = value.get("confidence")
+        if not isinstance(raw_confidence, (int, float)) or isinstance(raw_confidence, bool):
+            raise ValueError("confidence must be numeric, not boolean or string")
+        confidence = float(raw_confidence)
+        if not math.isfinite(confidence):
+            raise ValueError("confidence must be finite")
         if quantity is not None and (not isinstance(quantity, (int, float)) or isinstance(quantity, bool) or not math.isfinite(float(quantity))):
             raise ValueError("quantity must be numeric or null")
         if weight is not None and (not isinstance(weight, (int, float)) or isinstance(weight, bool) or not math.isfinite(float(weight))):
