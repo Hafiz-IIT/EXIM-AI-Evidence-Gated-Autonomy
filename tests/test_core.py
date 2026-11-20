@@ -32,8 +32,9 @@ class EvidenceGateCompletenessTests(unittest.TestCase):
     def test_low_risk_cannot_bypass_duplicate_document_kinds(self):
         case = clean_high_risk_case()
         case["action"]["risk_level"] = "LOW"
-        instances = case["observable"]["document_instances"]
-        instances.append(copy.deepcopy(instances[0]))
+        case["observable"]["document_instances"] = [
+            {"kind": "invoice"}, {"kind": "invoice"}
+        ]
         self.assertTrue(visible_features(case)["duplicate_document_kind"])
         self.assertEqual(evidence_gate_v1(case), "ESCALATE")
 
