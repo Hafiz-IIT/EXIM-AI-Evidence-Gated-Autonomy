@@ -29,6 +29,14 @@ def validate(data: dict) -> list[str]:
         dep=call.get("depends_on")
         if dep is not None and (not isinstance(dep, int) or dep < 1 or dep >= i):
             errors.append(f"invalid dependency at row {i}")
+        elif call.get("stage") != "PROPOSER":
+            proposer_family = call.get("run_id", "").removeprefix(call.get("case_id", "") + "-")[:1]
+            expected = next((x.get("sequence") for x in calls
+                             if x.get("case_id") == call.get("case_id")
+                             and x.get("stage") == "PROPOSER"
+                             and x.get("family") == proposer_family), None)
+            if dep != expected:
+                errors.append(f"dependency does not point to same-case proposer for {call.get('run_id')}")
     providers=data.get("provider_families", {})
     if set(providers) != ALLOWED_FAMILIES:
         errors.append("provider family set must be exactly G/Z/O")
