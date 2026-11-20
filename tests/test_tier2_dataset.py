@@ -21,6 +21,41 @@ class EximTier2DatasetTests(unittest.TestCase):
         self.assertEqual(counts, data["category_counts"])
         self.assertEqual(sum(row["expected_action"] == "ACT" for row in data["scenarios"]), 5)
 
+    def test_evidence_issue_dates_precede_expiry(self):
+        from datetime import datetime
+        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        for row in data["scenarios"]:
+            for evidence in row["evidence"]:
+                issued = evidence.get("issued_at")
+                expires = evidence.get("valid_until")
+                if issued and expires:
+                    self.assertLess(datetime.fromisoformat(issued.replace("Z", "+00:00")),
+                                    datetime.fromisoformat(expires.replace("Z", "+00:00")),
+                                    msg=f"{row['scenario_id']}: {evidence.get('document_type')}")
+
+    def test_expired_records_are_expired_before_shipment(self):
+        from datetime import datetime
+        shipment_date = datetime.fromisoformat("2026-11-20T00:00:00+00:00")
+        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        expired = [row for row in data["scenarios"] if row["category"] == "expired_certificate"]
+        self.assertEqual(len(expired), 4)
+        for row in expired:
+            official = row["evidence"][0]
+            expiry = datetime.fromisoformat(official["valid_until"].replace("Z", "+00:00"))
+            self.assertLess(expiry, shipment_date, msg=row["scenario_id"])
+
+    def test_document_type_matches_mismatch_context(self):
+        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        expected = {
+            "EXIM-DOC-MISMATCH-1": ["Bill of Lading", "Commercial Invoice"],
+            "EXIM-DOC-MISMATCH-2": ["Carrier Manifest", "Packing List"],
+            "EXIM-DOC-MISMATCH-3": ["Commercial Invoice", "Packing List"],
+            "EXIM-DOC-MISMATCH-4": ["Shipping Bill", "Commercial Invoice"],
+        }
+        for row in data["scenarios"]:
+            if row["scenario_id"] in expected:
+                self.assertEqual([e["document_type"] for e in row["evidence"]], expected[row["scenario_id"]])
+
     def test_every_case_has_evidence_and_gold_action(self):
         data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
         for row in data["scenarios"]:
