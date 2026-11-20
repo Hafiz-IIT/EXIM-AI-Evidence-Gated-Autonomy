@@ -309,7 +309,7 @@ def normalize_extraction(value: dict) -> tuple[dict, bool]:
         if not 0.0 <= confidence <= 1.0:
             raise ValueError("confidence must be in [0,1]")
         return {"quantity": quantity, "gross_weight": weight, "hs": hs, "confidence": confidence}, True
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return {"quantity": None, "gross_weight": None, "hs": None, "confidence": 0.0}, False
 
 
@@ -317,10 +317,16 @@ def normalize_verifier(value: dict) -> tuple[dict, bool]:
     accept = value.get("accept")
     confidence = value.get("confidence", 0.0)
     reasons = value.get("reason_codes", [])
-    valid = isinstance(accept, bool) and isinstance(confidence, (int, float)) and not isinstance(confidence, bool) and 0 <= float(confidence) <= 1 and isinstance(reasons, list)
+    valid = isinstance(accept, bool) and isinstance(confidence, (int, float)) and not isinstance(confidence, bool) and isinstance(reasons, list)
+    try:
+        normalized_confidence = float(confidence) if valid else 0.0
+        valid = valid and math.isfinite(normalized_confidence) and 0.0 <= normalized_confidence <= 1.0
+    except (TypeError, ValueError, OverflowError):
+        valid = False
+        normalized_confidence = 0.0
     if not valid:
         return {"accept": False, "confidence": 0.0, "reason_codes": ["invalid_model_response"]}, False
-    return {"accept": accept, "confidence": float(confidence), "reason_codes": [str(x) for x in reasons]}, True
+    return {"accept": accept, "confidence": normalized_confidence, "reason_codes": [str(x) for x in reasons]}, True
 
 
 def _endpoint(base_url: str) -> str:
@@ -360,7 +366,16 @@ def estimate_condition_cost(tasks: list[dict], condition: dict, config: dict) ->
             role_cost = None
             all_priced = False
         else:
-            role_cost = (input_tokens * float(in_price) + output_tokens * float(out_price)) / 1000.0
+            try:
+                in_price = float(in_price)
+                out_price = float(out_price)
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise ValueError(f"model {model_name} has invalid token pricing") from exc
+            if not math.isfinite(in_price) or not math.isfinite(out_price) or in_price < 0 or out_price < 0:
+                raise ValueError(f"model {model_name} token prices must be finite and non-negative")
+            role_cost = (input_tokens * in_price + output_tokens * out_price) / 1000.0
+            if not math.isfinite(role_cost):
+                raise ValueError(f"model {model_name} estimated cost is not finite")
             total_cost += role_cost
         role_totals[role] = {
             "model": model_name,
@@ -543,6 +558,8 @@ def run_condition(
     if any(config["models"][name].get("holdout_only") for name in [condition["extractor_model"], *condition["verifier_models"]]) and not split.startswith("final_holdout"):
         raise ValueError("a holdout-only model cannot run on development/validation")
     if max_tasks is not None:
+        if isinstance(max_tasks, bool) or not isinstance(max_tasks, int) or max_tasks < 1:
+            raise ValueError("max_tasks must be a positive integer")
         if split.startswith("final_holdout"):
             raise ValueError("partial final-holdout runs are prohibited")
         private_rows = private_rows[:max_tasks]
@@ -558,6 +575,12 @@ def run_condition(
         # Backward compatibility for older private configs; this remains a soft preflight estimate.
         budget_limit = config["settings"].get("max_estimated_cost_usd")
     if budget_limit is not None:
+        try:
+            budget_limit = float(budget_limit)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValueError("configured preflight budget must be a finite non-negative number") from exc
+        if not math.isfinite(budget_limit) or budget_limit < 0:
+            raise ValueError("configured preflight budget must be a finite non-negative number")
         if not cost_estimate["cost_known"]:
             raise ValueError("cost budget is set but one or more model token prices are missing")
         if cost_estimate["preflight_estimated_cost_usd"] > float(budget_limit):
