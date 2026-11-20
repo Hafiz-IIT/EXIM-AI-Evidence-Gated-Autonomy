@@ -31,6 +31,9 @@ jobs:
       - name: Run provider adapter contract tests (no network)
         working-directory: experiments/exp3_c0_c14
         run: python -m unittest test_provider_adapters -v
+      - name: Run deterministic feature mapper tests
+        working-directory: experiments/exp3_c0_c14
+        run: python -m unittest test_feature_mapper -v
       - name: Run disposable DRY-01 to DRY-06 mechanical checks
         working-directory: experiments/exp3_c0_c14
         run: python dry_run_suite.py
