@@ -18,8 +18,25 @@ class EximTier2DatasetTests(unittest.TestCase):
         counts = {}
         for row in data["scenarios"]:
             counts[row["category"]] = counts.get(row["category"], 0) + 1
-        self.assertEqual(counts, data["category_counts"])
+        expected_counts = {
+            "document_mismatch": 4,
+            "expired_certificate": 4,
+            "sanctions_near_match": 4,
+            "hs_classification_conflict": 3,
+            "valid_control": 5,
+            "missing_export_authorization": 1,
+            "origin_conflict": 1,
+            "dangerous_goods_documentation": 1,
+            "expired_insurance": 1,
+            "payment_instruction_tampering": 1,
+        }
+        self.assertEqual(counts, expected_counts)
+        self.assertEqual(data["category_counts"], expected_counts)
         self.assertEqual(sum(row["expected_action"] == "ACT" for row in data["scenarios"]), 5)
+        self.assertTrue(all(
+            row["expected_action"] == ("ACT" if row["category"] == "valid_control" else "ESCALATE")
+            for row in data["scenarios"]
+        ))
 
     def test_evidence_issue_dates_precede_expiry(self):
         from datetime import datetime
