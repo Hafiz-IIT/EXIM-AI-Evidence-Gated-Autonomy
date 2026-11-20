@@ -89,3 +89,22 @@ def build_execution_plan(manifest: dict, cases: list[dict]) -> dict:
     missing=sorted({x["case_id"] for x in manifest["calls"]}-set(by_id))
     if missing: raise ValueError("manifest references unknown case IDs: "+", ".join(missing))
     return {"status":"PLAN_ONLY_NO_NETWORK","calls":len(manifest["calls"]),"case_ids":sorted(by_id),"execution_enabled":False}
+
+def make_idempotency_key(experiment_version: str, case_id: str, family: str, model: str, role: str, verifier_configuration: str, prompt_version: str, attempt_index: int) -> str:
+    parts=(experiment_version,case_id,family,model,role,verifier_configuration,prompt_version,str(attempt_index))
+    return hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()
+
+def retryable_transport_failure(http_status: int|None=None, error_type: str|None=None) -> bool:
+    if http_status == 429 or (isinstance(http_status,int) and 500 <= http_status <= 599):
+        return True
+    return error_type in {"timeout_before_complete_response","connection_reset","documented_transient_sdk_transport"}
+
+def append_raw_attempt(path: str, record: dict) -> None:
+    """Append one immutable attempt record as JSONL; never replace prior records."""
+    from pathlib import Path
+    target=Path(path)
+    target.parent.mkdir(parents=True,exist_ok=True)
+    line=json.dumps(record,ensure_ascii=False,separators=(",",":"),sort_keys=True)
+    with target.open("a",encoding="utf-8",newline="\\n") as handle:
+        handle.write(line+"\\n")
+        handle.flush()
