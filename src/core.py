@@ -4,7 +4,7 @@ import math
 
 
 def _canonical_hash(value):
-    raw = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
 
 
@@ -58,10 +58,12 @@ def visible_features(r):
 
 def evidence_gate_v1(r):
     f = visible_features(r)
-    if f["risk"] == "LOW":
-        return "ACT"
+    # Integrity and provenance are non-bypassable invariants, including for
+    # low-risk consignments. Risk tier must not authorize corrupted evidence.
     if f["duplicate_document_kind"] or not f["provenance_valid"]:
         return "ESCALATE"
+    if f["risk"] == "LOW":
+        return "ACT"
     if not f["complete"] or not f["auth_present"] or not f["fresh"]:
         return "REQUEST_EVIDENCE"
     if not f["doc_agree"]:
