@@ -132,6 +132,18 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(set(first.values()), {"development", "validation", "final_holdout"})
 
+    def test_split_keys_are_scoped_by_family_when_pair_ids_collide(self):
+        cases = [
+            self.make_case("C0", f"PAIR-{i:03d}") for i in range(10)
+        ] + [
+            self.make_case("C1", f"PAIR-{i:03d}") for i in range(10)
+        ]
+        assignments = assign_splits(cases)
+        self.assertEqual(len(assignments), 20)
+        self.assertIn(("C0", "PAIR-000"), assignments)
+        self.assertIn(("C1", "PAIR-000"), assignments)
+        self.assertEqual(set(assignments.values()), {"development", "validation", "final_holdout"})
+
     def test_layout_ood_changes_rendering_without_changing_values(self):
         docs = self.make_case("C0", "U-00-000")["observable"]["documents"]
         canonical = render_documents(docs, "canonical")
@@ -142,6 +154,14 @@ class Exp3BlindingAndSchemaTests(unittest.TestCase):
 
     def test_parse_json_fenced_response(self):
         self.assertEqual(parse_json_object('```json\n{"accept":true}\n```'), {"accept": True})
+
+    def test_extraction_confidence_rejects_boolean_and_string_values(self):
+        for confidence in (True, False, "0.9"):
+            normalized, valid = normalize_extraction({
+                "quantity": 5, "gross_weight": 7.5, "hs": "8542", "confidence": confidence
+            })
+            self.assertFalse(valid)
+            self.assertEqual(normalized["confidence"], 0.0)
 
     def test_invalid_extraction_fails_closed(self):
         normalized, valid = normalize_extraction({"quantity": "unknown", "gross_weight": 7.5, "hs": "8542", "confidence": 0.9})
