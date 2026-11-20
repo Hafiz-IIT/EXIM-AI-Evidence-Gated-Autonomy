@@ -37,6 +37,8 @@ python -m unittest -v
 python dry_run_suite.py
 python validate_manifest.py
 python validate_primary_manifest.py
+python runner.py --manifest routing --plan-only
+python runner.py --manifest primary --plan-only
 ```
 
 A PASS means only that the JSON route table is internally consistent. It does not mean the six dry-run scenarios are reconciled, provider accounts are Free, smoke tests passed, or any experiment has executed.
@@ -66,6 +68,7 @@ The v2 draft makes two underspecified role assignments explicit rather than sile
 - [ ] Freeze the 3B/3C/3E role interpretation in a versioned protocol amendment.
 - [x] Implement direct-provider request adapters and API-free contract tests.
 - [x] Implement deterministic explicit-field feature mapping and fail-closed tests.
+- [x] Add a plan-only runner for 28-call and 630-call manifests; actual execution is hard-blocked.
 - [ ] Recover the exact deterministic B1–B8 controller definitions/thresholds; do not reuse the unrelated v0.4 Evidence Gate.
 - [ ] Verify all three provider accounts are Free with no paid fallback.
 - [ ] Complete the 28-call provider dry run and separate DRY-01…DRY-06 mechanical suite.
