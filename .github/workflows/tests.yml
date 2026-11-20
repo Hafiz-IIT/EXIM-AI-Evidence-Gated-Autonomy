@@ -1,0 +1,32 @@
+name: Unit and Synthetic Evaluation
+
+on:
+  push:
+    branches: ["main", "research/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests-and-synthetic-evaluation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deterministic test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Run unit and Tier 2 fixture tests
+        run: python -m unittest discover -s tests -v
+      - name: Generate benchmark v0.4 fixtures
+        run: python scripts/generate_benchmark_v04.py
+      - name: Verify benchmark v0.4 integrity
+        run: python scripts/verify_benchmark_v04.py
+      - name: Run documented deterministic checks
+        run: |
+          python scripts/verify_benchmark.py
