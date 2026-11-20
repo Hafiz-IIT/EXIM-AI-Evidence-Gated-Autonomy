@@ -57,3 +57,54 @@ These must not be merged into one protocol by assumption. Before any new run, id
 - OpenRouter free models and limits: https://openrouter.ai/collections/free-models/
 
 This is a provider-qualification artifact, not an audit report, benchmark result, or claim that any real-model experiment has run.
+
+## Authoritative source recovery and correction (2026-11-21)
+
+The original frozen Experiment 3 documents have now been recovered from the Notion research workspace:
+
+- Frozen Real-Model Protocol: https://app.notion.com/p/3de0a218bb3d8117a22cf31b037d5306
+- Primary Deterministic Run Manifest: https://app.notion.com/p/3de0a218bb3d81789fe8d731007dc2e5
+- Dry-Run Manifest v1 — 28 Calls: https://app.notion.com/p/3de0a218bb3d81699d46e0b0ded894f3
+- Prompt Pack v1: https://app.notion.com/p/3de0a218bb3d81689cfdfb876d2051c7
+- Model & Provider Matrix v1 — Zero-Cost First: https://app.notion.com/p/3de0a218bb3d81259811e9e6d12a1a65
+- Execution Harness Contract v1: https://app.notion.com/p/3de0a218bb3d81898fded057b1e38aad
+- Statistical Analysis Plan v1: https://app.notion.com/p/3de0a218bb3d816db032d6ec1ee8070b
+
+The Experiment 3 Case Registry was queried directly. It contains exactly 30 frozen rows: one LOW and one HIGH case for each of C0–C14 (15 condition families × 2 consequence regimes). Every condition/consequence cell has exactly one row and its Frozen field is checked. The original case bank is therefore confirmed, not merely remembered.
+
+### Corrected primary workload
+
+| Stage | Frozen unit | Calls |
+|---|---|---:|
+| 3A Proposers | 30 cases × 3 proposer families | 90 |
+| 3B Same-family single verifier | 30 × 3 | 90 |
+| 3C Cross-family single verifier | 30 × 3 | 90 |
+| 3D Same-family verifier pair | 30 × 3 × 2 roles | 180 |
+| 3E Heterogeneous verifier pair | 30 × 3 × 2 non-proposer families | 180 |
+| **Primary total** | **90 proposer + 540 verifier** | **630** |
+
+Proposer outputs are generated once per (case, proposer family) and reused across verifier setups. Controller comparisons B1–B8 reuse identical raw outputs and add no model calls.
+
+### Dry-run manifest compatibility warning
+
+The recovered 28-call DR-01…DR-06 manifest is disposable mechanical validation only and is never part of the 630 scored calls. However, its historical provider codes are G = Gemini, M = Mistral, O = Groq, and its rows explicitly route calls through Mistral. **Do not execute this manifest as written.** Mistral API requires billing activation under the currently checked policy, which violates the zero-spend constraint. Preserve historical v1; create a versioned replacement dry-run manifest and provider matrix only after a third genuinely free model family is qualified. Do not silently remap Mistral rows to another provider.
+
+### The GitHub branch contains a different benchmark design
+
+The current `experiments/exp3_real_models/PROTOCOL.md` and harness in this branch implement generated benchmark v0.4: 700 HIGH-risk cases across 14 synthetic failure families, pair-stratified 60/20/20 splits, extractor + verifier A/B roles, and an Evidence Gate v1 extraction/verifier schema.
+
+The recovered frozen Notion Experiment 3 is a distinct study: 30 gold cases across C0–C14 × LOW/HIGH, 90 proposer + 540 verifier calls, proposer/V1/V2/recovery prompts, and B1–B8 policy comparisons. The current GitHub harness does not implement that recovered manifest or prompt contract. These designs must not be combined or described as the same run. Keep the 700-case v0.4 harness separate unless a deliberate, versioned scientific decision supersedes one design. Do not overwrite the frozen Notion v1 source assets.
+
+### Current zero-cost qualification status
+
+Gemini and Groq-hosted GPT-OSS remain conditional candidates. Mistral is excluded. OpenRouter is only a possible fallback route, not yet a qualified third family: an exact :free model ID, family owner, account access, stability, and no-paid-fallback behavior have not been established. Cerebras also remains unqualified. Therefore the frozen three-family requirement is **not yet satisfied**, and no scored run or 28-call dry run should start.
+
+### Revised next steps
+
+1. Identify and qualify an exact third model family on a truly free account tier.
+2. Create a versioned zero-cost provider matrix and replacement 28-call dry-run manifest with no Mistral dependency; leave historical v1 unchanged.
+3. Implement a dedicated C0–C14 proposer/V1/V2/recovery runner with zero-spend fail-closed behavior. Do not relabel the existing 700-case harness.
+4. Run the replacement dry run only after all three providers are demonstrably free for this account and all mechanical checks are ready.
+5. Freeze and execute the 630-call primary manifest only after dry-run acceptance, exact model identities, prompt hashes, quota evidence, and zero-cost safeguards are verified.
+
+This reconciliation is a research protocol artifact, not a portfolio audit, benchmark result, or claim that real-model calls have occurred.
