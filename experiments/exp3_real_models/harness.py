@@ -236,7 +236,6 @@ def prepare_tasks(benchmark_path: Path, output_dir: Path) -> dict:
 
 def verify_prepared_package(prepared_dir: Path) -> tuple[dict, dict, list[dict], list[dict]]:
     """Verify public and private task-package hashes before estimating or running models."""
-    reject_inline_secrets(config)
     public_dir = prepared_dir / "public"
     private_dir = prepared_dir / "private"
     task_manifest_path = public_dir / "task_manifest.json"
