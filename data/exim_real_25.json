@@ -1,0 +1,686 @@
+{
+  "schema_version": "1.0",
+  "title": "EXIM Evidence-Gating Domain Scenarios",
+  "count": 25,
+  "source_note": "Domain-grounded, expert-authored synthetic cases. These are not real shipment records, customer documents, customs records, or observed production incidents.",
+  "scenarios": [
+    {
+      "id": "EXIM-001",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "independent_invoice_manifest_match",
+      "description": "Invoice and manifest quantities agree with independent ledger and scale evidence.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_a"
+        },
+        {
+          "claim": "supported",
+          "source": "exim_source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Invoice and manifest quantities agree with independent ledger and scale evidence."
+    },
+    {
+      "id": "EXIM-002",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "verified_packing_list_weight",
+      "description": "Packing-list gross weight is corroborated by terminal scale record.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_source_a",
+          "confidence": 0.97,
+          "age_seconds": 21,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_a"
+        },
+        {
+          "claim": "supported",
+          "source": "exim_source_b",
+          "confidence": 0.96,
+          "age_seconds": 36,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Packing-list gross weight is corroborated by terminal scale record."
+    },
+    {
+      "id": "EXIM-003",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_identity",
+      "name": "container_number_crosscheck",
+      "description": "Container identifier matches carrier and gate systems.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_source_a",
+          "confidence": 0.97,
+          "age_seconds": 22,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_a"
+        },
+        {
+          "claim": "supported",
+          "source": "exim_source_b",
+          "confidence": 0.96,
+          "age_seconds": 37,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Container identifier matches carrier and gate systems."
+    },
+    {
+      "id": "EXIM-004",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "customs_authority",
+      "name": "current_authority_confirmation",
+      "description": "Current authorization is confirmed by two independent authority sources.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_source_a",
+          "confidence": 0.97,
+          "age_seconds": 23,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_a"
+        },
+        {
+          "claim": "supported",
+          "source": "exim_source_b",
+          "confidence": 0.96,
+          "age_seconds": 38,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Current authorization is confirmed by two independent authority sources."
+    },
+    {
+      "id": "EXIM-005",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "classification",
+      "name": "independent_hs_reference_match",
+      "description": "Two independent tariff references support the same HS classification.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_source_a",
+          "confidence": 0.97,
+          "age_seconds": 24,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_a"
+        },
+        {
+          "claim": "supported",
+          "source": "exim_source_b",
+          "confidence": 0.96,
+          "age_seconds": 39,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Two independent tariff references support the same HS classification."
+    },
+    {
+      "id": "EXIM-006",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_identity",
+      "name": "consignee_identity_match",
+      "description": "Consignee identity matches independent registry and booking records.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_source_a",
+          "confidence": 0.97,
+          "age_seconds": 25,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_a"
+        },
+        {
+          "claim": "supported",
+          "source": "exim_source_b",
+          "confidence": 0.96,
+          "age_seconds": 40,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Consignee identity matches independent registry and booking records."
+    },
+    {
+      "id": "EXIM-007",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_completeness",
+      "name": "complete_document_set",
+      "description": "Required invoice, packing list and declaration slots are independently confirmed.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_source_a",
+          "confidence": 0.97,
+          "age_seconds": 26,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_a"
+        },
+        {
+          "claim": "supported",
+          "source": "exim_source_b",
+          "confidence": 0.96,
+          "age_seconds": 41,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Required invoice, packing list and declaration slots are independently confirmed."
+    },
+    {
+      "id": "EXIM-008",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "release_status",
+      "name": "verified_release_status",
+      "description": "Release status is current and independently corroborated.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_source_a",
+          "confidence": 0.97,
+          "age_seconds": 27,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_a"
+        },
+        {
+          "claim": "supported",
+          "source": "exim_source_b",
+          "confidence": 0.96,
+          "age_seconds": 42,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Release status is current and independently corroborated."
+    },
+    {
+      "id": "EXIM-009",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "invoice_ocr_uncertainty",
+      "description": "OCR confidence on a material invoice field is low and needs source review.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 28,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: OCR confidence on a material invoice field is low and needs source review."
+    },
+    {
+      "id": "EXIM-010",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_completeness",
+      "name": "missing_packing_list",
+      "description": "Packing list is absent; request evidence before action.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 29,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Packing list is absent; request evidence before action."
+    },
+    {
+      "id": "EXIM-011",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "classification",
+      "name": "ambiguous_hs_subheading",
+      "description": "Two tariff candidates remain plausible without decisive source evidence.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 30,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Two tariff candidates remain plausible without decisive source evidence."
+    },
+    {
+      "id": "EXIM-012",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_identity",
+      "name": "unit_normalization_pending",
+      "description": "Gross and net weight values may use incompatible units.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 31,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Gross and net weight values may use incompatible units."
+    },
+    {
+      "id": "EXIM-013",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "customs_authority",
+      "name": "authorization_expiry_unknown",
+      "description": "Authorization is present but expiry cannot be verified.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 32,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Authorization is present but expiry cannot be verified."
+    },
+    {
+      "id": "EXIM-014",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_timing",
+      "name": "stale_terminal_event",
+      "description": "Terminal event evidence is older than its configured TTL.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 33,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Terminal event evidence is older than its configured TTL."
+    },
+    {
+      "id": "EXIM-015",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "single_source_invoice_value",
+      "description": "Invoice value is supported by one extractor only.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 34,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Invoice value is supported by one extractor only."
+    },
+    {
+      "id": "EXIM-016",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_completeness",
+      "name": "partial_declaration_fields",
+      "description": "Some declaration fields lack source-backed values.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Some declaration fields lack source-backed values."
+    },
+    {
+      "id": "EXIM-017",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "financial_reconciliation",
+      "name": "duty_calculation_inputs_incomplete",
+      "description": "Duty calculation is missing a required classification or valuation input.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_single_source",
+          "confidence": 0.65,
+          "age_seconds": 36,
+          "ttl_seconds": 3600,
+          "independent_group": "single"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Duty calculation is missing a required classification or valuation input."
+    },
+    {
+      "id": "EXIM-018",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "invoice_packing_quantity_conflict",
+      "description": "Invoice and packing list contain materially conflicting quantities.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_primary",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "primary"
+        },
+        {
+          "claim": "contradicted",
+          "source": "exim_integrity_or_authority",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_check"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Invoice and packing list contain materially conflicting quantities."
+    },
+    {
+      "id": "EXIM-019",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "tampered_document_digest",
+      "description": "Document instance does not match the attested digest.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_primary",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "primary"
+        },
+        {
+          "claim": "contradicted",
+          "source": "exim_integrity_or_authority",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_check"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Document instance does not match the attested digest."
+    },
+    {
+      "id": "EXIM-020",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_identity",
+      "name": "container_identity_conflict",
+      "description": "Carrier and gate records disagree on container identity.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_primary",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "primary"
+        },
+        {
+          "claim": "contradicted",
+          "source": "exim_integrity_or_authority",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_check"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Carrier and gate records disagree on container identity."
+    },
+    {
+      "id": "EXIM-021",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "customs_authority",
+      "name": "revoked_authorization_key",
+      "description": "Authorization attestation uses a revoked signing key.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_primary",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "primary"
+        },
+        {
+          "claim": "contradicted",
+          "source": "exim_integrity_or_authority",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_check"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Authorization attestation uses a revoked signing key."
+    },
+    {
+      "id": "EXIM-022",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "classification",
+      "name": "high_impact_hs_conflict",
+      "description": "Authoritative tariff sources materially conflict on classification.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_primary",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "primary"
+        },
+        {
+          "claim": "contradicted",
+          "source": "exim_integrity_or_authority",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_check"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Authoritative tariff sources materially conflict on classification."
+    },
+    {
+      "id": "EXIM-023",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "release_status",
+      "name": "unauthorized_release_request",
+      "description": "Release instruction lacks evidence of authorized approval.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_primary",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "primary"
+        },
+        {
+          "claim": "contradicted",
+          "source": "exim_integrity_or_authority",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_check"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Release instruction lacks evidence of authorized approval."
+    },
+    {
+      "id": "EXIM-024",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "duplicate_document_slot",
+      "description": "Two distinct files claim the same required document slot.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_primary",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "primary"
+        },
+        {
+          "claim": "contradicted",
+          "source": "exim_integrity_or_authority",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_check"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Two distinct files claim the same required document slot."
+    },
+    {
+      "id": "EXIM-025",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "provenance",
+      "name": "cross_case_document_replay",
+      "description": "Attested documents are bound to a different shipment case.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "exim_primary",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "primary"
+        },
+        {
+          "claim": "contradicted",
+          "source": "exim_integrity_or_authority",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "independent_check"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Attested documents are bound to a different shipment case."
+    }
+  ]
+}
