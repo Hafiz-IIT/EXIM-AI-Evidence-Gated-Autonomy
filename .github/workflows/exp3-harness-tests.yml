@@ -23,5 +23,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Run Experiment 3 harness regression tests
+      - name: Run Experiment 3 v0.4 harness regression tests
         run: python -m unittest discover -s tests -p 'test_exp3_harness.py' -v
+      - name: Run recovered C0-C14 offline unit tests
+        working-directory: experiments/exp3_c0_c14
+        run: python -m unittest -v
+      - name: Run disposable DRY-01 to DRY-06 mechanical checks
+        working-directory: experiments/exp3_c0_c14
+        run: python dry_run_suite.py
+      - name: Validate 28-call zero-cost routing manifest
+        working-directory: experiments/exp3_c0_c14
+        run: python validate_manifest.py
+      - name: Validate 630-call primary draft manifest
+        working-directory: experiments/exp3_c0_c14
+        run: python validate_primary_manifest.py
