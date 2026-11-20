@@ -64,4 +64,13 @@ class ProviderAdapterTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError,"quota"):
             dispatch_free_only(request,config,opener=NeverCall())
 
+    def test_original_routing_codes_alias_to_provider_adapters(self):
+        gemini={"model":"gemini-2.5-flash","base_url":"https://generativelanguage.googleapis.com/v1beta","credential_env":"GEMINI_API_KEY"}
+        groq={"model":"openai/gpt-oss-120b","base_url":"https://api.groq.com/openai/v1","credential_env":"GROQ_API_KEY"}
+        g=build_request("G",gemini,[{"role":"user","content":"x"}],{"GEMINI_API_KEY":"k"})
+        o=build_request("O",groq,[{"role":"user","content":"x"}],{"GROQ_API_KEY":"k"})
+        self.assertIn("generateContent",g.full_url)
+        self.assertIn("chat/completions",o.full_url)
+
+
 if __name__=="__main__": unittest.main()
