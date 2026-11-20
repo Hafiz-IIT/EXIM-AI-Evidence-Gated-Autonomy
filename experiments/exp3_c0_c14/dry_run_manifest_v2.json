@@ -1,0 +1,285 @@
+{
+  "manifest_id": "E3-DRY-RUN-MANIFEST-v2-zero-cost-candidates",
+  "version": "2.0.0-draft",
+  "status": "BLOCKED_NOT_EXECUTABLE",
+  "source_manifest": "Experiment 3 Dry-Run Manifest v1 — 28 Calls (Notion page 3de0a218bb3d81699d46e0b0ded894f3)",
+  "created_for_branch": "research/exp3-real-model-harness",
+  "purpose": "Disposable mechanical validation only; not part of the 630 scored calls.",
+  "zero_spend_policy": {
+    "api_spend_usd_max": 0,
+    "billing_activation": false,
+    "paid_fallback": false,
+    "prepaid_credits": false,
+    "automatic_model_substitution": false
+  },
+  "provider_families": {
+    "G": {
+      "provider": "Google AI Studio / Gemini API",
+      "model": "gemini-2.5-flash",
+      "family": "Google Gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "credential_env": "GEMINI_API_KEY",
+      "account_free_tier_verified": false
+    },
+    "Z": {
+      "provider": "Cloudflare Workers AI",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "family": "Z.ai GLM",
+      "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+      "credential_env": "CLOUDFLARE_API_TOKEN",
+      "account_free_tier_verified": false
+    },
+    "O": {
+      "provider": "GroqCloud",
+      "model": "openai/gpt-oss-120b",
+      "family": "OpenAI GPT-OSS",
+      "base_url": "https://api.groq.com/openai/v1",
+      "credential_env": "GROQ_API_KEY",
+      "account_free_tier_verified": false
+    }
+  },
+  "substitution": {
+    "historical_code": "M",
+    "historical_provider": "Mistral",
+    "historical_model": "mistral-small-2603",
+    "replacement_code": "Z",
+    "replacement_provider": "Cloudflare Workers AI",
+    "replacement_model": "@cf/zai-org/glm-4.7-flash",
+    "reason": "Mistral API requires billing activation, prohibited by the zero-spend constraint.",
+    "scientific_note": "This is a new dry-run provider configuration. It is not equivalent to Mistral and does not rewrite or supersede the historical v1 manifest."
+  },
+  "calls": [
+    {
+      "sequence": 1,
+      "run_id": "DR-01-G-P",
+      "case_id": "DR-01",
+      "stage": "PROPOSER",
+      "family": "G",
+      "depends_on": null
+    },
+    {
+      "sequence": 2,
+      "run_id": "DR-01-G-V1",
+      "case_id": "DR-01",
+      "stage": "V1",
+      "family": "G",
+      "depends_on": 1
+    },
+    {
+      "sequence": 3,
+      "run_id": "DR-01-G-V2",
+      "case_id": "DR-01",
+      "stage": "V2",
+      "family": "G",
+      "depends_on": 1
+    },
+    {
+      "sequence": 4,
+      "run_id": "DR-02-Z-P",
+      "case_id": "DR-02",
+      "stage": "PROPOSER",
+      "family": "Z",
+      "depends_on": null
+    },
+    {
+      "sequence": 5,
+      "run_id": "DR-02-Z-V1",
+      "case_id": "DR-02",
+      "stage": "V1",
+      "family": "Z",
+      "depends_on": 4
+    },
+    {
+      "sequence": 6,
+      "run_id": "DR-02-Z-V2",
+      "case_id": "DR-02",
+      "stage": "V2",
+      "family": "Z",
+      "depends_on": 4
+    },
+    {
+      "sequence": 7,
+      "run_id": "DR-03-O-P",
+      "case_id": "DR-03",
+      "stage": "PROPOSER",
+      "family": "O",
+      "depends_on": null
+    },
+    {
+      "sequence": 8,
+      "run_id": "DR-03-O-V1",
+      "case_id": "DR-03",
+      "stage": "V1",
+      "family": "O",
+      "depends_on": 7
+    },
+    {
+      "sequence": 9,
+      "run_id": "DR-03-O-V2",
+      "case_id": "DR-03",
+      "stage": "V2",
+      "family": "O",
+      "depends_on": 7
+    },
+    {
+      "sequence": 10,
+      "run_id": "DR-04-G-P",
+      "case_id": "DR-04",
+      "stage": "PROPOSER",
+      "family": "G",
+      "depends_on": null
+    },
+    {
+      "sequence": 11,
+      "run_id": "DR-04-G-ZV2",
+      "case_id": "DR-04",
+      "stage": "V2",
+      "family": "Z",
+      "depends_on": 9
+    },
+    {
+      "sequence": 12,
+      "run_id": "DR-04-Z-P",
+      "case_id": "DR-04",
+      "stage": "PROPOSER",
+      "family": "Z",
+      "depends_on": null
+    },
+    {
+      "sequence": 13,
+      "run_id": "DR-04-Z-OV2",
+      "case_id": "DR-04",
+      "stage": "V2",
+      "family": "O",
+      "depends_on": 11
+    },
+    {
+      "sequence": 14,
+      "run_id": "DR-04-O-P",
+      "case_id": "DR-04",
+      "stage": "PROPOSER",
+      "family": "O",
+      "depends_on": null
+    },
+    {
+      "sequence": 15,
+      "run_id": "DR-04-O-GV2",
+      "case_id": "DR-04",
+      "stage": "V2",
+      "family": "G",
+      "depends_on": 13
+    },
+    {
+      "sequence": 16,
+      "run_id": "DR-05-G-P",
+      "case_id": "DR-05",
+      "stage": "PROPOSER",
+      "family": "G",
+      "depends_on": null
+    },
+    {
+      "sequence": 17,
+      "run_id": "DR-05-G-ZV1",
+      "case_id": "DR-05",
+      "stage": "V1",
+      "family": "Z",
+      "depends_on": 15
+    },
+    {
+      "sequence": 18,
+      "run_id": "DR-05-G-OV2",
+      "case_id": "DR-05",
+      "stage": "V2",
+      "family": "O",
+      "depends_on": 15
+    },
+    {
+      "sequence": 19,
+      "run_id": "DR-05-Z-P",
+      "case_id": "DR-05",
+      "stage": "PROPOSER",
+      "family": "Z",
+      "depends_on": null
+    },
+    {
+      "sequence": 20,
+      "run_id": "DR-05-Z-OV1",
+      "case_id": "DR-05",
+      "stage": "V1",
+      "family": "O",
+      "depends_on": 18
+    },
+    {
+      "sequence": 21,
+      "run_id": "DR-05-Z-GV2",
+      "case_id": "DR-05",
+      "stage": "V2",
+      "family": "G",
+      "depends_on": 18
+    },
+    {
+      "sequence": 22,
+      "run_id": "DR-05-O-P",
+      "case_id": "DR-05",
+      "stage": "PROPOSER",
+      "family": "O",
+      "depends_on": null
+    },
+    {
+      "sequence": 23,
+      "run_id": "DR-05-O-GV1",
+      "case_id": "DR-05",
+      "stage": "V1",
+      "family": "G",
+      "depends_on": 21
+    },
+    {
+      "sequence": 24,
+      "run_id": "DR-05-O-ZV2",
+      "case_id": "DR-05",
+      "stage": "V2",
+      "family": "Z",
+      "depends_on": 21
+    },
+    {
+      "sequence": 25,
+      "run_id": "DR-06-G-P",
+      "case_id": "DR-06",
+      "stage": "PROPOSER",
+      "family": "G",
+      "depends_on": null
+    },
+    {
+      "sequence": 26,
+      "run_id": "DR-06-G-ZV1",
+      "case_id": "DR-06",
+      "stage": "V1",
+      "family": "Z",
+      "depends_on": 24
+    },
+    {
+      "sequence": 27,
+      "run_id": "DR-06-G-OV2",
+      "case_id": "DR-06",
+      "stage": "V2",
+      "family": "O",
+      "depends_on": 24
+    },
+    {
+      "sequence": 28,
+      "run_id": "DR-06-G-REC",
+      "case_id": "DR-06",
+      "stage": "RECOVERY",
+      "family": "G",
+      "depends_on": 24
+    }
+  ],
+  "blocking_issues": [
+    "Account-level Free entitlement, quota and billing/overage state are unverified for Google AI Studio, GroqCloud and Cloudflare Workers AI. Public free-tier documentation is not account-level proof.",
+    "The frozen 28-call manifest uses DR-01…DR-06 identifiers, while the companion Dry-Run Suite v1 defines DRY-01…DRY-06. Their scenario mapping is not specified.",
+    "The 28-call manifest's final DR-06-G-REC is a recovery call, but the companion suite places the recovery exercise under DRY-02 and the parser-format exercise under DRY-06. Do not infer that these identifiers are interchangeable.",
+    "The companion suite's required coverage (DRY-01…DRY-04 on every family, V1/V2 on DRY-03, recovery on DRY-02, transport injection per adapter, parser tests locally) is broader than the 28-call route table. This manifest alone cannot establish full suite completion."
+  ],
+  "execution_gate": "NO EXECUTION until case-ID reconciliation is documented, all three accounts are verified Free with no paid fallback, and provider smoke tests succeed under the zero-spend policy.",
+  "calls_total": 28
+}
