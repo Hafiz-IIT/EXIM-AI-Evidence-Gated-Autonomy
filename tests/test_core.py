@@ -27,6 +27,12 @@ class EvidenceGateCompletenessTests(unittest.TestCase):
         self.assertFalse(visible_features(case)["verifier_schema_valid"])
         self.assertEqual(evidence_gate_v1(case), "ESCALATE")
 
+    def test_non_list_verifier_payload_fails_closed_without_crashing(self):
+        case = clean_high_risk_case()
+        case["observable"]["machine"]["verifiers"] = None
+        self.assertFalse(visible_features(case)["verifier_schema_valid"])
+        self.assertEqual(evidence_gate_v1(case), "ESCALATE")
+
     def test_missing_verifier_dependency_group_fails_closed(self):
         case = clean_high_risk_case()
         del case["observable"]["machine"]["verifiers"][0]["dependency_group"]
