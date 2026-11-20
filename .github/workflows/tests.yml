@@ -1,0 +1,31 @@
+name: Unit and Synthetic Evaluation
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tests-and-synthetic-evaluation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run credential-free unit and dataset tests
+        run: python -m unittest discover -s tests -v
+      - name: Verify committed benchmark v0.4
+        run: python scripts/verify_benchmark_v04.py
+      - name: Run deterministic document-root threat experiment
+        run: python scripts/run_document_root_attestation.py
+      - name: Upload synthetic experiment outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-document-root-attestation-${{ github.run_id }}
+          path: results/document_root_attestation/
+          if-no-files-found: error
