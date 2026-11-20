@@ -58,6 +58,24 @@ def validate(data: dict) -> list[str]:
         errors.append("manifest must remain blocked pending account and case-ID gates")
     if not data.get("blocking_issues"):
         errors.append("blocking issues must be explicit")
+    cases_path=Path(__file__).with_name("routing_cases_v0.json")
+    if cases_path.exists():
+        routing=json.loads(cases_path.read_text(encoding="utf-8"))
+        case_rows=routing.get("cases",[])
+        expected_cases={f"DR-0{i}" for i in range(1,7)}
+        actual_cases={x.get("case_id") for x in case_rows}
+        if actual_cases != expected_cases:
+            errors.append("routing fixture bank must contain DR-01…DR-06 exactly once")
+        if len(case_rows)!=6:
+            errors.append("routing fixture bank must contain six disposable cases")
+        if any(x.get("dataset_role")=="SCORED" for x in case_rows):
+            errors.append("disposable routing fixtures cannot be scored")
+        if data.get("routing_case_file") != cases_path.name:
+            errors.append("manifest must point to the recovered routing fixture file")
+        if data.get("calls") and {x.get("case_id") for x in data["calls"]} != expected_cases:
+            errors.append("28-call route case IDs do not match recovered disposable fixtures")
+    else:
+        errors.append("recovered DR-01…DR-06 routing fixture file is missing")
     return errors
 
 def main() -> int:
