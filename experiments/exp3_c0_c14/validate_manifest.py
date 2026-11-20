@@ -27,16 +27,21 @@ def validate(data: dict) -> list[str]:
         if call.get("stage") not in ALLOWED_STAGES:
             errors.append(f"unknown stage at row {i}")
         dep=call.get("depends_on")
-        if dep is not None and (not isinstance(dep, int) or dep < 1 or dep >= i):
+        deps=dep if isinstance(dep, list) else ([] if dep is None else [dep])
+        if any(not isinstance(x, int) or x < 1 or x >= i for x in deps):
             errors.append(f"invalid dependency at row {i}")
-        elif call.get("stage") != "PROPOSER":
+        if call.get("stage") == "PROPOSER" and deps:
+            errors.append(f"proposer row must not have dependencies at row {i}")
+        if call.get("stage") in {"V1", "V2"}:
             proposer_family = call.get("run_id", "").removeprefix(call.get("case_id", "") + "-")[:1]
             expected = next((x.get("sequence") for x in calls
                              if x.get("case_id") == call.get("case_id")
                              and x.get("stage") == "PROPOSER"
                              and x.get("family") == proposer_family), None)
-            if dep != expected:
-                errors.append(f"dependency does not point to same-case proposer for {call.get('run_id')}")
+            if deps != [expected]:
+                errors.append(f"verifier must depend on its exact proposer for {call.get('run_id')}")
+        if call.get("stage") == "RECOVERY" and deps != [25, 26, 27]:
+            errors.append("recovery must depend on proposer, V1 and V2 outputs")
     providers=data.get("provider_families", {})
     if set(providers) != ALLOWED_FAMILIES:
         errors.append("provider family set must be exactly G/Z/O")
