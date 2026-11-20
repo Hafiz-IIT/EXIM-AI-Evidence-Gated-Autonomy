@@ -62,4 +62,5 @@ class HarnessCoreTests(unittest.TestCase):
             self.assertEqual(len(lines),2)
             self.assertEqual(json.loads(lines[0])["raw_text"],"first")
             self.assertEqual(json.loads(lines[1])["raw_text"],"second")
-\nif __name__=="__main__": unittest.main()
+
+if __name__=="__main__": unittest.main()
