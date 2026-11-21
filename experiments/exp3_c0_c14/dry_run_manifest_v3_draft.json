@@ -300,5 +300,10 @@
     "offline_rendering_status": "CI_PASS_OFFLINE_RENDER_ONLY"
   },
   "protocol_status": "E3_PROTOCOL_V2_FROZEN_FOR_PROVIDER_DRY_RUN_ACCEPTANCE",
-  "protocol_decision_record": "E3_PROTOCOL_V2_DECISION_RECORD.md"
+  "protocol_decision_record": "E3_PROTOCOL_V2_DECISION_RECORD.md",
+  "local_executor": "execute_dry_run_v3.py",
+  "local_executor_tests": "test_execute_dry_run_v3.py",
+  "local_executor_default_mode": "PLAN_ONLY",
+  "local_raw_ledger_path": ".local/exp3_c0_c14/dry_run_v3_raw.jsonl",
+  "local_config_path": "provider_config.local.json (gitignored; copy from provider_config.example.json after account checks)"
 }
