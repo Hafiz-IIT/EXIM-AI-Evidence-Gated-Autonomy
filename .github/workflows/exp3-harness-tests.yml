@@ -39,6 +39,9 @@ jobs:
       - name: Run provider adapter contract tests (no network)
         working-directory: experiments/exp3_c0_c14
         run: python -m unittest test_provider_adapters -v
+      - name: Test guarded 28-call executor with fake transport only
+        working-directory: experiments/exp3_c0_c14
+        run: python -m unittest test_execute_dry_run_v3 -v
       - name: Run deterministic feature mapper tests
         working-directory: experiments/exp3_c0_c14
         run: python -m unittest test_feature_mapper -v
