@@ -7,7 +7,8 @@ This directory is deliberately separate from `experiments/exp3_real_models/`, wh
 - `dry_run_manifest_v2.json`: earlier v1-prompt 28-call route table, retained for history.
 - `dry_run_manifest_v3_draft.json`: matching 28-call route draft for Prompt Pack v2. Historical provider code Mistral is replaced by Z.ai GLM-4.7-Flash under code Z. The original v1 manifest remains unchanged.
 - `routing_cases_v0.json`: recovered six disposable DR-01…DR-06 case packets from the original Notion Dry-Run Suite v0; diagnostic expected actions are separated from model-facing prompt fields.
-- `primary_run_manifest_v2_draft.json`: 630-call operational draft with explicit role/family routing and fixed randomization seed. It preserves the 90/90/90/180/180 stage totals.
+- `primary_run_manifest_v2_draft.json`: earlier 630-call operational draft retained for traceability.
+- `primary_run_manifest_v3_draft.json`: 630-call matrix matched to E3 protocol v2, Prompt Pack v2 and B1–B8 controller v1. It preserves the 90/90/90/180/180 stage totals.
 - `validate_manifest.py` and `validate_primary_manifest.py`: offline structural validators only.
 
 ## Important reconciliation stop
@@ -50,7 +51,7 @@ A PASS means only that the JSON route table is internally consistent. It does no
 
 The offline core is now in place: prompt templates based on Prompt Pack v1, deterministic prompt hashing, strict one-pass JSON parsing, role-specific required-key checks, and a plan-only manifest interface. The six DRY checks are explicitly disposable and do not enter the scored registry.
 
-The case registry does not contain a reversibility-description field even though the frozen Prompt Pack requires one. The public export therefore does not fabricate it, and prompt rendering hard-stops on the missing field. The transport adapter, append-only raw-response ledger, deterministic evidence-feature mapper, and plan-only runner are implemented. Historical B1–B8 policy source has now been recovered and documented in `CONTROLLER_RECOVERY.md`; the C0–C14-specific mapping remains blocked because the frozen prompts/registry do not expose all required historical inputs and do not specify every threshold/tie rule. No model calls have been made.
+The case registry does not contain explicit reversibility descriptions for 12/30 cases. Prompt Pack v2 now renders these as `NOT_SPECIFIED_IN_FROZEN_SOURCE`; B8 deterministically returns DEFER for source-null reversibility. The transport adapter, append-only raw-response ledger, deterministic evidence-feature mapper, and plan-only runner are implemented. Historical B1–B8 policy source has now been recovered and documented in `CONTROLLER_RECOVERY.md`; the C0–C14-specific mapping remains blocked because the frozen prompts/registry do not expose all required historical inputs and do not specify every threshold/tie rule. No model calls have been made.
 
 
 ## Primary 630-call draft interpretation
@@ -75,7 +76,10 @@ The v2 draft makes two underspecified role assignments explicit rather than sile
 - [x] Recover the historical B1–B8 executable policy functions and thresholds from `src/core.py`; record their exact ordered rules and source hash in `CONTROLLER_RECOVERY.md`.
 - [x] Select and implement an explicit C0–C14 B1–B8 operational mapping in `controllers_v1.py`; thresholds, vote set, verifier designation, risk mapping and B8 precedence are versioned and documented in the amendment draft.
 - [x] Add controller boundary, malformed-input, false-reject, UNKNOWN and precedence tests in `test_controllers_v1.py`; add the suite to CI.
-- [ ] Review/freeze the selected operational defaults, Prompt Pack v2 and Statistical Analysis Plan v2 together before scored execution.
+- [x] Record and freeze the selected E3 v2 operational defaults for provider dry-run acceptance in `E3_PROTOCOL_V2_DECISION_RECORD.md`.
+- [x] Implement Prompt Pack v2 renderer and a matching 28-call route draft.
+- [x] Implement a matching 630-call primary matrix v3 and plan-only runner support.
+- [ ] Complete account-level zero-cost qualification and 28-call provider dry-run acceptance before any scored execution.
 - [ ] Verify all three provider accounts are Free with no paid fallback.
 - [x] Recover all six disposable DR-01…DR-06 routing payloads in `routing_cases_v0.json`.
 - [x] Run the separate DRY-01…DRY-06 offline mechanical checks in CI.
@@ -107,7 +111,7 @@ This is an additive source-reconciliation artifact; the frozen Notion registry a
 
 ## Current scored-run blockers
 
-- 12/30 cases still have no explicit reversibility statement in their frozen source. They remain null in model-facing inputs.
+- 12/30 cases still have no explicit reversibility statement in their frozen source. They remain UNKNOWN and are handled by the v2 renderer/controller; this is not a reason to delete or impute those cases.
 - The frozen Experiment 3 protocol does not fully specify every operational detail for B2/B3/B5/B6/B7/B8. A versioned operational mapping is now implemented in `controllers_v1.py`; the selected defaults and source-vs-proposal distinction are documented in `CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md`. Review/freeze remains required before scoring.
 - These are protocol/specification blockers, not software test failures. The harness remains plan-only and no model calls have been made.
 
@@ -149,3 +153,25 @@ These drafts are coupled: they must be reviewed and frozen together. Prompt Pack
 - Typed verifier statuses use `SUPPORTED`, `CONTRADICTED` or `UNKNOWN`. Non-UNKNOWN evidence references must be exact verbatim substrings from the exposed `evidence_packet`; B8 validates this.
 - `dry_run_manifest_v3_draft.json` retains the 28-call G/Z/O routing structure but is explicitly tied to Prompt Pack v2. The previous v2 route is retained and is not treated as v2 prompt acceptance.
 - Plan it offline with `python runner.py --manifest routing-v3 --plan-only`. The runner still refuses all provider execution.
+
+
+## E3 v2 operational protocol
+
+The operational choices are now selected and frozen for provider dry-run acceptance in `E3_PROTOCOL_V2_DECISION_RECORD.md`. The frozen Notion v1 pages remain untouched. This resolves the prior wait on controller thresholds, agreement voting, verifier designation, risk mapping, B8 precedence and 3B/3C/3E role assignments.
+
+The v2 execution artifacts are:
+- `controllers_v1.py` / `test_controllers_v1.py`
+- `prompt_pack_v2.py` / `test_prompt_pack_v2.py`
+- `dry_run_manifest_v3_draft.json` (28 calls)
+- `primary_run_manifest_v3_draft.json` (630 calls)
+- `STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md`
+
+Offline plan commands:
+```bash
+python runner.py --manifest routing-v3 --plan-only
+python runner.py --manifest primary-v3 --plan-only
+python validate_manifest.py dry_run_manifest_v3_draft.json
+python validate_primary_manifest.py primary_run_manifest_v3_draft.json
+```
+
+The only remaining external gates are local account-level Free/no-overage qualification and end-to-end provider dry-run acceptance. The runner remains hard-blocked from network execution.
