@@ -53,7 +53,7 @@
     "The 3B/3C single-verifier role and 3E V1/V2 family assignment are operationalized in this draft because frozen v1 leaves them underspecified. This v2 interpretation must be explicitly frozen before scored calls.",
     "Account-level Free entitlement, quota and billing/overage state are unverified for Google AI Studio, GroqCloud and Cloudflare Workers AI.",
     "Prompt pack v1 and execution harness contract still require end-to-end dry-run acceptance; this file alone is not execution authorization.",
-    "The exact deterministic B1–B8 controller implementations and thresholds are not recovered in the frozen source set. The high-level baseline descriptions are insufficient to implement them without inventing policy behavior; do not reuse the unrelated v0.4 Evidence Gate."
+    "Historical B1–B8 executable policies and thresholds are recovered in src/core.py and documented in CONTROLLER_RECOVERY.md. However, the frozen C0–C14 protocol does not fully specify how those historical functions map to the real-model prompt outputs; B3/B6 differ in wording and the current schema lacks positive freshness/provenance attestations and legacy extraction fields. A versioned C0–C14 controller mapping amendment is required; do not silently reuse or relabel the historical controller."
   ],
   "calls": [
     {
@@ -8247,5 +8247,12 @@
       "sequence": 630
     }
   ],
-  "execution_gate": "NO SCORED EXECUTION until reversibility descriptions are sourced for all 30 cases, the v2 role interpretation is frozen, exact B1-B8 controller rules are recovered and regression-tested, all three accounts are verified Free/no-overage, and both dry-run tracks pass."
+  "execution_gate": "NO SCORED EXECUTION until reversibility descriptions are sourced for all 30 cases, the v2 role interpretation is frozen, exact B1-B8 controller rules are recovered and regression-tested, all three accounts are verified Free/no-overage, and both dry-run tracks pass.",
+  "controller_recovery": {
+    "status": "HISTORICAL_SOURCE_RECOVERED_E3_MAPPING_BLOCKED",
+    "historical_source": "src/core.py",
+    "historical_source_blob_sha": "4700f68570eb3179c6baa35213304a5fb42bfc43",
+    "recovery_note": "CONTROLLER_RECOVERY.md",
+    "c0_c14_execution_authorized": false
+  }
 }
