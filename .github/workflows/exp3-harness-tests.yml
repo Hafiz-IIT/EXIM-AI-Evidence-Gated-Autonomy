@@ -63,3 +63,6 @@ jobs:
       - name: Validate 630-call primary draft manifest
         working-directory: experiments/exp3_c0_c14
         run: python validate_primary_manifest.py
+      - name: Validate E3 protocol v2 630-call primary manifest
+        working-directory: experiments/exp3_c0_c14
+        run: python validate_primary_manifest.py primary_run_manifest_v3_draft.json
