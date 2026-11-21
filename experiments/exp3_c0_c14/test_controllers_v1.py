@@ -110,6 +110,7 @@ class ControllerTests(unittest.TestCase):
         malformed["consistency_status"]={"status":"SUPPORTED","basis":"ok","evidence_refs":[]}
         self.assertEqual(b8_evidence_gate(self.case,self.p,self.v1,malformed),"ESCALATE")
         self.assertEqual(b8_evidence_gate(self.case,self.p,None,self.v2),"ESCALATE")
+        self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(freshness_event="REPLAYED"),self.v2),"ESCALATE")
 
     def test_unknown_consequence_and_invalid_controller(self):
         self.assertEqual(b8_evidence_gate({"consequence":"MEDIUM"},self.p,self.v1,self.v2),"ESCALATE")
