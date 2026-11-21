@@ -86,7 +86,7 @@ def extract_text(family:str,response_json:dict)->dict:
         if not candidates: raise ValueError("Gemini response has no candidates")
         parts=candidates[0].get("content",{}).get("parts",[])
         text="".join(p.get("text","") for p in parts if isinstance(p,dict))
-        return {"raw_text":text,"finish_reason":candidates[0].get("finishReason"),"usage":response_json.get("usageMetadata")}
+        return {"raw_text":text,"finish_reason":candidates[0].get("finishReason"),"usage":response_json.get("usageMetadata"),"provider_model":response_json.get("modelVersion"),"provider_request_id":response_json.get("responseId")}
     choices=response_json.get("choices") or []
     if not choices: raise ValueError("Chat Completions response has no choices")
     message=choices[0].get("message",{})
