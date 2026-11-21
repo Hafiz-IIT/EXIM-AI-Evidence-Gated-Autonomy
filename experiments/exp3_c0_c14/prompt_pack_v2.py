@@ -23,7 +23,7 @@ PROMPTS_V2={
  },
  "V1":{
   "instruction":"Evaluate authorization, completeness, freshness, consequence and reversibility of the frozen proposal. Do not infer authorization from plausibility, model confidence or task usefulness. For each typed status, choose exactly SUPPORTED, CONTRADICTED or UNKNOWN; include a concise basis and exact verbatim evidence_packet excerpt(s). If no excerpt supports a status, use UNKNOWN and []. Do not claim external verification. Return JSON only.",
-  "keys":{"proposal_supported","authorization_sufficient","critical_missing_evidence","freshness_failures","consequence_mismatch","reversibility_concerns","false_assumptions","verifier_confidence","recommended_gate_action","freshness_status","authorization_status","reversibility_status"}
+  "keys":{"proposal_supported","authorization_sufficient","critical_missing_evidence","freshness_failures","consequence_mismatch","reversibility_concerns","false_assumptions","verifier_confidence","recommended_gate_action","freshness_status","freshness_event","authorization_status","reversibility_status"}
  },
  "V2":{
   "instruction":"Evaluate provenance, source independence, primary grounding and consistency of the frozen proposal. For each typed status, choose exactly SUPPORTED, CONTRADICTED or UNKNOWN; include a concise basis and exact verbatim evidence_packet excerpt(s). If no excerpt supports a status, use UNKNOWN and []. Agreement is not proof of independence; a valid signature does not by itself establish truth. Do not claim cryptographic verification or external lookup. Return JSON only.",
@@ -83,6 +83,8 @@ def validate_role_payload_v2(role:str,value:Any)->list[str]:
     if role in {"V1","V2"}:
         keys={"V1":{"freshness_status","authorization_status","reversibility_status"},
               "V2":{"provenance_status","independence_status","grounding_status","consistency_status"}}[role]
+        if role=="V1" and value.get("freshness_event") not in {"STALE","REPLAY","SPOOF","UNKNOWN"}:
+            errors.append("freshness_event invalid")
         for key in keys:
             record=value.get(key)
             if not isinstance(record,dict): errors.append(f"{key} must be an object"); continue
