@@ -8279,7 +8279,9 @@
   "prompt_pack": {
     "version": "Prompt Pack v2",
     "renderer": "prompt_pack_v2.py",
-    "hash_policy": "Record exact rendered prompt SHA-256 per call after resolving case and frozen proposer output."
+    "hash_policy": "Record exact rendered prompt SHA-256 per call after resolving case and frozen proposer output.",
+    "offline_primary_render_validation": "validate_v2_primary_rendering.py",
+    "offline_rendering_status": "CI_PASS_OFFLINE_RENDER_ONLY"
   },
   "protocol_decision_record": "E3_PROTOCOL_V2_DECISION_RECORD.md",
   "dry_run_manifest": "dry_run_manifest_v3_draft.json"
