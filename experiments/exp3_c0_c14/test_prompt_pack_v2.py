@@ -9,10 +9,12 @@ class PromptPackV2Tests(unittest.TestCase):
         rendered=render_prompt_v2("PROPOSER",self.case)
         body=rendered["messages"][1]["content"]
         self.assertIn("NOT_SPECIFIED_IN_FROZEN_SOURCE",body)
-        self.assertIn("freshness_status",body)
-        self.assertIn("freshness_event",body)
-        self.assertIn("evidence_refs",body)
         self.assertIn("REQUIRED OUTPUT JSON SHAPE",body)
+        verifier=render_prompt_v2("V1",self.case,{"proposed_action":"hold"})
+        verifier_body=verifier["messages"][1]["content"]
+        self.assertIn("freshness_status",verifier_body)
+        self.assertIn("freshness_event",verifier_body)
+        self.assertIn("evidence_refs",verifier_body)
         self.assertEqual(rendered["prompt_version"],"Prompt Pack v2")
 
     def test_case_id_and_pair_metadata_not_leaked(self):
