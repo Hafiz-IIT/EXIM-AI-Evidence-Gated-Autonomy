@@ -81,8 +81,12 @@ def b5_selective_confidence(proposer):
     return "ACT"
 
 
-def b6_strong_verifier_gate(v1):
-    if not isinstance(v1, dict) or validate_role_payload_v2("V1", v1):
+def b6_strong_verifier_gate(v1, case):
+    if not isinstance(v1, dict) or not isinstance(case, dict) or validate_role_payload_v2("V1", v1):
+        return "DEFER"
+    packet = case.get("evidence_packet")
+    auth_refs = v1.get("authorization_status", {}).get("evidence_refs", [])
+    if not isinstance(packet, str) or not auth_refs or any(ref not in packet for ref in auth_refs):
         return "DEFER"
     auth = _status(v1, "authorization_status")
     if auth == "CONTRADICTED":
@@ -206,7 +210,7 @@ def evaluate_controller(controller_id, case, proposer, v1=None, v2=None):
         "B3": lambda: b3_agreement_gate(proposer, v1, v2),
         "B4": lambda: b4_always_verify(),
         "B5": lambda: b5_selective_confidence(proposer),
-        "B6": lambda: b6_strong_verifier_gate(v1),
+        "B6": lambda: b6_strong_verifier_gate(v1, case),
         "B7": lambda: b7_risk_gate(case, proposer),
         "B8": lambda: b8_evidence_gate(case, proposer, v1, v2),
     }
