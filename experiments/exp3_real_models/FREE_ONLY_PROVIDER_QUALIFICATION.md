@@ -171,3 +171,22 @@ The current GitHub harness assumes a generic OpenAI-compatible Chat Completions 
 - Z.ai model family identity and Cloudflare's provider attribution are shown on the official model page.
 
 **Updated status:** three distinct model-family candidates are now identified and publicly documented. Account entitlement, smoke validation, replacement dry-run manifest, and the dedicated 630-call runner remain pending. No API request was made and no spend occurred in this qualification pass.
+
+
+## Current C0–C14 E3 v2 provider routing decision (2026-11-21)
+
+The dedicated recovered C0–C14 E3 v2 route now pins these three candidate model families:
+
+| Family code | Model family | Inference provider | Exact model |
+|---|---|---|---|
+| A / G | Google Gemini | Google AI Studio / Gemini API | `gemini-2.5-flash` |
+| B / Z | Z.ai GLM | Cloudflare Workers AI | `@cf/zai-org/glm-4.7-flash` |
+| C / O | OpenAI GPT-OSS | GroqCloud | `openai/gpt-oss-120b` |
+
+This is the selected public-policy candidate set for the E3 v2 dry-run manifests. It supersedes OpenRouter as the active third-family candidate for this route. Historical Mistral is excluded; the Z.ai substitution is a new configuration and is not treated as equivalent to Mistral.
+
+**Account-level status remains unverified for all three providers.** The public pricing/rate-limit pages do not prove the linked user's current plan, effective quota, billing state or no-overage behavior. No provider calls have been made. The matching 28-call Prompt Pack v2 route is in `experiments/exp3_c0_c14/dry_run_manifest_v3_draft.json`; it remains blocked until local account checks establish Free/no-overage status for all three accounts.
+
+The only permitted first provider request after those account checks is a minimal synthetic smoke request with a strict output cap, no tools, no streaming, and no paid fallback. If any dashboard requires billing activation, a card, a plan upgrade or prepaid credits, stop and leave that provider unqualified. Do not automatically substitute another model.
+
+The authoritative E3 operational decisions are in `experiments/exp3_c0_c14/E3_PROTOCOL_V2_DECISION_RECORD.md`. The separate 700-case v0.4 benchmark remains a distinct track.
