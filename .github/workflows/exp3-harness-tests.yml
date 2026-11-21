@@ -33,6 +33,9 @@ jobs:
       - name: Run deterministic C0-C14 B1-B8 controller tests
         working-directory: experiments/exp3_c0_c14
         run: python -m unittest test_controllers_v1 -v
+      - name: Run Prompt Pack v2 renderer and schema tests
+        working-directory: experiments/exp3_c0_c14
+        run: python -m unittest test_prompt_pack_v2 -v
       - name: Run provider adapter contract tests (no network)
         working-directory: experiments/exp3_c0_c14
         run: python -m unittest test_provider_adapters -v
