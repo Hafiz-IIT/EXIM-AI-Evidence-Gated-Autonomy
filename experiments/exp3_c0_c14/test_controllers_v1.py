@@ -90,7 +90,7 @@ class ControllerTests(unittest.TestCase):
     def test_b8_grounding_and_unknowns(self):
         self.assertEqual(b8_evidence_gate(self.case,self.p,self.v1,role_v2(grounding="CONTRADICTED")),"REQUEST EVIDENCE")
         self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(reversibility="UNKNOWN"),self.v2),"DEFER")
-        self.assertEqual(b8_evidence_gate({"consequence":"LOW"},self.p,role_v1(reversibility="UNKNOWN"),self.v2),"DEFER")
+        self.assertEqual(b8_evidence_gate({"consequence":"LOW","reversibility":"reversible","evidence_packet":"current deployment authorization"},self.p,role_v1(reversibility="UNKNOWN"),self.v2),"DEFER")
         self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(auth="UNKNOWN"),self.v2),"DEFER")
 
     def test_b8_false_reject_boolean_does_not_override_typed_evidence(self):
