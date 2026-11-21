@@ -1,8 +1,8 @@
-# Experiment 3 Prompt Pack v2 — DRAFT ONLY
+# Experiment 3 Prompt Pack v2 — Frozen for E3 Provider Dry-Run Acceptance
 
-**Status:** DRAFT FOR SCIENTIFIC REVIEW — NOT FROZEN — NOT SCORED  
-**Supersedes:** Nothing yet. Prompt Pack v1 remains the only frozen source.  
-**Purpose:** Proposed schema extension needed for the C0–C14 controller amendment. This draft must not be used for scored calls until the controller amendment, manifest and statistical plan are approved together.
+**Status:** SELECTED AND FROZEN FOR PROVIDER DRY-RUN ACCEPTANCE — NOT SCORED  
+**Supersedes:** Prompt Pack v1 remains the historical frozen source; this v2 is the selected operational prompt bundle for E3 v2 provider acceptance.  
+**Purpose:** Proposed schema extension needed for the C0–C14 controller amendment. This v2 bundle is tied to `E3_PROTOCOL_V2_DECISION_RECORD.md`, the controller implementation and v3 manifests. It is frozen for provider dry-run acceptance only; scored execution remains blocked by account qualification and dry-run acceptance.
 
 ## Shared system instruction
 
