@@ -1,6 +1,6 @@
 # Experiment 3 C0–C14 Controller Protocol Amendment v1 — DRAFT
 
-**Status:** DRAFT FOR SCIENTIFIC REVIEW — NOT FROZEN — NOT EXECUTABLE  
+**Status:** IMPLEMENTED OPERATIONAL PROPOSAL — NOT FROZEN FOR SCORING  
 **Scope:** Recovered C0–C14 Experiment 3 only. This does not alter the separate generated 700-case v0.4 experiment.  
 **Source protocol:** Frozen Experiment 3 v1 (Notion); Prompt Pack v1; Execution Harness Contract v1; Statistical Analysis Plan v1; recovered historical controller source.  
 **Change policy:** Additive proposal only. The frozen Notion pages and historical manifests remain unchanged.
@@ -11,7 +11,7 @@ The frozen protocol names B1–B8 but does not fully operationalize six policies
 
 The current Prompt Pack also requires a reversibility description, while 12/30 source cases have no explicit reversibility statement. The public case export correctly leaves those values null; the current renderer, however, hard-stops on null. The amendment must represent “not specified” as an explicit unknown rather than invent a description or drop those cases.
 
-This document separates (a) source-recovered facts, (b) a recommended operational proposal, and (c) decisions that remain unresolved. Nothing in this draft authorizes controller scoring or model calls.
+This document separates (a) source-recovered facts, (b) the selected operational proposal now implemented in `controllers_v1.py`, and (c) decisions that remain unresolved for scientific review. The project owner instructed the assistant to proceed with E3 operationalization; the implementation choices below are therefore selected defaults for the draft, not historical facts. They remain versioned and reviewable. They do not authorize provider calls or scored execution.
 
 ## 2. Source-recovered facts (not new decisions)
 
@@ -53,7 +53,7 @@ The existing feature mapper correctly treats missing/invalid fields as incomplet
 
 ## 3. Recommended operational proposal (requires approval before freeze)
 
-The following is a coherent candidate mapping that can be implemented and tested after approval. It is deliberately labelled proposed because the frozen protocol does not currently specify these details.
+The following mapping has been selected as the explicit E3 operationalization and implemented in `controllers_v1.py`, with boundary/precedence tests in `test_controllers_v1.py`. It is deliberately labelled proposed because the frozen protocol does not specify every detail. Its selection does not rewrite the frozen source.
 
 ### 3.1 Shared normalization and missing-data rules
 
@@ -169,7 +169,7 @@ The following are not settled by the source material and must not be silently ac
 - Role routing: approve the proposed 3B/3C/3E assignments already recorded in the draft manifest?
 - Statistical plan: approve treating the 12 unknown-reversibility cases as a reported stratum rather than excluding them?
 
-Until these decisions are approved and tests pass, keep the primary manifest `BLOCKED_NOT_EXECUTABLE`.
+Implementation status: the operational defaults in this section have been selected for the E3 draft and implemented; the dedicated controller unit tests are now part of CI. Remaining scientific-review items are (i) accept or revise the choices before scoring, (ii) complete Prompt Pack v2 and statistical-plan review/freeze, (iii) verify 3B/3C/3E role routing, and (iv) complete matching provider dry-run and account-level zero-cost qualification. The primary manifest remains `BLOCKED_NOT_EXECUTABLE` until these independent gates pass.
 
 ## 9. Source anchors
 
@@ -183,3 +183,13 @@ Until these decisions are approved and tests pass, keep the primary manifest `BL
 - Historical source: `src/core.py`, blob SHA `4700f68570eb3179c6baa35213304a5fb42bfc43`
 - Reversibility assessment: `reversibility_assessment_v1.json`
 - Current mapping gaps: `CONTROLLER_MAPPING_GAPS_v1.md`
+
+
+## 10. Implementation and test trace
+
+- Implementation: `controllers_v1.py`, controller version `E3-B1-B8-v1.0.0`.
+- Tests: `test_controllers_v1.py`; included in `.github/workflows/exp3-harness-tests.yml`.
+- B8 evidence references must be exact verbatim substrings of the exposed `evidence_packet`; fabricated IDs or paraphrased references fail closed.
+- B8 also checks the source registry's reversibility field directly. A null source value cannot be upgraded to SUPPORTED by model output; it returns DEFER.
+- B8 does not treat a lone top-level `proposal_supported=false` or `recommended_gate_action=VERIFY` as a source-grounded contradiction. The typed statuses and exact evidence references govern the gate, preventing an unsubstantiated single-verifier false rejection from automatically defeating otherwise supported evidence.
+- The module is pure offline logic. It does not call a provider, access hidden gold labels, or enable the plan-only runner.
