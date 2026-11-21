@@ -8269,7 +8269,9 @@
     "dry_run_route": "dry_run_manifest_v3_draft.json",
     "statistical_analysis_plan": "STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md",
     "status": "E3_V2_FROZEN_FOR_PROVIDER_DRY_RUN_ACCEPTANCE",
-    "note": "Controller, Prompt Pack v2 and statistical analysis plan are selected and frozen for provider dry-run acceptance in E3_PROTOCOL_V2_DECISION_RECORD.md. Offline controller/prompt tests and 28/630 prompt rendering validations pass CI. Provider account eligibility and actual provider acceptance remain unverified."
+    "note": "Controller, Prompt Pack v2 and statistical analysis plan are selected and frozen for provider dry-run acceptance in E3_PROTOCOL_V2_DECISION_RECORD.md. Offline controller/prompt tests and 28/630 prompt rendering validations pass CI. Provider account eligibility and actual provider acceptance remain unverified.",
+    "local_dry_run_executor": "execute_dry_run_v3.py",
+    "local_dry_run_executor_tests": "test_execute_dry_run_v3.py"
   },
   "controller_policy": {
     "version": "E3-B1-B8-v1.0.0",
