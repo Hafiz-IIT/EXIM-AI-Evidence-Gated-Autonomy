@@ -281,10 +281,12 @@
   "blocking_issues": [
     "Account-level Free entitlement, quota and billing/overage state remain unverified for Google AI Studio, GroqCloud and Cloudflare Workers AI. Public free-tier documentation is not account-level proof.",
     "The separate DRY-01…DRY-06 mechanical suite must also pass and be recorded in its own disposable ledger. It is complementary to, not a remapping of, the DR-01…DR-06 routing fixtures.",
-    "The Prompt Pack v1 schema and the provider adapters still require end-to-end dry-run acceptance; no real provider request has been made."
+    "The Prompt Pack v1 schema and the provider adapters still require end-to-end dry-run acceptance; no real provider request has been made.",
+    "This v2 dry-run manifest predates the proposed Prompt Pack v2. If Prompt Pack v2 is approved, create a separately versioned route manifest with frozen v2 prompt hashes and repeat provider acceptance; do not treat v1 dry-run evidence as v2 acceptance."
   ],
   "execution_gate": "NO EXECUTION until all three provider accounts are verified Free with no paid fallback, all offline checks pass, the separate DRY-01…DRY-06 suite is accepted, and local provider smoke tests succeed without billing activation.",
   "calls_total": 28,
   "routing_case_source": "Experiment 3 Dry-Run Suite — Disposable Cases v0 (Notion page 3de0a218bb3d81378174f5b7ca32e72d)",
-  "routing_case_file": "routing_cases_v0.json"
+  "routing_case_file": "routing_cases_v0.json",
+  "prompt_version_status": "CURRENT_MANIFEST_PRECEDES_PROMPT_PACK_V2_DRAFT"
 }
