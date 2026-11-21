@@ -1,8 +1,7 @@
 """Safe CLI entry point for recovered C0-C14 Experiment 3.
 
 Default behavior is plan-only. This version intentionally refuses model execution:
-the scored reversibility field, exact B1-B8 controller contract, and provider
-account entitlements are not yet frozen/verified.
+provider account entitlements and end-to-end provider dry-run acceptance are not yet verified.
 """
 from __future__ import annotations
 import argparse
@@ -29,7 +28,7 @@ def build_plan(kind:str)->dict:
         provider_code=call.get("family") or call.get("model_family")
         provider=manifest.get("provider_families",{}).get(provider_code)
         if provider is None:
-            provider=load_json("primary_run_manifest_v2_draft.json")["providers"].get(provider_code)
+            provider=load_json("primary_run_manifest_v3_draft.json" if kind=="primary-v3" else "primary_run_manifest_v2_draft.json")["providers"].get(provider_code)
         rows.append({
           "sequence":call["sequence"],"run_id":call["run_id"],"case_id":call["case_id"],
           "stage":call["stage"],"role":call.get("role",call["stage"]),
