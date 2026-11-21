@@ -19,7 +19,7 @@ def build_plan(kind:str)->dict:
         manifest=load_json("dry_run_manifest_v3_draft.json" if kind=="routing-v3" else "dry_run_manifest_v2.json")
         cases=load_json("routing_cases_v0.json")["cases"]
     else:
-        manifest=load_json("primary_run_manifest_v2_draft.json")
+        manifest=load_json("primary_run_manifest_v3_draft.json" if kind=="primary-v3" else "primary_run_manifest_v2_draft.json")
         cases=load_json("cases_public_v1.json")["cases"]
     by_id={x["case_id"]:x for x in cases}
     unknown=sorted({x["case_id"] for x in manifest["calls"]}-set(by_id))
@@ -43,7 +43,7 @@ def execute(_plan):
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument("--manifest",choices=("routing","routing-v3","primary"),default="routing-v3")
+    parser.add_argument("--manifest",choices=("routing","routing-v3","primary","primary-v3"),default="routing-v3")
     parser.add_argument("--plan-only",action="store_true",help="Print the deterministic plan; default behavior.")
     parser.add_argument("--execute",action="store_true",help="Refused until all frozen scientific and zero-cost gates are satisfied.")
     args=parser.parse_args()
