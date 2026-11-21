@@ -194,6 +194,10 @@ def b8_evidence_gate(case, proposer, v1, v2):
         return "DEFER"
     if reversibility == "CONTRADICTED":
         return "DEFER"
+    if source_reversibility == "irreversible":
+        return "VERIFY"
+    if source_reversibility not in {"reversible", "reversible_with_rollback_plan"}:
+        return "DEFER"
 
     # Any remaining UNKNOWN means no positive authorization to act.
     if any(status != "SUPPORTED" for status in s):
