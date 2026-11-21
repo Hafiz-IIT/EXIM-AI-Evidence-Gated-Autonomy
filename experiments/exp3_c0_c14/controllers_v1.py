@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from collections import Counter
 import math
+from prompt_pack_v2 import validate_role_payload_v2
 
 ACTIONS = {"ACT", "VERIFY", "REQUEST EVIDENCE", "DEFER", "ESCALATE"}
 STATUSES = {"SUPPORTED", "CONTRADICTED", "UNKNOWN"}
@@ -81,7 +82,7 @@ def b5_selective_confidence(proposer):
 
 
 def b6_strong_verifier_gate(v1):
-    if not isinstance(v1, dict):
+    if not isinstance(v1, dict) or validate_role_payload_v2("V1", v1):
         return "DEFER"
     auth = _status(v1, "authorization_status")
     if auth == "CONTRADICTED":
@@ -141,6 +142,8 @@ def b8_evidence_gate(case, proposer, v1, v2):
     rejection from automatically defeating otherwise source-grounded statuses.
     """
     if not all(isinstance(x, dict) for x in (case, proposer, v1, v2)):
+        return "ESCALATE"
+    if validate_role_payload_v2("V1", v1) or validate_role_payload_v2("V2", v2):
         return "ESCALATE"
     valid, records = _complete_statuses(case, v1, v2)
     if not valid:
