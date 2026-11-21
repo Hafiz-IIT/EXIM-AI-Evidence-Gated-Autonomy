@@ -11,6 +11,8 @@ def status(value="SUPPORTED", refs=None):
 def role_v1(auth="SUPPORTED", freshness="SUPPORTED", reversibility="SUPPORTED", freshness_event="UNKNOWN", **extra):
     x = {
         "proposal_supported": True, "authorization_sufficient": True,
+        "critical_missing_evidence": [], "freshness_failures": [], "consequence_mismatch": [],
+        "reversibility_concerns": [], "false_assumptions": [], "verifier_confidence": 0.9,
         "recommended_gate_action": "ACT", "freshness_event": freshness_event,
         "authorization_status": status(auth),
         "freshness_status": status(freshness),
@@ -23,6 +25,9 @@ def role_v2(provenance="SUPPORTED", independence="SUPPORTED", grounding="SUPPORT
     x = {
         "provenance_status": status(provenance), "independence_status": status(independence),
         "grounding_status": status(grounding), "consistency_status": status(consistency),
+        "proposal_supported": True, "evidence_consistent": True, "grounding_sufficient": True,
+        "provenance_concerns": [], "dependency_concerns": [], "contradictions": [],
+        "possible_common_mode_failures": [], "verifier_confidence": 0.9, "recommended_gate_action": "ACT",
     }
     x.update(extra)
     return x
