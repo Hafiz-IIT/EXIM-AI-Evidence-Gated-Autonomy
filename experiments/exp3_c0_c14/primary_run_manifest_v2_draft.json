@@ -55,7 +55,8 @@
     "Prompt pack v1 and execution harness contract still require end-to-end dry-run acceptance; this file alone is not execution authorization.",
     "The historical B1-B8 functions are recovered in src/core.py, but the frozen Experiment 3 protocol does not fully specify the real-model mapping for B2, B3, B5, B6, B7 and B8. See CONTROLLER_MAPPING_GAPS_v1.md; do not silently substitute historical semantics or invent thresholds.",
     "The six DR-01…DR-06 disposable routing payloads are recovered in routing_cases_v0.json; provider-level end-to-end validation of the 28-call route remains unperformed.",
-    "CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md is not approved/frozen; B2/B3/B5/B6/B7/B8 operational choices and Prompt Pack v2 tri-state/UNKNOWN treatment require scientific approval and acceptance tests."
+    "CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md is not approved/frozen; B2/B3/B5/B6/B7/B8 operational choices and Prompt Pack v2 tri-state/UNKNOWN treatment require scientific approval and acceptance tests.",
+    "Prompt Pack v2 and Statistical Analysis Plan v2 are drafts only; if approved, the current 28-call route must be versioned/revalidated against the frozen v2 prompt hashes before primary execution."
   ],
   "calls": [
     {
@@ -8249,7 +8250,7 @@
       "sequence": 630
     }
   ],
-  "execution_gate": "NO SCORED EXECUTION until the controller protocol amendment and Prompt Pack v2 are approved/frozen, the 12 source-unknown reversibility values are explicitly handled as UNKNOWN (not imputed), both dry-run tracks pass at their proper levels, and all provider accounts are verified Free/no-overage.",
+  "execution_gate": "NO SCORED EXECUTION until the controller protocol amendment, Prompt Pack v2 and Statistical Analysis Plan v2 are approved/frozen together; the 12 source-unknown reversibility values are explicitly handled as UNKNOWN (not imputed); a matching v2 dry-run and the separate mechanical suite pass; and all provider accounts are verified Free/no-overage.",
   "controller_recovery": {
     "status": "HISTORICAL_SOURCE_RECOVERED_E3_MAPPING_BLOCKED",
     "historical_source": "src/core.py",
@@ -8261,5 +8262,12 @@
     "status": "DRAFT_NOT_APPROVED_NOT_FROZEN",
     "path": "experiments/exp3_c0_c14/CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md",
     "note": "Candidate B1-B8 operational mapping and Prompt Pack v2 UNKNOWN/tri-state proposal. Historical facts are distinguished from new decisions. No controller code or prompt version has been changed."
+  },
+  "protocol_artifacts": {
+    "controller_amendment": "CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md",
+    "prompt_pack": "PROMPT_PACK_v2_DRAFT.md",
+    "statistical_analysis_plan": "STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md",
+    "status": "DRAFTS_NOT_APPROVED_NOT_FROZEN",
+    "note": "These drafts are coupled. Current Prompt Pack v1 and SAP v1 remain authoritative until explicit review/freeze. A v2 provider dry-run manifest must be created after prompt freeze."
   }
 }
