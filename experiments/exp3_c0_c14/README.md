@@ -142,7 +142,7 @@ The selected E3 v2 bundle is recorded as frozen for provider dry-run acceptance 
 - B5 uses the selected 0.75–0.90 confidence band (DEFER below 0.75; VERIFY from 0.75 to below 0.90; ACT at/above 0.90).
 - B6 designates V1 as the authorization verifier and requires explicit supported authorization plus V1 acceptance.
 - B7 uses HIGH→VERIFY; LOW uses the 0.90 proposer-confidence threshold; unknown consequence escalates.
-- B8 uses ordered tri-state evidence statuses, exact verbatim packet excerpts, and the source reversibility field. It cannot convert a null source reversibility value into a positive attestation. A lone top-level verifier false-reject boolean does not override otherwise source-grounded typed evidence.
+- B8 uses ordered tri-state evidence statuses, exact verbatim packet excerpts, and the source reversibility field. It cannot convert a null source reversibility value into a positive attestation; source-irreversible actions require VERIFY. A lone top-level verifier false-reject boolean does not override otherwise source-grounded typed evidence.
 - Dedicated tests are wired into CI. These are offline policy tests only; they do not authorize model calls.
 
 
