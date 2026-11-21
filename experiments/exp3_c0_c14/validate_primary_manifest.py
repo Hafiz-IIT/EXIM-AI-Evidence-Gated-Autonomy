@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline validator for the proposed 630-call C0-C14 primary matrix."""
 from __future__ import annotations
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -40,7 +41,10 @@ def validate(manifest:dict,cases:dict)->list[str]:
 
 def main()->int:
     here=Path(__file__).parent
-    manifest=json.loads((here/"primary_run_manifest_v2_draft.json").read_text(encoding="utf-8"))
+    parser=argparse.ArgumentParser()
+    parser.add_argument("manifest",nargs="?",default="primary_run_manifest_v2_draft.json")
+    args=parser.parse_args()
+    manifest=json.loads((here/args.manifest).read_text(encoding="utf-8"))
     cases=json.loads((here/"cases_public_v1.json").read_text(encoding="utf-8"))
     errors=validate(manifest,cases)
     if errors:
