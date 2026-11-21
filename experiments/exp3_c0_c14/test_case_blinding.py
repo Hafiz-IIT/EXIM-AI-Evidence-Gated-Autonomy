@@ -13,9 +13,14 @@ class CaseBlindingTests(unittest.TestCase):
             for forbidden in ("gold_decision","hidden_ground_truth","attacked_dimension","recovery_target","case_notes","condition","pair_id","domain"):
                 self.assertNotIn(forbidden,case)
 
-    def test_reversibility_is_not_fabricated(self):
+    def test_only_source_supported_reversibility_is_exposed(self):
         data=json.loads(Path(__file__).with_name("cases_public_v1.json").read_text(encoding="utf-8"))
-        self.assertTrue(all(case["reversibility"] is None for case in data["cases"]))
+        assessment=json.loads(Path(__file__).with_name("reversibility_assessment_v1.json").read_text(encoding="utf-8"))
+        supported={x["case_id"]:x["reversibility"] for x in assessment["cases"]}
+        for case in data["cases"]:
+            expected=supported[case["case_id"]]
+            self.assertEqual(case["reversibility"],None if expected=="not_specified" else expected)
+        self.assertEqual(sum(x["reversibility"] is None for x in data["cases"]),12)
 
     def test_non_prompt_metadata_is_separate(self):
         data=json.loads(Path(__file__).with_name("case_registry_metadata_v1.json").read_text(encoding="utf-8"))
