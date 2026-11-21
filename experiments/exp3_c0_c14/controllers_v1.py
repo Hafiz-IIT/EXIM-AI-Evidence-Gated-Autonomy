@@ -157,6 +157,11 @@ def b8_evidence_gate(case, proposer, v1, v2):
     if authorization == "CONTRADICTED":
         return "REQUEST EVIDENCE"
     if freshness == "CONTRADICTED":
+        freshness_event = v1.get("freshness_event")
+        if freshness_event in {"REPLAY", "SPOOF"}:
+            return "ESCALATE"
+        if freshness_event != "STALE":
+            return "ESCALATE"
         return "REQUEST EVIDENCE"
 
     # 5-6. Contradictory evidence or non-independent sources require verification.
