@@ -6,7 +6,7 @@ from controllers_v1 import (
 )
 
 def status(value="SUPPORTED", refs=None):
-    return {"status": value, "basis": "explicit synthetic packet evidence", "evidence_refs": refs or ["current deployment authorization"]}
+    return {"status": value, "basis": "explicit synthetic packet evidence", "evidence_refs": [] if value=="UNKNOWN" else (refs or ["current deployment authorization"])}
 
 def role_v1(auth="SUPPORTED", freshness="SUPPORTED", reversibility="SUPPORTED", freshness_event="UNKNOWN", **extra):
     x = {
