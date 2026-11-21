@@ -32,6 +32,8 @@ def load_json(path:Path):
 
 def build_plan():
     manifest=load_json(MANIFEST_PATH)
+    if len(manifest.get("calls",[]))!=28:
+        raise ValueError("E3 v2 dry-run manifest must contain exactly 28 calls")
     cases=load_json(CASES_PATH)["cases"]
     case_ids={x["case_id"] for x in cases}
     if {x["case_id"] for x in manifest["calls"]}-case_ids:
@@ -76,12 +78,21 @@ def execute_dry_run(config:dict,ledger_path:Path,env:dict|None=None,opener=None)
     env=os.environ if env is None else env
     manifest=load_json(MANIFEST_PATH)
     routing=load_json(CASES_PATH)["cases"]
+    if len(manifest.get("calls",[]))!=28:
+        raise ValueError("E3 v2 dry-run manifest must contain exactly 28 calls")
     by_case={x["case_id"]:x for x in routing}
 
     ledger_path=Path(ledger_path)
     if ledger_path.exists() and ledger_path.stat().st_size:
         raise RuntimeError("refusing to reuse a non-empty ledger; do not duplicate provider calls")
     validate_local_config(config,manifest,env)
+    append_raw_attempt(str(ledger_path),{
+        "event":"run_started","timestamp_utc":_now(),"manifest_id":manifest["manifest_id"],
+        "protocol_decision_record":"E3_PROTOCOL_V2_DECISION_RECORD.md",
+        "prompt_version":"Prompt Pack v2","call_count":28,"provider_calls_authorized":True,
+        "zero_spend_policy":{"api_spend_usd_max":0,"paid_fallback":False,"prepaid_credits":False,"automatic_model_substitution":False,"external_tools":False},
+        "providers":{code:{"provider":config["provider_families"][code]["provider"],"model":config["provider_families"][code]["model"],"account_free_tier_verified":True,"billing_state":"free_no_paid_overage","quota_verified":True} for code in ("A","B","C")}
+    })
 
     defaults=config["defaults"]
     timeout=defaults["timeout_seconds"]
@@ -197,7 +208,7 @@ def execute_dry_run(config:dict,ledger_path:Path,env:dict|None=None,opener=None)
                 "provider_family":family,"provider":provider["provider"],"model":model,
                 "prompt_version":"Prompt Pack v2","prompt_sha256":prompt["prompt_sha256"],
                 "latency_ms":elapsed_ms,"http_status":response["http_status"],
-                "usage":extracted.get("usage"),"provider_request_id":extracted.get("provider_request_id"),
+                "usage":extracted.get("usage"),"finish_reason":extracted.get("finish_reason"),"provider_request_id":extracted.get("provider_request_id"),
                 "parsed_output":parsed
             })
             if role=="PROPOSER":
@@ -207,6 +218,7 @@ def execute_dry_run(config:dict,ledger_path:Path,env:dict|None=None,opener=None)
         else:
             raise RuntimeError(f"provider call exhausted retries: {call['run_id']}") from last_error
 
+    append_raw_attempt(str(ledger_path),{"event":"run_completed","timestamp_utc":_now(),"manifest_id":manifest["manifest_id"],"completed_calls":completed,"provider_calls":completed})
     return {"manifest_id":manifest["manifest_id"],"completed_calls":completed,
             "ledger_path":str(ledger_path),"provider_calls":completed,
             "status":"PROVIDER_DRY_RUN_COMPLETED_NO_SCORED_CASES"}
