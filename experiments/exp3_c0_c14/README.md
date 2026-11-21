@@ -68,7 +68,7 @@ E3 protocol v2 selects the role assignments: 3B and 3C use V1 as the single veri
 - [x] Add CI coverage for both the existing 700-case v0.4 harness and this separate C0–C14 track.
 - [x] Separate model-facing case packets from pair/condition metadata and recovery targets; add regression tests against prompt leakage.
 - [x] Recover source-backed reversibility wording for 18/30 cases; leave 12 unresolved rather than infer reversibility from consequence.
-- [x] Audit source-backed reversibility for all 30 cases; retain 12 unspecified values as null/UNKNOWN rather than infer them. A versioned amendment draft now proposes how to expose UNKNOWN without dropping cases.
+- [x] Audit source-backed reversibility for all 30 cases; retain 12 unspecified values as null/UNKNOWN rather than infer them. Prompt Pack v2 renders the sentinel and B8 defers on source-unknown reversibility.
 - [x] Freeze the 3B/3C/3E role interpretation in `E3_PROTOCOL_V2_DECISION_RECORD.md`.
 - [x] Implement direct-provider request adapters and API-free contract tests.
 - [x] Implement deterministic explicit-field feature mapping and fail-closed tests.
