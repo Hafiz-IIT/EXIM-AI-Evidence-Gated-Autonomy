@@ -69,3 +69,8 @@ Do not implement guessed B2/B5/B6/B7/B8 rules as if they were frozen. Do not sub
 - Historical executable implementation: `src/core.py`, blob SHA above
 - Historical rule extraction: `CONTROLLER_RECOVERY.md`
 - Case reversibility source audit: `reversibility_assessment_v1.json`
+
+
+## Versioned amendment draft
+
+An additive proposal is now available at [CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md](CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md). It does not close this gap register: it proposes deterministic B1–B8 mappings, explicit unknown-value behavior, and Prompt Pack v2 tri-state attestations while keeping source-supported facts separate from new design choices. The proposal remains unapproved and unfrozen. Do not implement or score its candidate rules until the scientific decisions and acceptance tests listed in that draft are resolved.
