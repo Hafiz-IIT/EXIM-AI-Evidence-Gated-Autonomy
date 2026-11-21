@@ -3,3 +3,8 @@ __pycache__/
 .venv/
 .env
 .DS_Store
+
+# Local E3 provider credentials, account attestations, and raw run ledgers
+.local/
+*.jsonl
+experiments/exp3_c0_c14/provider_config.local.json
