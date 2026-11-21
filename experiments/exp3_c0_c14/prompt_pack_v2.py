@@ -152,4 +152,6 @@ def validate_role_payload_v2(role:str,value:Any)->list[str]:
                 errors.append(f"{key}.evidence_refs invalid")
             elif record.get("status")!="UNKNOWN" and not refs:
                 errors.append(f"{key} requires evidence_refs unless UNKNOWN")
+            elif record.get("status")=="UNKNOWN" and refs:
+                errors.append(f"{key} UNKNOWN must use an empty evidence_refs list")
     return errors
