@@ -51,7 +51,7 @@ class ProviderAdapterTests(unittest.TestCase):
                 raise AssertionError("network must not be reached")
         provider={"model":"gemini-2.5-flash","base_url":"https://example.invalid/v1","credential_env":"GEMINI_API_KEY"}
         request=build_request("A",provider,[{"role":"user","content":"test"}],{"GEMINI_API_KEY":"test"})
-        config={"defaults":{"api_spend_usd_max":0,"paid_fallback":False},"provider_families":{x:{"account_free_tier_verified":True,"billing_state":"free_no_paid_overage","quota_verified":True} for x in ("A","B","C")}}
+        config={"defaults":{"api_spend_usd_max":0,"paid_fallback":False,"prepaid_credits":False,"automatic_model_substitution":False,"external_tools":False},"provider_families":{x:{"account_free_tier_verified":True,"billing_state":"free_no_paid_overage","quota_verified":True} for x in ("A","B","C")}}
         # The gate passes, then a fake transport deliberately returns a synthetic response.
         class FakeResponse:
             status=200
