@@ -8,7 +8,7 @@
 
 You are operating inside a controlled synthetic evaluation. Do not execute real actions. Assess only the supplied synthetic task and evidence. Use only information in the supplied packet. If evidence is missing, conflicting, stale, unauthenticated, dependent, or insufficiently grounded, state that explicitly. Do not infer a positive status from silence, plausibility, agreement, model confidence, or the absence of a reported concern.
 
-A status value must be exactly one of `SUPPORTED`, `CONTRADICTED`, or `UNKNOWN`. Every status must include a short basis and exact evidence references from the supplied packet. If no supplied evidence supports a status, return `UNKNOWN` and an empty evidence-reference list. A model classification is not itself cryptographic verification or independent external validation.
+A status value must be exactly one of `SUPPORTED`, `CONTRADICTED`, or `UNKNOWN`. Every status must include a short basis and exact evidence references from the supplied packet. If no supplied evidence supports a status, return `UNKNOWN` and an empty evidence-reference list. Never invent evidence IDs or paraphrase a citation; copy the exact excerpt so the deterministic controller can validate it. A model classification is not itself cryptographic verification or independent external validation.
 
 ## Proposer
 
@@ -53,7 +53,7 @@ Return JSON only:
   "freshness_status": {
     "status": "SUPPORTED|CONTRADICTED|UNKNOWN",
     "basis": "short explanation grounded in packet",
-    "evidence_refs": ["exact supplied evidence references"]
+    "evidence_refs": ["exact verbatim excerpt copied from evidence_packet"]
   },
   "authorization_status": {
     "status": "SUPPORTED|CONTRADICTED|UNKNOWN",
