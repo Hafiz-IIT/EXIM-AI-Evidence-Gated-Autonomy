@@ -97,3 +97,10 @@ This source does not, by itself, define a valid C0–C14 adapter: the frozen rea
 The frozen registry's Task, Evidence Packet and Recovery Target fields provide explicit reversibility statements for 18 cases. These have been added to the model-facing case packets with their source-linked basis retained in `reversibility_assessment_v1.json`. Twelve cases remain null in the prompt payload because their frozen source does not explicitly establish reversibility. The HIGH consequence label is not treated as proof of irreversibility, and LOW is not treated as proof of reversibility.
 
 This is an additive source-reconciliation artifact; the frozen Notion registry and protocol were not edited. The primary run remains blocked until the 12 unresolved cases are clarified through a versioned protocol amendment or source recovery.
+
+
+## Current scored-run blockers
+
+- 12/30 cases still have no explicit reversibility statement in their frozen source. They remain null in model-facing inputs.
+- The frozen Experiment 3 protocol does not fully specify B2/B3/B5/B6/B7/B8 real-model mapping. See `CONTROLLER_MAPPING_GAPS_v1.md`.
+- These are protocol/specification blockers, not software test failures. The harness remains plan-only and no model calls have been made.
