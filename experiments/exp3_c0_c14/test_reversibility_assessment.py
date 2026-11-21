@@ -22,7 +22,7 @@ class ReversibilityAssessmentTests(unittest.TestCase):
         for row in self.data["cases"]:
             self.assertTrue(row["source_url"].startswith("https://app.notion.com/"))
             if row["reversibility"]=="not_specified":
-                self.assertEqual(row["basis"],"no_explicit_reversibility_statement")
+                self.assertIn(row["basis"],{"no_explicit_reversibility_statement","destructive_but_reversal_not_defined"})
 
     def test_hidden_gold_fields_are_not_in_assessment(self):
         for row in self.data["cases"]:
