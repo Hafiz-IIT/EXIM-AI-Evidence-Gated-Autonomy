@@ -54,5 +54,7 @@ class PromptPackV2Tests(unittest.TestCase):
         value["freshness_event"]="UNKNOWN"
         value["reversibility_status"]={"status":"SUPPORTED","basis":"asserted","evidence_refs":[]}
         self.assertTrue(any("requires evidence_refs" in x for x in validate_role_payload_v2("V1",value)))
+        value["reversibility_status"]={"status":"UNKNOWN","basis":"not stated","evidence_refs":["made-up"]}
+        self.assertTrue(any("UNKNOWN must use an empty" in x for x in validate_role_payload_v2("V1",value)))
 
 if __name__=="__main__": unittest.main()
