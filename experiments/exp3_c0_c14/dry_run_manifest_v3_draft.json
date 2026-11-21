@@ -288,14 +288,16 @@
   "calls_total": 28,
   "routing_case_source": "Experiment 3 Dry-Run Suite — Disposable Cases v0 (Notion page 3de0a218bb3d81378174f5b7ca32e72d)",
   "routing_case_file": "routing_cases_v0.json",
-  "prompt_version_status": "PROMPT_PACK_V2_DRAFT_RENDERER_IMPLEMENTED_NOT_FROZEN",
+  "prompt_version_status": "PROMPT_PACK_V2_FROZEN_FOR_PROVIDER_DRY_RUN_ACCEPTANCE",
   "prompt_pack": {
     "version": "Prompt Pack v2",
     "renderer": "prompt_pack_v2.py",
     "renderer_test": "test_prompt_pack_v2.py",
     "hash_policy": "Compute and record the exact rendered prompt SHA-256 per call after case/proposer payload resolution; never reuse a template-only hash as the rendered prompt hash.",
     "evidence_reference_policy": "Typed status evidence_refs must be exact verbatim substrings of the exposed evidence_packet; controller validates exact substring membership.",
-    "reversibility_unknown_policy": "Null frozen reversibility is rendered as NOT_SPECIFIED_IN_FROZEN_SOURCE; no imputation."
+    "reversibility_unknown_policy": "Null frozen reversibility is rendered as NOT_SPECIFIED_IN_FROZEN_SOURCE; no imputation.",
+    "offline_route_render_validation": "validate_v2_route_rendering.py",
+    "offline_rendering_status": "CI_PASS_OFFLINE_RENDER_ONLY"
   },
   "protocol_status": "E3_PROTOCOL_V2_FROZEN_FOR_PROVIDER_DRY_RUN_ACCEPTANCE",
   "protocol_decision_record": "E3_PROTOCOL_V2_DECISION_RECORD.md"
