@@ -17,7 +17,7 @@ This record resolves the operational choices that were previously left as altern
 | B3 | Exact normalized vote over proposer, V1 and V2 `recommended_gate_action`. Invalid/missing votes abstain. Any action with >=2 votes wins; otherwise VERIFY. |
 | B4 | Always VERIFY. |
 | B5 | Confidence <0.75 -> DEFER; 0.75<=confidence<0.90 -> VERIFY; confidence>=0.90 -> ACT. Invalid/missing confidence -> DEFER. |
-| B6 | V1 is the designated strong authorization verifier. ACT only when authorization_status=SUPPORTED, proposal_supported=true, authorization_sufficient=true and V1 recommended action=ACT. Contradicted/insufficient authorization -> REQUEST EVIDENCE; UNKNOWN/malformed -> DEFER; other non-acceptance -> VERIFY. |
+| B6 | V1 is the designated strong authorization verifier. ACT only when authorization_status=SUPPORTED, proposal_supported=true, authorization_sufficient=true and V1 recommended action=ACT, and every authorization evidence reference is an exact verbatim substring of the exposed evidence_packet. Contradicted/insufficient authorization -> REQUEST EVIDENCE; UNKNOWN/malformed -> DEFER; other non-acceptance -> VERIFY. |
 | B7 | HIGH -> VERIFY. LOW -> ACT iff valid proposer self_confidence>=0.90, otherwise DEFER. Unknown consequence -> ESCALATE. |
 | B8 | Apply the ordered typed evidence gate in §2. |
 
