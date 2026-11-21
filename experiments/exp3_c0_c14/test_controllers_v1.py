@@ -64,12 +64,15 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(b5_selective_confidence({"self_confidence":None}),"DEFER")
 
     def test_b6_requires_v1_authorization_and_acceptance(self):
-        self.assertEqual(b6_strong_verifier_gate(self.v1),"ACT")
-        self.assertEqual(b6_strong_verifier_gate(role_v1(auth="UNKNOWN")),"DEFER")
-        self.assertEqual(b6_strong_verifier_gate(role_v1(auth="CONTRADICTED")),"REQUEST EVIDENCE")
-        self.assertEqual(b6_strong_verifier_gate(role_v1(auth="SUPPORTED",authorization_sufficient=False)),"REQUEST EVIDENCE")
-        self.assertEqual(b6_strong_verifier_gate(role_v1(auth="SUPPORTED",proposal_supported=False)),"VERIFY")
-        self.assertEqual(b6_strong_verifier_gate(None),"DEFER")
+        self.assertEqual(b6_strong_verifier_gate(self.v1,self.case),"ACT")
+        self.assertEqual(b6_strong_verifier_gate(role_v1(auth="UNKNOWN"),self.case),"DEFER")
+        self.assertEqual(b6_strong_verifier_gate(role_v1(auth="CONTRADICTED"),self.case),"REQUEST EVIDENCE")
+        self.assertEqual(b6_strong_verifier_gate(role_v1(auth="SUPPORTED",authorization_sufficient=False),self.case),"REQUEST EVIDENCE")
+        self.assertEqual(b6_strong_verifier_gate(role_v1(auth="SUPPORTED",proposal_supported=False),self.case),"VERIFY")
+        self.assertEqual(b6_strong_verifier_gate(None,self.case),"DEFER")
+        bad=role_v1()
+        bad["authorization_status"]["evidence_refs"]=["invented approval"]
+        self.assertEqual(b6_strong_verifier_gate(bad,self.case),"DEFER")
 
     def test_b7_risk_and_confidence(self):
         self.assertEqual(b7_risk_gate({"consequence":"HIGH"},self.p),"VERIFY")
