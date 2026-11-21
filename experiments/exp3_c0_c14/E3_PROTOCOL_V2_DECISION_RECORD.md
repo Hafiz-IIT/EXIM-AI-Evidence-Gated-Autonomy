@@ -74,7 +74,7 @@ This resolves the previously underspecified role assignment without changing the
 - 630-call matrix: `primary_run_manifest_v3_draft.json` (to be validated).
 - The exact rendered prompt SHA-256 is generated per call after case/proposer payload resolution and must be recorded in the raw ledger. A template-only hash is not a substitute.
 
-The CI workflow runs controller tests, Prompt Pack v2 tests, both 28-call route validators and the 630-call manifest validator. CI makes no provider calls.
+The CI workflow runs controller tests, Prompt Pack v2 schema tests, all 28 dry-run prompt renders, all 630 primary prompt renders (including all 12 UNKNOWN reversibility cases), both 28-call route validators and the 630-call manifest validators. CI makes no provider calls.
 
 ## 6. Remaining execution gates (not protocol-choice blockers)
 
