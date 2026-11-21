@@ -72,14 +72,16 @@ This resolves the previously underspecified role assignment without changing the
 - 28-call provider route: `dry_run_manifest_v3_draft.json`.
 - Statistical analysis: `STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md`.
 - 630-call matrix: `primary_run_manifest_v3_draft.json` (to be validated).
-- The exact rendered prompt SHA-256 is generated per call after case/proposer payload resolution and must be recorded in the raw ledger. A template-only hash is not a substitute.
+- Guarded local executor: `execute_dry_run_v3.py`; fake-transport tests: `test_execute_dry_run_v3.py`.
+- Provider adapter persists raw response bytes before JSON parsing and enforces the three-account Free/no-overage gate on every request.
+- The exact rendered prompt SHA-256 is generated per call after case/proposer payload resolution and recorded in the raw ledger. A template-only hash is not a substitute.
 
 The CI workflow runs controller tests, Prompt Pack v2 schema tests, all 28 dry-run prompt renders, all 630 primary prompt renders (including all 12 UNKNOWN reversibility cases), both 28-call route validators and the 630-call manifest validators. CI makes no provider calls.
 
 ## 6. Remaining execution gates (not protocol-choice blockers)
 
 1. All three provider accounts must be checked locally for actual Free entitlement, remaining quota and no paid overage/fallback. Never activate billing or buy credits.
-2. The 28-call v3 provider dry run must complete end-to-end using the exact Prompt Pack v2 renderer, with raw-response append-only ledger, prompt hashes, parser/schema validation and recovery path verified.
+2. The 28-call v3 provider dry run must be executed locally using `execute_dry_run_v3.py` only after account verification. It must complete end-to-end using the exact Prompt Pack v2 renderer, with raw-response append-only ledger, prompt hashes, parser/schema validation and recovery path verified.
 3. The separate DRY-01…DRY-06 mechanical suite must pass; it is not the 28-call provider run.
 4. The primary 630-call manifest must pass structural validation and remain plan-only until the provider dry-run and account gates pass.
 5. No gold labels enter any model prompt. No scored run, holdout access, or statistical claim before the protocol and manifest hashes are frozen for the scored run.
