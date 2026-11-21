@@ -65,15 +65,17 @@ The v2 draft makes two underspecified role assignments explicit rather than sile
 - [x] Add CI coverage for both the existing 700-case v0.4 harness and this separate C0–C14 track.
 - [x] Separate model-facing case packets from pair/condition metadata and recovery targets; add regression tests against prompt leakage.
 - [x] Recover source-backed reversibility wording for 18/30 cases; leave 12 unresolved rather than infer reversibility from consequence.
-- [ ] Source explicit reversibility descriptions for the 30 scored cases; do not infer them.
+- [x] Audit source-backed reversibility for all 30 cases; retain 12 unspecified values as null/UNKNOWN rather than infer them. A versioned amendment draft now proposes how to expose UNKNOWN without dropping cases.
 - [ ] Freeze the 3B/3C/3E role interpretation in a versioned protocol amendment.
 - [x] Implement direct-provider request adapters and API-free contract tests.
 - [x] Implement deterministic explicit-field feature mapping and fail-closed tests.
 - [x] Add a plan-only runner for 28-call and 630-call manifests; actual execution is hard-blocked.
 - [x] Recover the historical B1–B8 executable policy functions and thresholds from `src/core.py`; record their exact ordered rules and source hash in `CONTROLLER_RECOVERY.md`.
-- [ ] Freeze a versioned C0–C14-specific mapping for B1–B8. Historical B3/B6/B8 inputs are not semantically interchangeable with the frozen real-model prompt outputs; missing freshness/provenance/reversibility fields must not be guessed.
+- [ ] Review and freeze `CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md`; it proposes B1–B8 mappings and Prompt Pack v2 tri-state attestations, while marking source-unsupported choices for approval. No controller code has been changed.
 - [ ] Verify all three provider accounts are Free with no paid fallback.
-- [ ] Complete the 28-call provider dry run and separate DRY-01…DRY-06 mechanical suite.
+- [x] Recover all six disposable DR-01…DR-06 routing payloads in `routing_cases_v0.json`.
+- [x] Run the separate DRY-01…DRY-06 offline mechanical checks in CI.
+- [ ] Complete provider-level end-to-end validation of the 28-call route; no provider calls have been made.
 - [ ] Freeze hashes and execute the 630-call scored matrix only after every gate passes.
 
 No external model calls have been made. No API spend or billing activation has occurred.
@@ -104,3 +106,12 @@ This is an additive source-reconciliation artifact; the frozen Notion registry a
 - 12/30 cases still have no explicit reversibility statement in their frozen source. They remain null in model-facing inputs.
 - The frozen Experiment 3 protocol does not fully specify B2/B3/B5/B6/B7/B8 real-model mapping. See `CONTROLLER_MAPPING_GAPS_v1.md`.
 - These are protocol/specification blockers, not software test failures. The harness remains plan-only and no model calls have been made.
+
+
+## Controller protocol amendment draft
+
+`CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md` is an additive proposal, not a freeze. It separates historical source facts from proposed operational rules, specifies candidate B1–B8 behavior, proposes explicit tri-state evidence attestations for Prompt Pack v2, and retains the 12 reversibility-unknown cases as UNKNOWN. The frozen Notion protocol and Prompt Pack v1 are unchanged. Do not implement the proposed controller semantics or execute scored calls until the amendment is reviewed, approved, tested and frozen.
+
+## Dry-run status correction
+
+The six disposable DR-01…DR-06 routing payloads are recovered. The 28-call dry-run remains blocked for provider/account qualification and end-to-end adapter acceptance, not for missing routing payloads. The separate DRY-01…DRY-06 suite is offline mechanical testing and does not count as provider-call acceptance.
