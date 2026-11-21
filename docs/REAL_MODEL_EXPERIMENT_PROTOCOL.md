@@ -1,44 +1,11 @@
 # Real-Model Experiment Protocol — Experiment 3
 
-## Purpose
-Replace synthetic extraction/verifier error probabilities with actual model outputs while keeping benchmark truth hidden and fixed.
+Status: harness and blinded task preparation implemented; no external model/API run is claimed.
 
-## Status
-Protocol only. No external LLM/API experiment is claimed.
+The frozen protocol and executable harness now live in experiments/exp3_real_models/. The harness supports OpenAI-compatible Chat Completions endpoints and evaluates Evidence Gate v1 only. It constructs public model tasks without case IDs, pair IDs, family labels, fault labels, ground truth, safe_to_act or fingerprints. The private evaluation map is stored separately and never sent to providers.
 
-## Freeze before running
-- benchmark cases and test split;
-- extraction prompts;
-- verifier rubrics;
-- Evidence Gate v1/v2/v3 policies;
-- evaluation metrics;
-- model/version identifiers;
-- temperature/seed settings;
-- maximum retries.
+The deterministic split is by underlying pair ID within family (60% development, 20% validation, 20% final holdout). Final holdout has both in-distribution and document-layout OOD renderings. The harness preserves exact model IDs and family labels for extractor and two verifier roles; family labels are not treated as proof of independence.
 
-## Model roles
-Use at least three independently developed model families where available:
-1. generator/extractor;
-2. verifier A;
-3. verifier B.
+Final holdout requires frozen benchmark, prompt and model/condition hashes plus explicit CLI confirmation. The exact historical v2/v3 controller source remains unavailable; no v2/v3 model evaluation is implemented until issue #3 is resolved.
 
-A same-model self-verification condition remains as a baseline.
-
-## Procedure
-1. Render synthetic JSON cases into varied document-like text/layout representations.
-2. Hide ground truth and fault labels.
-3. Run extraction.
-4. Run classification.
-5. Run same-model and cross-model verification.
-6. Record exact prompts, outputs, model version, timestamp, latency, and cost.
-7. Feed only observable outputs to frozen controllers.
-8. Evaluate against hidden benchmark truth after all outputs are saved.
-
-## Primary metrics
-HIGH-risk incorrect consequential action rate, false authorization, false blocking, co-failure rate, cascade depth/action reach, coverage, escalation rate, latency, and monetary cost.
-
-## Required analyses
-Same-model vs cross-model verifier co-failure; confidence/calibration; Evidence Gate v1/v2/v3; provenance attacks; model-family holdout; prompt perturbation; document-format OOD split.
-
-## Integrity rule
-No policy thresholds may be changed after inspecting test-set results. Any changed policy becomes a new preregistered experiment on a fresh holdout.
+See experiments/exp3_real_models/PROTOCOL.md and README.md for execution and artifact requirements.
