@@ -164,6 +164,8 @@ The v2 execution artifacts are:
 - `prompt_pack_v2.py` / `test_prompt_pack_v2.py`
 - `dry_run_manifest_v3_draft.json` (28 calls)
 - `primary_run_manifest_v3_draft.json` (630 calls)
+- `validate_v2_route_rendering.py` renders all 28 prompts offline without provider calls.
+- `validate_v2_primary_rendering.py` renders all 630 prompts offline, including all 12 UNKNOWN reversibility cases.
 - `STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md`
 
 Offline plan commands:
