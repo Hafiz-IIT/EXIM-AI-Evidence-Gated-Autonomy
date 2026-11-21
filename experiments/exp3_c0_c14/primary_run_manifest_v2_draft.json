@@ -53,10 +53,10 @@
     "The 3B/3C single-verifier role and 3E V1/V2 family assignment are operationalized in this draft because frozen v1 leaves them underspecified. This v2 interpretation must be explicitly frozen before scored calls.",
     "Account-level Free entitlement, quota and billing/overage state are unverified for Google AI Studio, GroqCloud and Cloudflare Workers AI.",
     "Prompt pack v1 and execution harness contract still require end-to-end dry-run acceptance; this file alone is not execution authorization.",
-    "The historical B1-B8 functions are recovered in src/core.py, but the frozen Experiment 3 protocol does not fully specify the real-model mapping for B2, B3, B5, B6, B7 and B8. See CONTROLLER_MAPPING_GAPS_v1.md; do not silently substitute historical semantics or invent thresholds.",
     "The six DR-01…DR-06 disposable routing payloads are recovered in routing_cases_v0.json; provider-level end-to-end validation of the 28-call route remains unperformed.",
-    "CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md is not approved/frozen; B2/B3/B5/B6/B7/B8 operational choices and Prompt Pack v2 tri-state/UNKNOWN treatment require scientific approval and acceptance tests.",
-    "Prompt Pack v2 and Statistical Analysis Plan v2 are drafts only; if approved, the current 28-call route must be versioned/revalidated against the frozen v2 prompt hashes before primary execution."
+    "Prompt Pack v2 and Statistical Analysis Plan v2 are drafts only; if approved, the current 28-call route must be versioned/revalidated against the frozen v2 prompt hashes before primary execution.",
+    "The selected B1-B8 operational mapping is implemented and has dedicated offline tests in CI, but the controller amendment, Prompt Pack v2 and Statistical Analysis Plan v2 must be reviewed and frozen together before scoring.",
+    "Twelve source reversibility values remain UNKNOWN. The v2 Prompt Pack and B8 controller preserve this UNKNOWN state; the controller returns DEFER rather than infer reversibility."
   ],
   "calls": [
     {
@@ -8250,7 +8250,7 @@
       "sequence": 630
     }
   ],
-  "execution_gate": "NO SCORED EXECUTION until the controller protocol amendment, Prompt Pack v2 and Statistical Analysis Plan v2 are approved/frozen together; the 12 source-unknown reversibility values are explicitly handled as UNKNOWN (not imputed); a matching v2 dry-run and the separate mechanical suite pass; and all provider accounts are verified Free/no-overage.",
+  "execution_gate": "NO SCORED EXECUTION until the selected B1-B8 operational mapping, Prompt Pack v2 and Statistical Analysis Plan v2 are frozen together; matching v2 provider dry-run acceptance passes; and all provider accounts are verified Free with no paid fallback or overage.",
   "controller_recovery": {
     "status": "HISTORICAL_SOURCE_RECOVERED_E3_MAPPING_BLOCKED",
     "historical_source": "src/core.py",
@@ -8269,5 +8269,21 @@
     "statistical_analysis_plan": "STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md",
     "status": "DRAFTS_NOT_APPROVED_NOT_FROZEN",
     "note": "These drafts are coupled. Current Prompt Pack v1 and SAP v1 remain authoritative until explicit review/freeze. A v2 provider dry-run manifest must be created after prompt freeze."
+  },
+  "controller_policy": {
+    "version": "E3-B1-B8-v1.0.0",
+    "implementation": "controllers_v1.py",
+    "tests": "test_controllers_v1.py",
+    "ci_step": "Run deterministic C0-C14 B1-B8 controller tests",
+    "selected_operational_defaults": {
+      "B2": "proposer.self_confidence >= 0.90 -> ACT; else DEFER",
+      "B3": "2-of-3 exact normalized vote across proposer/V1/V2; no majority -> VERIFY",
+      "B5": "confidence < 0.75 -> DEFER; 0.75 <= c < 0.90 -> VERIFY; c >= 0.90 -> ACT",
+      "B6": "V1 designated authorization verifier; requires explicit supported authorization and V1 acceptance",
+      "B7": "HIGH -> VERIFY; LOW -> ACT iff confidence >= 0.90 else DEFER; unknown consequence -> ESCALATE",
+      "B8": "typed tri-state evidence gate; exact evidence_packet substring references; source-null reversibility cannot be upgraded; ordered fail-closed precedence"
+    },
+    "status": "IMPLEMENTED_OFFLINE_TESTED_PENDING_CI",
+    "note": "Selected for the E3 operational draft under the project owner's instruction to proceed. These rules are not claimed as historical frozen-v1 semantics."
   }
 }
