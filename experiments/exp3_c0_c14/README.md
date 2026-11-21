@@ -51,12 +51,12 @@ A PASS means only that the JSON route table is internally consistent. It does no
 
 The offline core is now in place: prompt templates based on Prompt Pack v1, deterministic prompt hashing, strict one-pass JSON parsing, role-specific required-key checks, and a plan-only manifest interface. The six DRY checks are explicitly disposable and do not enter the scored registry.
 
-The case registry does not contain explicit reversibility descriptions for 12/30 cases. Prompt Pack v2 now renders these as `NOT_SPECIFIED_IN_FROZEN_SOURCE`; B8 deterministically returns DEFER for source-null reversibility. The transport adapter, append-only raw-response ledger, deterministic evidence-feature mapper, and plan-only runner are implemented. Historical B1–B8 policy source has now been recovered and documented in `CONTROLLER_RECOVERY.md`; the C0–C14-specific mapping remains blocked because the frozen prompts/registry do not expose all required historical inputs and do not specify every threshold/tie rule. No model calls have been made.
+The case registry does not contain explicit reversibility descriptions for 12/30 cases. Prompt Pack v2 renders these as `NOT_SPECIFIED_IN_FROZEN_SOURCE`; B8 deterministically returns DEFER for source-null reversibility. The transport adapter, append-only raw-response ledger, deterministic feature mapper, B1–B8 controllers, Prompt Pack v2 renderer and plan-only runner are implemented. The selected E3 operational semantics are recorded in `E3_PROTOCOL_V2_DECISION_RECORD.md`. No model calls have been made.
 
 
 ## Primary 630-call draft interpretation
 
-The v2 draft makes two underspecified role assignments explicit rather than silently guessing: 3B and 3C use V1 as the single verifier; 3E assigns V1 to the next family and V2 to the remaining family in the A→B→C→A rotation. This is a proposed operational interpretation requiring a freeze before scored execution. It is not a modification of the frozen Notion v1 manifest.
+E3 protocol v2 selects the role assignments: 3B and 3C use V1 as the single verifier; 3E assigns V1 to the next family and V2 to the remaining family in the A→B→C→A rotation. These choices are frozen for provider dry-run acceptance and do not modify the frozen Notion v1 manifest.
 
 ## Current gates
 
@@ -69,7 +69,7 @@ The v2 draft makes two underspecified role assignments explicit rather than sile
 - [x] Separate model-facing case packets from pair/condition metadata and recovery targets; add regression tests against prompt leakage.
 - [x] Recover source-backed reversibility wording for 18/30 cases; leave 12 unresolved rather than infer reversibility from consequence.
 - [x] Audit source-backed reversibility for all 30 cases; retain 12 unspecified values as null/UNKNOWN rather than infer them. A versioned amendment draft now proposes how to expose UNKNOWN without dropping cases.
-- [ ] Freeze the 3B/3C/3E role interpretation in a versioned protocol amendment.
+- [x] Freeze the 3B/3C/3E role interpretation in `E3_PROTOCOL_V2_DECISION_RECORD.md`.
 - [x] Implement direct-provider request adapters and API-free contract tests.
 - [x] Implement deterministic explicit-field feature mapping and fail-closed tests.
 - [x] Add a plan-only runner for 28-call and 630-call manifests; actual execution is hard-blocked.
@@ -89,7 +89,7 @@ The v2 draft makes two underspecified role assignments explicit rather than sile
 No external model calls have been made. No API spend or billing activation has occurred.
 
 
-The adapters are deliberately not invoked by CI. They require local credentials and a separately verified account entitlement. The current code has no scored-run execution command, and the B1–B8 decision policies remain blocked pending recovery of their exact frozen rules.
+The adapters are deliberately not invoked by CI. They require local credentials and separately verified account entitlements. The E3 v2 B1–B8 decision policies are implemented and tested; the runner remains plan-only until account-level zero-cost qualification and provider dry-run acceptance pass.
 
 
 Provider configuration uses canonical family labels A/B/C (Gemini/GLM/GPT-OSS). The disposable 28-call routing manifest retains its historical G/Z/O labels; the adapter normalizes G→A, Z→B and O→C without changing provider/model identity.
@@ -99,39 +99,39 @@ Provider configuration uses canonical family labels A/B/C (Gemini/GLM/GPT-OSS). 
 
 The exact historical controller functions are preserved in `src/core.py` (source blob SHA recorded in `CONTROLLER_RECOVERY.md`). The historical thresholds are 0.90 for B2/B5/B7, and 0.94/0.75 for B6. Historical B8 has an ordered rule set over source-document completeness/agreement, authorization freshness, external measurement conflict, extraction match, verifier rejection/dependency diversity and provenance integrity.
 
-This source does not, by itself, define a valid C0–C14 adapter: the frozen real-model prompts expose different fields and omit some positive evidence attestations. The frozen Experiment 3 text also describes B3/B6 differently from the historical function names. No controller scores will be generated by pretending these mappings are equivalent. A versioned protocol amendment is required before scored execution.
+This historical source does not, by itself, define the C0–C14 adapter: the frozen real-model prompts expose different fields and omit some positive evidence attestations. The frozen Experiment 3 text also describes B3/B6 differently from the historical function names. E3 protocol v2 now defines and implements the C0–C14 mapping separately; the historical functions remain a reference and are not misrepresented as identical.
 
 
 ## Reversibility source reconciliation
 
 The frozen registry's Task, Evidence Packet and Recovery Target fields provide explicit reversibility statements for 18 cases. These have been added to the model-facing case packets with their source-linked basis retained in `reversibility_assessment_v1.json`. Twelve cases remain null in the prompt payload because their frozen source does not explicitly establish reversibility. The HIGH consequence label is not treated as proof of irreversibility, and LOW is not treated as proof of reversibility.
 
-This is an additive source-reconciliation artifact; the frozen Notion registry and protocol were not edited. The primary run remains blocked until the 12 unresolved cases are clarified through a versioned protocol amendment or source recovery.
+This is an additive source-reconciliation artifact; the frozen Notion registry and protocol were not edited. E3 protocol v2 preserves the 12 unknowns as UNKNOWN, renders the explicit sentinel and makes B8 defer. The cases are retained in aggregate and reported as a separate stratum; they do not need to be guessed or removed.
 
 
 ## Current scored-run blockers
 
 - 12/30 cases still have no explicit reversibility statement in their frozen source. They remain UNKNOWN and are handled by the v2 renderer/controller; this is not a reason to delete or impute those cases.
-- The frozen Experiment 3 protocol does not fully specify every operational detail for B2/B3/B5/B6/B7/B8. A versioned operational mapping is now implemented in `controllers_v1.py`; the selected defaults and source-vs-proposal distinction are documented in `CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md`. Review/freeze remains required before scoring.
+- The frozen Experiment 3 protocol did not fully specify every operational detail for B2/B3/B5/B6/B7/B8. E3 protocol v2 now selects and implements those details; see `E3_PROTOCOL_V2_DECISION_RECORD.md`. Provider/account qualification and end-to-end dry-run acceptance remain before scored execution.
 - These are protocol/specification blockers, not software test failures. The harness remains plan-only and no model calls have been made.
 
 
 ## Controller protocol amendment draft
 
-`CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md` is an additive proposal, not a freeze. It separates historical source facts from proposed operational rules, specifies candidate B1–B8 behavior, proposes explicit tri-state evidence attestations for Prompt Pack v2, and retains the 12 reversibility-unknown cases as UNKNOWN. The frozen Notion protocol and Prompt Pack v1 are unchanged. Do not implement the proposed controller semantics or execute scored calls until the amendment is reviewed, approved, tested and frozen.
+`CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md` records the original implementation proposal and is superseded for operational choices by `E3_PROTOCOL_V2_DECISION_RECORD.md`. The v2 decision record freezes the selected controller rules, prompt schema, role routing and UNKNOWN treatment for provider dry-run acceptance. Frozen Notion v1 source pages remain unchanged. Scored execution remains blocked by provider account qualification and end-to-end dry-run acceptance.
 
 ## Dry-run status correction
 
 The six disposable DR-01…DR-06 routing payloads are recovered. The 28-call dry-run remains blocked for provider/account qualification and end-to-end adapter acceptance, not for missing routing payloads. The separate DRY-01…DRY-06 suite is offline mechanical testing and does not count as provider-call acceptance.
 
 
-## Companion protocol drafts (not frozen)
+## Companion protocol documents
 
 - `CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md`: proposed deterministic B1–B8 mapping and UNKNOWN behavior.
 - `PROMPT_PACK_v2_DRAFT.md`: proposed tri-state evidence attestations and explicit unknown-reversibility rendering.
 - `STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md`: proposed reporting of the 12 UNKNOWN cases and versioning requirements.
 
-These drafts are coupled: they must be reviewed and frozen together. Prompt Pack v1 and Statistical Analysis Plan v1 remain authoritative until that happens. The current provider dry-run manifest predates Prompt Pack v2; if v2 is approved, generate a new versioned dry-run manifest and rerun provider acceptance with the frozen v2 prompt hashes before scored execution.
+The selected E3 v2 bundle is recorded as frozen for provider dry-run acceptance in `E3_PROTOCOL_V2_DECISION_RECORD.md`. Prompt Pack v1 and Statistical Analysis Plan v1 remain historical sources; the v2 files govern the new operational route. The old 28-call v2 manifest predates Prompt Pack v2; `dry_run_manifest_v3_draft.json` is the matching v2 route. Provider acceptance and account qualification remain pending before scored execution.
 
 
 ## Deterministic controller implementation
