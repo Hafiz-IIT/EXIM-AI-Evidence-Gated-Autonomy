@@ -105,7 +105,7 @@ def b7_risk_gate(case, proposer):
     return "DEFER" if confidence is None else ("ACT" if confidence >= B2_THRESHOLD else "DEFER")
 
 
-def _complete_statuses(v1, v2):
+def _complete_statuses(case, v1, v2):
     required = [
         (v1, "freshness_status"),
         (v1, "authorization_status"),
@@ -116,12 +116,17 @@ def _complete_statuses(v1, v2):
         (v2, "consistency_status"),
     ]
     records = [_status_record(role, key) for role, key in required]
-    # A valid status object must have a non-empty basis. SUPPORTED/CONTRADICTED
-    # additionally require at least one packet evidence reference.
+    packet = case.get("evidence_packet")
+    if not isinstance(packet, str) or not packet.strip():
+        return False, records
+    # Evidence refs are exact verbatim excerpts from the exposed packet.
+    # This keeps model-generated labels from masquerading as source citations.
     for record in records:
         if not record["basis"].strip():
             return False, records
         if record["status"] != "UNKNOWN" and not record["evidence_refs"]:
+            return False, records
+        if any(not ref.strip() or ref not in packet for ref in record["evidence_refs"]):
             return False, records
     return True, records
 
@@ -135,7 +140,7 @@ def b8_evidence_gate(case, proposer, v1, v2):
     """
     if not all(isinstance(x, dict) for x in (case, proposer, v1, v2)):
         return "ESCALATE"
-    valid, records = _complete_statuses(v1, v2)
+    valid, records = _complete_statuses(case, v1, v2)
     if not valid:
         return "ESCALATE"
 
