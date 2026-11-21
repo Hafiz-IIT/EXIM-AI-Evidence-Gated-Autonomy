@@ -39,6 +39,9 @@ jobs:
       - name: Run model-facing case blinding tests
         working-directory: experiments/exp3_c0_c14
         run: python -m unittest test_case_blinding -v
+      - name: Validate source-backed reversibility assessment
+        working-directory: experiments/exp3_c0_c14
+        run: python -m unittest test_reversibility_assessment -v
       - name: Run plan-only runner safety tests
         working-directory: experiments/exp3_c0_c14
         run: python -m unittest test_runner -v
