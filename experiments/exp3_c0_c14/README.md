@@ -71,7 +71,9 @@ The v2 draft makes two underspecified role assignments explicit rather than sile
 - [x] Implement deterministic explicit-field feature mapping and fail-closed tests.
 - [x] Add a plan-only runner for 28-call and 630-call manifests; actual execution is hard-blocked.
 - [x] Recover the historical B1–B8 executable policy functions and thresholds from `src/core.py`; record their exact ordered rules and source hash in `CONTROLLER_RECOVERY.md`.
-- [ ] Review and freeze `CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md`; it proposes B1–B8 mappings and Prompt Pack v2 tri-state attestations, while marking source-unsupported choices for approval. No controller code has been changed.
+- [x] Select and implement an explicit C0–C14 B1–B8 operational mapping in `controllers_v1.py`; thresholds, vote set, verifier designation, risk mapping and B8 precedence are versioned and documented in the amendment draft.
+- [x] Add controller boundary, malformed-input, false-reject, UNKNOWN and precedence tests in `test_controllers_v1.py`; add the suite to CI.
+- [ ] Review/freeze the selected operational defaults, Prompt Pack v2 and Statistical Analysis Plan v2 together before scored execution.
 - [ ] Verify all three provider accounts are Free with no paid fallback.
 - [x] Recover all six disposable DR-01…DR-06 routing payloads in `routing_cases_v0.json`.
 - [x] Run the separate DRY-01…DRY-06 offline mechanical checks in CI.
@@ -104,7 +106,7 @@ This is an additive source-reconciliation artifact; the frozen Notion registry a
 ## Current scored-run blockers
 
 - 12/30 cases still have no explicit reversibility statement in their frozen source. They remain null in model-facing inputs.
-- The frozen Experiment 3 protocol does not fully specify B2/B3/B5/B6/B7/B8 real-model mapping. See `CONTROLLER_MAPPING_GAPS_v1.md`.
+- The frozen Experiment 3 protocol does not fully specify every operational detail for B2/B3/B5/B6/B7/B8. A versioned operational mapping is now implemented in `controllers_v1.py`; the selected defaults and source-vs-proposal distinction are documented in `CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md`. Review/freeze remains required before scoring.
 - These are protocol/specification blockers, not software test failures. The harness remains plan-only and no model calls have been made.
 
 
@@ -124,3 +126,15 @@ The six disposable DR-01…DR-06 routing payloads are recovered. The 28-call dry
 - `STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md`: proposed reporting of the 12 UNKNOWN cases and versioning requirements.
 
 These drafts are coupled: they must be reviewed and frozen together. Prompt Pack v1 and Statistical Analysis Plan v1 remain authoritative until that happens. The current provider dry-run manifest predates Prompt Pack v2; if v2 is approved, generate a new versioned dry-run manifest and rerun provider acceptance with the frozen v2 prompt hashes before scored execution.
+
+
+## Deterministic controller implementation
+
+- `controllers_v1.py` implements B1–B8 as pure deterministic functions under version `E3-B1-B8-v1.0.0`.
+- B2 uses proposer self-confidence with the recovered 0.90 threshold; invalid confidence defers.
+- B3 uses exact normalized majority vote across proposer, V1 and V2; absent/invalid votes abstain; no 2-of-3 majority yields VERIFY.
+- B5 uses the selected 0.75–0.90 confidence band (DEFER below 0.75; VERIFY from 0.75 to below 0.90; ACT at/above 0.90).
+- B6 designates V1 as the authorization verifier and requires explicit supported authorization plus V1 acceptance.
+- B7 uses HIGH→VERIFY; LOW uses the 0.90 proposer-confidence threshold; unknown consequence escalates.
+- B8 uses ordered tri-state evidence statuses, exact verbatim packet excerpts, and the source reversibility field. It cannot convert a null source reversibility value into a positive attestation. A lone top-level verifier false-reject boolean does not override otherwise source-grounded typed evidence.
+- Dedicated tests are wired into CI. These are offline policy tests only; they do not authorize model calls.
