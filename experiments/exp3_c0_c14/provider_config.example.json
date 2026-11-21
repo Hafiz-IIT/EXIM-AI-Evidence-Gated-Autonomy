@@ -38,7 +38,7 @@
   },
   "defaults": {
     "temperature": 0,
-    "max_output_tokens": 2048,
+    "max_output_tokens": 1024,
     "timeout_seconds": 60,
     "external_tools": false,
     "paid_fallback": false,
