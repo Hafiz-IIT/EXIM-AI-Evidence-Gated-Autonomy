@@ -1,6 +1,6 @@
 # Experiment 3 C0–C14 Controller Protocol Amendment v1 — DRAFT
 
-**Status:** IMPLEMENTED OPERATIONAL PROPOSAL — NOT FROZEN FOR SCORING  
+**Status:** HISTORICAL AMENDMENT DRAFT — OPERATIONAL CHOICES SUPERSEDED BY E3_PROTOCOL_V2_DECISION_RECORD.md  
 **Scope:** Recovered C0–C14 Experiment 3 only. This does not alter the separate generated 700-case v0.4 experiment.  
 **Source protocol:** Frozen Experiment 3 v1 (Notion); Prompt Pack v1; Execution Harness Contract v1; Statistical Analysis Plan v1; recovered historical controller source.  
 **Change policy:** Additive proposal only. The frozen Notion pages and historical manifests remain unchanged.
@@ -51,9 +51,9 @@ Historical values are evidence for candidate thresholds, not proof that those th
 
 The existing feature mapper correctly treats missing/invalid fields as incomplete and does not infer positive evidence from silence. Keep that invariant.
 
-## 3. Recommended operational proposal (requires approval before freeze)
+## 3. Operational proposal (selected and frozen for provider dry-run acceptance by the v2 decision record)
 
-The following mapping has been selected as the explicit E3 operationalization and implemented in `controllers_v1.py`, with boundary/precedence tests in `test_controllers_v1.py`. It is deliberately labelled proposed because the frozen protocol does not specify every detail. Its selection does not rewrite the frozen source.
+The following mapping was selected as the explicit E3 operationalization and implemented in `controllers_v1.py`, with boundary/precedence tests in `test_controllers_v1.py`. Its canonical decision and dry-run freeze are recorded in `E3_PROTOCOL_V2_DECISION_RECORD.md`. It does not rewrite the frozen source.
 
 ### 3.1 Shared normalization and missing-data rules
 
@@ -155,21 +155,9 @@ No provider calls are authorized by this amendment. The zero-spend constraints r
 9. Recompute and freeze all prompt/schema/manifest hashes; update the statistical analysis plan version for the new protocol.
 10. Independent protocol review and explicit freeze record before any scored call.
 
-## 8. Decisions still requiring explicit scientific approval
+## 8. Decision closure
 
-The following are not settled by the source material and must not be silently accepted as historical facts:
-
-- B2: approve proposer `self_confidence` and threshold 0.90?
-- B3: approve exact three-way vote across proposer, V1 and V2?
-- B5: approve the proposed 0.75–0.90 confidence band?
-- B6: approve V1 as the designated stronger authorization verifier?
-- B7: approve use of proposer `self_confidence` for the historical 0.90 LOW-risk threshold?
-- B8: approve the proposed precedence and action mapping, especially UNKNOWN handling and C7 false-reject recovery?
-- Prompt Pack v2: approve tri-state attestations and explicit UNKNOWN reversibility rendering?
-- Role routing: approve the proposed 3B/3C/3E assignments already recorded in the draft manifest?
-- Statistical plan: approve treating the 12 unknown-reversibility cases as a reported stratum rather than excluding them?
-
-Implementation status: the operational defaults in this section have been selected for the E3 draft and implemented; the dedicated controller unit tests are now part of CI. Remaining scientific-review items are (i) accept or revise the choices before scoring, (ii) complete Prompt Pack v2 and statistical-plan review/freeze, (iii) verify 3B/3C/3E role routing, and (iv) complete matching provider dry-run and account-level zero-cost qualification. The primary manifest remains `BLOCKED_NOT_EXECUTABLE` until these independent gates pass.
+The alternatives previously listed in this draft were resolved by the project-owner instruction to proceed and are now recorded as selected operational decisions in `E3_PROTOCOL_V2_DECISION_RECORD.md`. The implementation is versioned and CI-tested. The protocol is frozen for provider dry-run acceptance, not for scored execution. Remaining gates concern provider account entitlement and end-to-end provider acceptance, not missing B1–B8 definitions.
 
 ## 9. Source anchors
 
