@@ -36,7 +36,7 @@ These are E3 v2 operational choices, not claims that every threshold or mapping 
 6. Grounding status CONTRADICTED -> REQUEST EVIDENCE.
 7. Unknown/missing consequence -> ESCALATE.
 8. Source registry reversibility is null/unknown -> DEFER, regardless of model claim.
-9. HIGH consequence with reversibility status other than SUPPORTED -> DEFER. Any reversibility status CONTRADICTED -> DEFER.
+9. HIGH consequence with reversibility status other than SUPPORTED -> DEFER. Any reversibility status CONTRADICTED -> DEFER. A source classification of `irreversible` -> VERIFY (human review), even if the classification itself is supported. Only source classifications `reversible` or `reversible_with_rollback_plan` may proceed to the final ACT check.
 10. Any remaining required typed status UNKNOWN -> DEFER.
 11. All required statuses SUPPORTED, source reversibility explicitly present, and no higher-precedence blocker -> ACT.
 
