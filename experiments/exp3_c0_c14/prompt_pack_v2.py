@@ -2,6 +2,7 @@
 from __future__ import annotations
 import hashlib
 import json
+import math
 from typing import Any
 
 ACTIONS={"ACT","VERIFY","REQUEST EVIDENCE","DEFER","ESCALATE"}
@@ -103,18 +104,43 @@ def validate_role_payload_v2(role:str,value:Any)->list[str]:
     if role not in PROMPTS_V2: return [f"unknown role: {role}"]
     if not isinstance(value,dict): return ["top-level JSON value must be an object"]
     errors=[f"missing required key: {key}" for key in sorted(PROMPTS_V2[role]["keys"]-set(value))]
+    if errors: return errors
+
+    list_fields={
+      "PROPOSER":{"evidence_used","missing_evidence","conflicts_detected","freshness_concerns","provenance_concerns","dependency_concerns","authorization_evidence"},
+      "V1":{"critical_missing_evidence","freshness_failures","consequence_mismatch","reversibility_concerns","false_assumptions"},
+      "V2":{"provenance_concerns","dependency_concerns","contradictions","possible_common_mode_failures"},
+      "RECOVERY":{"minimum_evidence_request","acceptable_source","unsafe_substitutes"}
+    }[role]
+    for key in list_fields:
+        field=value.get(key)
+        if not isinstance(field,list) or any(not isinstance(item,str) for item in field):
+            errors.append(f"{key} must be an array of strings")
+
+    if role=="PROPOSER" and not isinstance(value.get("proposed_action"),str):
+        errors.append("proposed_action must be a string")
     if role in {"PROPOSER","V1","V2"}:
         key="self_confidence" if role=="PROPOSER" else "verifier_confidence"
         confidence=value.get(key)
-        if isinstance(confidence,bool) or not isinstance(confidence,(int,float)) or not 0<=confidence<=1:
-            errors.append(f"{key} must be numeric in [0,1]")
+        if isinstance(confidence,bool) or not isinstance(confidence,(int,float)) or not math.isfinite(float(confidence)) or not 0<=confidence<=1:
+            errors.append(f"{key} must be finite numeric in [0,1]")
         if value.get("recommended_gate_action") not in ACTIONS:
             errors.append("recommended_gate_action outside decision space")
+    if role=="V1":
+        for key in ("proposal_supported","authorization_sufficient"):
+            if type(value.get(key)) is not bool: errors.append(f"{key} must be boolean")
+        if value.get("freshness_event") not in FRESHNESS_EVENTS:
+            errors.append("freshness_event invalid")
+    if role=="V2":
+        for key in ("proposal_supported","evidence_consistent","grounding_sufficient"):
+            if type(value.get(key)) is not bool: errors.append(f"{key} must be boolean")
+    if role=="RECOVERY":
+        if not isinstance(value.get("blocking_uncertainty"),str): errors.append("blocking_uncertainty must be a string")
+        if value.get("next_gate_action_if_received_and_valid") not in ACTIONS:
+            errors.append("next_gate_action_if_received_and_valid outside decision space")
     if role in {"V1","V2"}:
         keys={"V1":{"freshness_status","authorization_status","reversibility_status"},
               "V2":{"provenance_status","independence_status","grounding_status","consistency_status"}}[role]
-        if role=="V1" and value.get("freshness_event") not in FRESHNESS_EVENTS:
-            errors.append("freshness_event invalid")
         for key in keys:
             record=value.get(key)
             if not isinstance(record,dict):
