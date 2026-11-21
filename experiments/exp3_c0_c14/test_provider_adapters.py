@@ -1,6 +1,6 @@
 import json
 import unittest
-from provider_adapters import build_request, extract_text, assert_free_only_entitlements, dispatch_free_only
+from provider_adapters import build_request, extract_text, assert_free_only_entitlements, dispatch_free_only, dispatch, ProviderError
 
 class ProviderAdapterTests(unittest.TestCase):
     def test_gemini_key_is_header_not_url(self):
@@ -30,7 +30,7 @@ class ProviderAdapterTests(unittest.TestCase):
             build_request("A",provider,[{"role":"user","content":"x"}],{})
 
     def test_free_entitlement_gate_blocks_example_config(self):
-        config={"defaults":{"api_spend_usd_max":0,"paid_fallback":False},"provider_families":{"A":{},"B":{},"C":{}}}
+        config={"defaults":{"api_spend_usd_max":0,"paid_fallback":False,"prepaid_credits":False,"automatic_model_substitution":False,"external_tools":False},"provider_families":{"A":{},"B":{},"C":{}}}
         with self.assertRaisesRegex(RuntimeError,"not verified"):
             assert_free_only_entitlements(config)
 
@@ -63,6 +63,17 @@ class ProviderAdapterTests(unittest.TestCase):
         config["provider_families"]["B"]["quota_verified"]=False
         with self.assertRaisesRegex(RuntimeError,"quota"):
             dispatch_free_only(request,config,opener=NeverCall())
+
+    def test_raw_sink_receives_bytes_before_transport_json_parse(self):
+        class BadResponse:
+            status=200
+            def __enter__(self): return self
+            def __exit__(self,*args): return False
+            def read(self): return b"not-json"
+        captured=[]
+        with self.assertRaises(ProviderError):
+            dispatch(None,opener=lambda *a,**k:BadResponse(),raw_sink=lambda raw,status:captured.append((raw,status)))
+        self.assertEqual(captured,[(b"not-json",200)])
 
     def test_original_routing_codes_alias_to_provider_adapters(self):
         gemini={"model":"gemini-2.5-flash","base_url":"https://generativelanguage.googleapis.com/v1beta","credential_env":"GEMINI_API_KEY"}
