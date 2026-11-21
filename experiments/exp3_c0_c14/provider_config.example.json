@@ -42,6 +42,8 @@
     "timeout_seconds": 60,
     "external_tools": false,
     "paid_fallback": false,
+    "prepaid_credits": false,
+    "automatic_model_substitution": false,
     "api_spend_usd_max": 0
   },
   "execution_enabled": false,
