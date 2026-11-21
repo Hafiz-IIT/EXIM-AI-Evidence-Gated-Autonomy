@@ -115,3 +115,12 @@ This is an additive source-reconciliation artifact; the frozen Notion registry a
 ## Dry-run status correction
 
 The six disposable DR-01…DR-06 routing payloads are recovered. The 28-call dry-run remains blocked for provider/account qualification and end-to-end adapter acceptance, not for missing routing payloads. The separate DRY-01…DRY-06 suite is offline mechanical testing and does not count as provider-call acceptance.
+
+
+## Companion protocol drafts (not frozen)
+
+- `CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md`: proposed deterministic B1–B8 mapping and UNKNOWN behavior.
+- `PROMPT_PACK_v2_DRAFT.md`: proposed tri-state evidence attestations and explicit unknown-reversibility rendering.
+- `STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md`: proposed reporting of the 12 UNKNOWN cases and versioning requirements.
+
+These drafts are coupled: they must be reviewed and frozen together. Prompt Pack v1 and Statistical Analysis Plan v1 remain authoritative until that happens. The current provider dry-run manifest predates Prompt Pack v2; if v2 is approved, generate a new versioned dry-run manifest and rerun provider acceptance with the frozen v2 prompt hashes before scored execution.
