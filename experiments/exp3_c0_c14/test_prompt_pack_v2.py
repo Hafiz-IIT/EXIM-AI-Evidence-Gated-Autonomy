@@ -8,7 +8,11 @@ class PromptPackV2Tests(unittest.TestCase):
     def test_null_reversibility_is_explicit_unknown_not_error(self):
         rendered=render_prompt_v2("PROPOSER",self.case)
         body=rendered["messages"][1]["content"]
-        self.assertIn("NOT_SPECIFIED_IN_FROZEN_SOURCE",body)\n        self.assertIn("freshness_status",body)\n        self.assertIn("evidence_refs",body)
+        self.assertIn("NOT_SPECIFIED_IN_FROZEN_SOURCE",body)
+        self.assertIn("freshness_status",body)
+        self.assertIn("freshness_event",body)
+        self.assertIn("evidence_refs",body)
+        self.assertIn("REQUIRED OUTPUT JSON SHAPE",body)
         self.assertEqual(rendered["prompt_version"],"Prompt Pack v2")
 
     def test_case_id_and_pair_metadata_not_leaked(self):
@@ -32,17 +36,20 @@ class PromptPackV2Tests(unittest.TestCase):
         changed=dict(self.case,reversibility="irreversible")
         self.assertNotEqual(a["prompt_sha256"],render_prompt_v2("PROPOSER",changed)["prompt_sha256"])
 
-    def test_tri_state_schema_and_verbatim_reference_contract(self):
+    def test_tri_state_schema_and_freshness_event(self):
         value={
           "proposal_supported":True,"authorization_sufficient":True,
-          "critical_missing_evidence":[],"freshness_failures":[],"consequence_mismatch":[],
-          "reversibility_concerns":[],"false_assumptions":[],"verifier_confidence":0.9,
-          "recommended_gate_action":"ACT",
+          "critical_missing_evidence":[],"freshness_failures":[],"freshness_event":"UNKNOWN",
+          "consequence_mismatch":[],"reversibility_concerns":[],"false_assumptions":[],
+          "verifier_confidence":0.9,"recommended_gate_action":"ACT",
           "freshness_status":{"status":"SUPPORTED","basis":"current record","evidence_refs":["current authorization"]},
           "authorization_status":{"status":"SUPPORTED","basis":"current authorization","evidence_refs":["current authorization"]},
           "reversibility_status":{"status":"UNKNOWN","basis":"not stated","evidence_refs":[]}
         }
         self.assertEqual(validate_role_payload_v2("V1",value),[])
+        value["freshness_event"]="REPLAYED_MAYBE"
+        self.assertTrue(any("freshness_event invalid" in x for x in validate_role_payload_v2("V1",value)))
+        value["freshness_event"]="UNKNOWN"
         value["reversibility_status"]={"status":"SUPPORTED","basis":"asserted","evidence_refs":[]}
         self.assertTrue(any("requires evidence_refs" in x for x in validate_role_payload_v2("V1",value)))
 
