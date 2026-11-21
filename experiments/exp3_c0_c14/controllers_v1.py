@@ -116,6 +116,8 @@ def _complete_statuses(case, v1, v2):
         (v2, "consistency_status"),
     ]
     records = [_status_record(role, key) for role, key in required]
+    if v1.get("freshness_event") not in {"STALE", "REPLAY", "SPOOF", "UNKNOWN"}:
+        return False, records
     packet = case.get("evidence_packet")
     if not isinstance(packet, str) or not packet.strip():
         return False, records
