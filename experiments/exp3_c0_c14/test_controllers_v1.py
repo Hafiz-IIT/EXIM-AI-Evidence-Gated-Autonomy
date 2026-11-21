@@ -29,7 +29,7 @@ def role_v2(provenance="SUPPORTED", independence="SUPPORTED", grounding="SUPPORT
 
 class ControllerTests(unittest.TestCase):
     def setUp(self):
-        self.case={"consequence":"HIGH"}
+        self.case={"consequence":"HIGH","reversibility":"reversible_with_rollback_plan"}
         self.p={"self_confidence":0.9,"recommended_gate_action":"ACT"}
         self.v1=role_v1()
         self.v2=role_v2()
