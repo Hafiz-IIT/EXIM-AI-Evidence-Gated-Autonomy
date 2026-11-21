@@ -8,7 +8,7 @@ class PromptPackV2Tests(unittest.TestCase):
     def test_null_reversibility_is_explicit_unknown_not_error(self):
         rendered=render_prompt_v2("PROPOSER",self.case)
         body=rendered["messages"][1]["content"]
-        self.assertIn("NOT_SPECIFIED_IN_FROZEN_SOURCE",body)
+        self.assertIn("NOT_SPECIFIED_IN_FROZEN_SOURCE",body)\n        self.assertIn("freshness_status",body)\n        self.assertIn("evidence_refs",body)
         self.assertEqual(rendered["prompt_version"],"Prompt Pack v2")
 
     def test_case_id_and_pair_metadata_not_leaked(self):
