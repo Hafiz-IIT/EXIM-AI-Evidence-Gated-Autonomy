@@ -49,11 +49,11 @@
   },
   "total_calls": 630,
   "blocking_issues": [
-    "All 30 registry rows lack an explicit reversibility-description field required by Prompt Pack v1; no prompt may be rendered until source-backed descriptions are added.",
+    "The frozen registry explicitly establishes reversibility for 18/30 cases only. Twelve cases remain unspecified in reversibility_assessment_v1.json; do not infer from consequence or action category. Resolve through source recovery or a versioned protocol amendment before scoring.",
     "The 3B/3C single-verifier role and 3E V1/V2 family assignment are operationalized in this draft because frozen v1 leaves them underspecified. This v2 interpretation must be explicitly frozen before scored calls.",
     "Account-level Free entitlement, quota and billing/overage state are unverified for Google AI Studio, GroqCloud and Cloudflare Workers AI.",
     "Prompt pack v1 and execution harness contract still require end-to-end dry-run acceptance; this file alone is not execution authorization.",
-    "Historical B1–B8 executable policies and thresholds are recovered in src/core.py and documented in CONTROLLER_RECOVERY.md. However, the frozen C0–C14 protocol does not fully specify how those historical functions map to the real-model prompt outputs; B3/B6 differ in wording and the current schema lacks positive freshness/provenance attestations and legacy extraction fields. A versioned C0–C14 controller mapping amendment is required; do not silently reuse or relabel the historical controller."
+    "The historical B1-B8 functions are recovered in src/core.py, but the frozen Experiment 3 protocol does not fully specify the real-model mapping for B2, B3, B5, B6, B7 and B8. See CONTROLLER_MAPPING_GAPS_v1.md; do not silently substitute historical semantics or invent thresholds."
   ],
   "calls": [
     {
@@ -8247,7 +8247,7 @@
       "sequence": 630
     }
   ],
-  "execution_gate": "NO SCORED EXECUTION until reversibility descriptions are sourced for all 30 cases, the v2 role interpretation is frozen, exact B1-B8 controller rules are recovered and regression-tested, all three accounts are verified Free/no-overage, and both dry-run tracks pass.",
+  "execution_gate": "NO SCORED EXECUTION until the 12 unspecified reversibility cases are resolved, the C0-C14 B1-B8 mapping is versioned and frozen, both dry-run tracks pass, and all three provider accounts are verified Free/no-overage.",
   "controller_recovery": {
     "status": "HISTORICAL_SOURCE_RECOVERED_E3_MAPPING_BLOCKED",
     "historical_source": "src/core.py",
