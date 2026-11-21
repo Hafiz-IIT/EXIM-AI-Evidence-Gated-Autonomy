@@ -8250,7 +8250,7 @@
       "sequence": 630
     }
   ],
-  "execution_gate": "NO SCORED EXECUTION until the selected B1-B8 operational mapping, Prompt Pack v2 and Statistical Analysis Plan v2 are frozen together; matching v2 provider dry-run acceptance passes; and all provider accounts are verified Free with no paid fallback or overage.",
+  "execution_gate": "NO SCORED EXECUTION until controller amendment, Prompt Pack v2 and Statistical Analysis Plan v2 are frozen together; the v3 matching 28-call route passes offline and provider acceptance; and all three provider accounts are verified Free with no paid fallback or overage. The runner remains plan-only.",
   "controller_recovery": {
     "status": "HISTORICAL_SOURCE_RECOVERED_E3_MAPPING_BLOCKED",
     "historical_source": "src/core.py",
@@ -8265,10 +8265,15 @@
   },
   "protocol_artifacts": {
     "controller_amendment": "CONTROLLER_PROTOCOL_AMENDMENT_v1_DRAFT.md",
+    "controller_implementation": "controllers_v1.py",
+    "controller_tests": "test_controllers_v1.py",
     "prompt_pack": "PROMPT_PACK_v2_DRAFT.md",
+    "prompt_renderer": "prompt_pack_v2.py",
+    "prompt_renderer_tests": "test_prompt_pack_v2.py",
+    "dry_run_route": "dry_run_manifest_v3_draft.json",
     "statistical_analysis_plan": "STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md",
-    "status": "DRAFTS_NOT_APPROVED_NOT_FROZEN",
-    "note": "These drafts are coupled. Current Prompt Pack v1 and SAP v1 remain authoritative until explicit review/freeze. A v2 provider dry-run manifest must be created after prompt freeze."
+    "status": "IMPLEMENTED_OFFLINE_DRAFTS_NOT_FROZEN_FOR_SCORING",
+    "note": "B1-B8 controller logic and Prompt Pack v2 renderer are implemented and CI-tested. Matching v3 28-call route is plan-only. The three protocol documents remain versioned drafts pending freeze; provider account eligibility and provider acceptance remain unverified."
   },
   "controller_policy": {
     "version": "E3-B1-B8-v1.0.0",
