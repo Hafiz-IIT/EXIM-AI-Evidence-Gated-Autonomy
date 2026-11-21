@@ -7,16 +7,21 @@ from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 class ProviderError(RuntimeError):
-    def __init__(self,message:str,http_status:int|None=None,raw_body:bytes|None=None):
+    def __init__(self,message:str,http_status:int|None=None,raw_body:bytes|None=None,error_type:str|None=None):
         super().__init__(message)
         self.http_status=http_status
         self.raw_body=raw_body
+        self.error_type=error_type
 
 def assert_free_only_entitlements(provider_config:dict)->None:
     """Fail closed unless all provider accounts are explicitly attested Free/no-overage."""
     policy=provider_config.get("defaults",{})
     if policy.get("api_spend_usd_max") != 0 or policy.get("paid_fallback") is not False:
         raise RuntimeError("zero-spend cap and disabled paid fallback are mandatory")
+    if policy.get("prepaid_credits") is not False or policy.get("automatic_model_substitution") is not False:
+        raise RuntimeError("prepaid credits and automatic model substitution must be disabled")
+    if policy.get("external_tools") is not False:
+        raise RuntimeError("external tools must be disabled for the zero-spend dry run")
     for code in ("A","B","C"):
         account=provider_config.get("provider_families",{}).get(code,{})
         if account.get("account_free_tier_verified") is not True:
@@ -54,21 +59,23 @@ def build_request(family:str,provider:dict,messages:list[dict],env:dict|None=Non
         raise ValueError("family must be A, B or C")
     return Request(url,data=json.dumps(body,ensure_ascii=False,separators=(",",":")).encode("utf-8"),headers=headers,method="POST")
 
-def dispatch(request:Request,timeout_seconds:int=60,opener=urlopen)->dict:
+def dispatch(request:Request,timeout_seconds:int=60,opener=urlopen,raw_sink=None)->dict:
     """Perform exactly one HTTP attempt. Retry decisions belong to the harness layer."""
     try:
         with opener(request,timeout=timeout_seconds) as response:
             raw=response.read()
             status=getattr(response,"status",200)
+            if raw_sink is not None: raw_sink(raw,status)
     except HTTPError as exc:
         raw=exc.read()
+        if raw_sink is not None: raw_sink(raw,exc.code)
         raise ProviderError(f"provider returned HTTP {exc.code}",http_status=exc.code,raw_body=raw) from exc
     except (URLError,TimeoutError,ConnectionError) as exc:
-        raise ProviderError(f"provider transport failure: {type(exc).__name__}") from exc
+        raise ProviderError(f"provider transport failure: {type(exc).__name__}",error_type="documented_transient_sdk_transport") from exc
     try:
         parsed=json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError,json.JSONDecodeError) as exc:
-        raise ProviderError("provider returned a non-JSON transport envelope",http_status=status,raw_body=raw) from exc
+        raise ProviderError("provider returned a non-JSON transport envelope",http_status=status,raw_body=raw,error_type="invalid_transport_envelope") from exc
     return {"http_status":status,"raw_response_bytes":raw,"response_json":parsed}
 
 def extract_text(family:str,response_json:dict)->dict:
@@ -87,7 +94,7 @@ def extract_text(family:str,response_json:dict)->dict:
     if not isinstance(content,str): raise ValueError("provider message content is not plain text")
     return {"raw_text":content,"finish_reason":choices[0].get("finish_reason"),"usage":response_json.get("usage"),"provider_model":response_json.get("model"),"provider_request_id":response_json.get("id")}
 
-def dispatch_free_only(request:Request,provider_config:dict,timeout_seconds:int=60,opener=urlopen)->dict:
+def dispatch_free_only(request:Request,provider_config:dict,timeout_seconds:int=60,opener=urlopen,raw_sink=None)->dict:
     """The only supported network entry point; requires all three Free/no-overage attestations."""
     assert_free_only_entitlements(provider_config)
-    return dispatch(request,timeout_seconds=timeout_seconds,opener=opener)
+    return dispatch(request,timeout_seconds=timeout_seconds,opener=opener,raw_sink=raw_sink)
