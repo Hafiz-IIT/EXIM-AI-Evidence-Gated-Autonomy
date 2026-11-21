@@ -4,7 +4,8 @@ This directory is deliberately separate from `experiments/exp3_real_models/`, wh
 
 ## What is now staged
 
-- `dry_run_manifest_v2.json`: versioned 28-call route table. Historical provider code Mistral is replaced by Z.ai GLM-4.7-Flash under code Z. The original v1 manifest remains unchanged.
+- `dry_run_manifest_v2.json`: earlier v1-prompt 28-call route table, retained for history.
+- `dry_run_manifest_v3_draft.json`: matching 28-call route draft for Prompt Pack v2. Historical provider code Mistral is replaced by Z.ai GLM-4.7-Flash under code Z. The original v1 manifest remains unchanged.
 - `routing_cases_v0.json`: recovered six disposable DR-01…DR-06 case packets from the original Notion Dry-Run Suite v0; diagnostic expected actions are separated from model-facing prompt fields.
 - `primary_run_manifest_v2_draft.json`: 630-call operational draft with explicit role/family routing and fixed randomization seed. It preserves the 90/90/90/180/180 stage totals.
 - `validate_manifest.py` and `validate_primary_manifest.py`: offline structural validators only.
@@ -36,6 +37,7 @@ Run from this directory:
 python -m unittest -v
 python dry_run_suite.py
 python validate_manifest.py
+python validate_manifest.py dry_run_manifest_v3_draft.json
 python validate_primary_manifest.py
 python runner.py --manifest routing --plan-only
 python runner.py --manifest primary --plan-only
@@ -138,3 +140,12 @@ These drafts are coupled: they must be reviewed and frozen together. Prompt Pack
 - B7 uses HIGH→VERIFY; LOW uses the 0.90 proposer-confidence threshold; unknown consequence escalates.
 - B8 uses ordered tri-state evidence statuses, exact verbatim packet excerpts, and the source reversibility field. It cannot convert a null source reversibility value into a positive attestation. A lone top-level verifier false-reject boolean does not override otherwise source-grounded typed evidence.
 - Dedicated tests are wired into CI. These are offline policy tests only; they do not authorize model calls.
+
+
+## Prompt Pack v2 implementation and dry-run route
+
+- `prompt_pack_v2.py` renders proposer, V1, V2 and recovery messages and computes exact rendered prompt SHA-256 values.
+- A null source reversibility field is rendered as `NOT_SPECIFIED_IN_FROZEN_SOURCE`; all 30 cases remain in the dataset.
+- Typed verifier statuses use `SUPPORTED`, `CONTRADICTED` or `UNKNOWN`. Non-UNKNOWN evidence references must be exact verbatim substrings from the exposed `evidence_packet`; B8 validates this.
+- `dry_run_manifest_v3_draft.json` retains the 28-call G/Z/O routing structure but is explicitly tied to Prompt Pack v2. The previous v2 route is retained and is not treated as v2 prompt acceptance.
+- Plan it offline with `python runner.py --manifest routing-v3 --plan-only`. The runner still refuses all provider execution.
