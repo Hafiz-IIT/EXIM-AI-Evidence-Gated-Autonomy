@@ -15,8 +15,8 @@ def load_json(name):
     return json.loads((HERE/name).read_text(encoding="utf-8"))
 
 def build_plan(kind:str)->dict:
-    if kind=="routing":
-        manifest=load_json("dry_run_manifest_v2.json")
+    if kind in {"routing","routing-v3"}:
+        manifest=load_json("dry_run_manifest_v3_draft.json" if kind=="routing-v3" else "dry_run_manifest_v2.json")
         cases=load_json("routing_cases_v0.json")["cases"]
     else:
         manifest=load_json("primary_run_manifest_v2_draft.json")
@@ -39,11 +39,11 @@ def build_plan(kind:str)->dict:
     return {"status":"PLAN_ONLY_NO_NETWORK","manifest_id":manifest["manifest_id"],"manifest_status":manifest["status"],"calls":len(rows),"rows":rows,"execution_enabled":False,"blocking_issues":manifest.get("blocking_issues",[])}
 
 def execute(_plan):
-    raise RuntimeError("EXECUTION BLOCKED: this runner version is plan-only. Do not bypass the frozen reversibility, B1-B8 controller, dry-run, and provider Free/quota gates.")
+    raise RuntimeError("EXECUTION BLOCKED: this runner version is plan-only. Do not bypass the v2 prompt/controller/analysis freeze, provider dry-run, and Free/quota gates.")
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument("--manifest",choices=("routing","primary"),default="routing")
+    parser.add_argument("--manifest",choices=("routing","routing-v3","primary"),default="routing-v3")
     parser.add_argument("--plan-only",action="store_true",help="Print the deterministic plan; default behavior.")
     parser.add_argument("--execute",action="store_true",help="Refused until all frozen scientific and zero-cost gates are satisfied.")
     args=parser.parse_args()
