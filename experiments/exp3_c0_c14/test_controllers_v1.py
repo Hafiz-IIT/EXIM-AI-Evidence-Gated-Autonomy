@@ -8,10 +8,10 @@ from controllers_v1 import (
 def status(value="SUPPORTED", refs=None):
     return {"status": value, "basis": "explicit synthetic packet evidence", "evidence_refs": refs or ["current deployment authorization"]}
 
-def role_v1(auth="SUPPORTED", freshness="SUPPORTED", reversibility="SUPPORTED", **extra):
+def role_v1(auth="SUPPORTED", freshness="SUPPORTED", reversibility="SUPPORTED", freshness_event="UNKNOWN", **extra):
     x = {
         "proposal_supported": True, "authorization_sufficient": True,
-        "recommended_gate_action": "ACT",
+        "recommended_gate_action": "ACT", "freshness_event": freshness_event,
         "authorization_status": status(auth),
         "freshness_status": status(freshness),
         "reversibility_status": status(reversibility),
@@ -81,7 +81,12 @@ class ControllerTests(unittest.TestCase):
 
     def test_b8_authorization_and_freshness_request_evidence(self):
         self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(auth="CONTRADICTED"),self.v2),"REQUEST EVIDENCE")
-        self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(freshness="CONTRADICTED"),self.v2),"REQUEST EVIDENCE")
+        self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(freshness="CONTRADICTED",freshness_event="STALE"),self.v2),"REQUEST EVIDENCE")
+
+    def test_b8_replay_and_spoof_escalate(self):
+        self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(freshness="CONTRADICTED",freshness_event="REPLAY"),self.v2),"ESCALATE")
+        self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(freshness="CONTRADICTED",freshness_event="SPOOF"),self.v2),"ESCALATE")
+        self.assertEqual(b8_evidence_gate(self.case,self.p,role_v1(freshness="CONTRADICTED",freshness_event="UNKNOWN"),self.v2),"ESCALATE")
 
     def test_b8_conflict_and_common_mode(self):
         self.assertEqual(b8_evidence_gate(self.case,self.p,self.v1,role_v2(consistency="CONTRADICTED")),"VERIFY")
