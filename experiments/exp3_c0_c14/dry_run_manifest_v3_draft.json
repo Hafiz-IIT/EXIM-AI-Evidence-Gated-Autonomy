@@ -280,11 +280,11 @@
   ],
   "blocking_issues": [
     "All three provider accounts still require local account-level Free entitlement, quota and no-paid-overage verification.",
-    "This v3 route uses the Prompt Pack v2 draft renderer. It is not a frozen scientific protocol; review/freeze the controller amendment, Prompt Pack v2 and Statistical Analysis Plan v2 before scored execution.",
     "The 28 calls remain unexecuted. Provider smoke tests and full raw-ledger/schema/recovery acceptance have not occurred.",
-    "The provider substitution Z=Cloudflare GLM-4.7-Flash is a new configuration, not scientifically equivalent to historical Mistral."
+    "The provider substitution Z=Cloudflare GLM-4.7-Flash is a new configuration, not scientifically equivalent to historical Mistral.",
+    "Scored execution remains blocked until provider qualification and dry-run acceptance pass; no provider call is authorized by this manifest."
   ],
-  "execution_gate": "PLAN_ONLY. No provider requests until the zero-cost account gates pass and protocol owners explicitly freeze the matching v2 prompt/controller/analysis versions. No paid fallback, billing activation, credits or API spend.",
+  "execution_gate": "PLAN_ONLY. The E3 v2 prompt/controller/analysis decisions are frozen for provider dry-run acceptance. Provider calls remain blocked until all three accounts are verified Free/no-overage and local execution is explicitly safe under the zero-spend policy.",
   "calls_total": 28,
   "routing_case_source": "Experiment 3 Dry-Run Suite — Disposable Cases v0 (Notion page 3de0a218bb3d81378174f5b7ca32e72d)",
   "routing_case_file": "routing_cases_v0.json",
@@ -296,5 +296,7 @@
     "hash_policy": "Compute and record the exact rendered prompt SHA-256 per call after case/proposer payload resolution; never reuse a template-only hash as the rendered prompt hash.",
     "evidence_reference_policy": "Typed status evidence_refs must be exact verbatim substrings of the exposed evidence_packet; controller validates exact substring membership.",
     "reversibility_unknown_policy": "Null frozen reversibility is rendered as NOT_SPECIFIED_IN_FROZEN_SOURCE; no imputation."
-  }
+  },
+  "protocol_status": "E3_PROTOCOL_V2_FROZEN_FOR_PROVIDER_DRY_RUN_ACCEPTANCE",
+  "protocol_decision_record": "E3_PROTOCOL_V2_DECISION_RECORD.md"
 }
