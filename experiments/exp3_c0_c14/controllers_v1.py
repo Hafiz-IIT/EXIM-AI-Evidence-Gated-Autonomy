@@ -166,6 +166,11 @@ def b8_evidence_gate(case, proposer, v1, v2):
     consequence = case.get("consequence")
     if consequence not in {"LOW", "HIGH"}:
         return "ESCALATE"
+    # Source-level UNKNOWN is authoritative: a model cannot upgrade a null
+    # frozen registry field into a positive reversibility claim.
+    source_reversibility = case.get("reversibility")
+    if not isinstance(source_reversibility, str) or not source_reversibility.strip():
+        return "DEFER"
     if consequence == "HIGH" and reversibility != "SUPPORTED":
         return "DEFER"
     if reversibility == "CONTRADICTED":
