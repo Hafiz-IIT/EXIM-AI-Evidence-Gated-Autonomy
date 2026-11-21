@@ -8268,8 +8268,8 @@
     "prompt_renderer_tests": "test_prompt_pack_v2.py",
     "dry_run_route": "dry_run_manifest_v3_draft.json",
     "statistical_analysis_plan": "STATISTICAL_ANALYSIS_PLAN_v2_DRAFT.md",
-    "status": "IMPLEMENTED_OFFLINE_DRAFTS_NOT_FROZEN_FOR_SCORING",
-    "note": "B1-B8 controller logic and Prompt Pack v2 renderer are implemented and CI-tested. Matching v3 28-call route is plan-only. The three protocol documents remain versioned drafts pending freeze; provider account eligibility and provider acceptance remain unverified."
+    "status": "E3_V2_FROZEN_FOR_PROVIDER_DRY_RUN_ACCEPTANCE",
+    "note": "Controller, Prompt Pack v2 and statistical analysis plan are selected and frozen for provider dry-run acceptance in E3_PROTOCOL_V2_DECISION_RECORD.md. Offline controller/prompt tests and 28/630 prompt rendering validations pass CI. Provider account eligibility and actual provider acceptance remain unverified."
   },
   "controller_policy": {
     "version": "E3-B1-B8-v1.0.0",
