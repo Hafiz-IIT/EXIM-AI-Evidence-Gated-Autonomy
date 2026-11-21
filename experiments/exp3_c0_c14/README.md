@@ -177,3 +177,19 @@ python validate_primary_manifest.py primary_run_manifest_v3_draft.json
 ```
 
 The only remaining external gates are local account-level Free/no-overage qualification and end-to-end provider dry-run acceptance. The runner remains hard-blocked from network execution.
+
+
+## Guarded local 28-call provider executor
+
+`execute_dry_run_v3.py` is now implemented. It is **plan-only by default** and does not execute from CI.
+
+Local preparation, after checking each provider dashboard:
+1. Copy `provider_config.example.json` to `provider_config.local.json` (this local file is gitignored).
+2. Keep the exact pinned model IDs. Only after verifying each account is on Free, no paid overage/fallback is possible, and quota is available, set the three account attestations to true, set `execution_enabled` to true, and retain every zero-spend flag as false/0.
+3. Set credentials only in local environment variables: `GEMINI_API_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `GROQ_API_KEY`. Never paste or commit them.
+4. Run `python execute_dry_run_v3.py` to print the plan only.
+5. Only after all account checks pass, run `python execute_dry_run_v3.py --execute --confirm-zero-spend`.
+
+The executor rechecks all three account attestations before every request, preflights credentials/endpoints before the first request, pins exact model IDs, disables tools/paid fallback/prepaid credits/automatic substitution, caps output at 1024 tokens, stores raw response bytes before parsing, records prompt hashes and request IDs, retries only documented transport failures (maximum two retries), and stops on malformed JSON/schema or model-identity mismatch. It refuses to reuse a non-empty ledger to prevent accidental duplicate calls. The local raw ledger is stored under the gitignored `.local/` directory.
+
+This executor is for the disposable 28-call dry run only. It does not execute the 630-call scored matrix and has not been run against real providers.
