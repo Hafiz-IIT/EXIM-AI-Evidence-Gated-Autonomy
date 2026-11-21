@@ -57,6 +57,9 @@ jobs:
       - name: Validate 28-call zero-cost routing manifest
         working-directory: experiments/exp3_c0_c14
         run: python validate_manifest.py
+      - name: Validate all 28 Prompt Pack v2 rendered prompts offline
+        working-directory: experiments/exp3_c0_c14
+        run: python validate_v2_route_rendering.py
       - name: Validate Prompt Pack v2 28-call dry-run manifest
         working-directory: experiments/exp3_c0_c14
         run: python validate_manifest.py dry_run_manifest_v3_draft.json
