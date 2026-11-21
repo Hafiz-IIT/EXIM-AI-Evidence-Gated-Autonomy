@@ -88,7 +88,7 @@ def execute_dry_run(config:dict,ledger_path:Path,env:dict|None=None,opener=None)
     max_tokens=defaults["max_output_tokens"]
     temperature=defaults["temperature"]
     alias_map=config["routing_family_aliases"]
-    outputs_by_case={}
+    outputs_by_sequence={}
     completed=0
 
     for call in manifest["calls"]:
@@ -97,17 +97,20 @@ def execute_dry_run(config:dict,ledger_path:Path,env:dict|None=None,opener=None)
         if role=="PROPOSER":
             prompt=render_prompt_v2("PROPOSER",case)
         elif role in {"V1","V2"}:
-            if call["case_id"] not in outputs_by_case:
-                raise RuntimeError(f"missing proposer output dependency for {call['case_id']}")
-            prompt=render_prompt_v2(role,case,outputs_by_case[call["case_id"]])
+            dependency=call.get("depends_on")
+            if not isinstance(dependency,int) or dependency not in outputs_by_sequence:
+                raise RuntimeError("missing proposer sequence dependency for "+call["run_id"])
+            prompt=render_prompt_v2(role,case,outputs_by_sequence[dependency])
         elif role=="RECOVERY":
-            if call["case_id"] not in outputs_by_case:
-                raise RuntimeError(f"missing proposer output dependency for {call['case_id']}")
-            prompt=render_prompt_v2("RECOVERY",case,outputs_by_case[call["case_id"]],
+            dependencies=call.get("depends_on") or []
+            proposer_sequence=dependencies[0] if isinstance(dependencies,list) and dependencies else None
+            if proposer_sequence not in outputs_by_sequence:
+                raise RuntimeError("missing recovery proposer dependency for "+call["run_id"])
+            prompt=render_prompt_v2("RECOVERY",case,outputs_by_sequence[proposer_sequence],
                 intervention="REQUEST_EVIDENCE_AFTER_INITIAL_GATE",
                 new_evidence=case.get("recovery_target",""))
         else:
-            raise RuntimeError(f"unsupported dry-run role: {role}")
+            raise RuntimeError("unsupported dry-run role: "+role)
 
         route_family=call["family"]
         family=alias_map[route_family]
@@ -150,7 +153,11 @@ def execute_dry_run(config:dict,ledger_path:Path,env:dict|None=None,opener=None)
                     continue
                 raise
             elapsed_ms=round((time.perf_counter()-started)*1000,2)
-            extracted=extract_text(family,response["response_json"])
+            try:
+                extracted=extract_text(family,response["response_json"])
+            except Exception as exc:
+                append_raw_attempt(str(ledger_path),{"event":"response_extraction_failure","timestamp_utc":_now(),"run_id":call["run_id"],"error":str(exc)})
+                raise RuntimeError("provider response extraction failed for "+call["run_id"]) from exc
             append_raw_attempt(str(ledger_path),{
                 "event":"extracted_model_text","timestamp_utc":_now(),
                 "run_id":call["run_id"],"sequence":call["sequence"],
@@ -159,7 +166,10 @@ def execute_dry_run(config:dict,ledger_path:Path,env:dict|None=None,opener=None)
                 "raw_text":extracted["raw_text"]
             })
             returned_model=extracted.get("provider_model")
-            if returned_model and returned_model != model:
+            if not returned_model:
+                append_raw_attempt(str(ledger_path),{"event":"model_identity_missing","timestamp_utc":_now(),"run_id":call["run_id"],"expected_model":model})
+                raise RuntimeError("provider omitted returned model identity; exact model cannot be verified")
+            if returned_model != model:
                 append_raw_attempt(str(ledger_path),{
                     "event":"model_identity_mismatch","timestamp_utc":_now(),
                     "run_id":call["run_id"],"expected_model":model,"returned_model":returned_model
@@ -191,7 +201,7 @@ def execute_dry_run(config:dict,ledger_path:Path,env:dict|None=None,opener=None)
                 "parsed_output":parsed
             })
             if role=="PROPOSER":
-                outputs_by_case[call["case_id"]]=parsed
+                outputs_by_sequence[call["sequence"]]=parsed
             completed+=1
             break
         else:
