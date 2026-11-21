@@ -1,7 +1,7 @@
-# Experiment 3 Statistical Analysis Plan v2 — DRAFT
+# Experiment 3 Statistical Analysis Plan v2 — Frozen Operational Plan
 
-**Status:** DRAFT FOR SCIENTIFIC REVIEW — NOT FROZEN — NO RESULTS  
-**Supersedes:** Nothing. Statistical Analysis Plan v1 remains the frozen source until this draft is approved.  
+**Status:** SELECTED AND FROZEN FOR E3 V2 — NO RESULTS  
+**Supersedes:** SAP v1 remains the historical source; this v2 is the selected operational analysis plan for E3 v2.  
 **Reason for version:** Proposed controller operationalization and explicit UNKNOWN reversibility handling require pre-results analysis definitions.
 
 ## 1. Primary question and estimands
@@ -84,13 +84,14 @@ Null, adverse and complexity-undermining findings remain in the manuscript.
 
 ## 8. Approval gates
 
-This draft cannot be frozen until:
-1. Controller Protocol Amendment v1 is approved.
-2. Prompt Pack v2 schema and exact templates are approved.
-3. Unknown-reversibility handling is approved.
-4. The 630-call role interpretation is approved or replaced.
-5. Unit tests cover all controller boundaries, missing/invalid values and precedence.
-6. Prompt, schema, controller, manifest and analysis-plan hashes are frozen.
-7. The dry-run tracks and account-level zero-cost gates pass.
+Scored execution remains blocked until:
+1. Provider accounts are locally verified Free with no paid fallback or overage.
+2. The matching 28-call Prompt Pack v2 provider dry run passes end-to-end.
+3. The separate DRY-01…DRY-06 mechanical suite passes.
+4. The final scored manifest, exact rendered prompt hashes, controller version and analysis-plan version are frozen together.
+5. No gold-label leakage, raw-ledger overwrite, schema repair or unapproved retry behavior is observed.
 
 No model calls or scored execution are authorized by this draft.
+
+
+The selected v2 decisions and owner-directed freeze for provider dry-run acceptance are recorded in `E3_PROTOCOL_V2_DECISION_RECORD.md`. The analysis plan retains all 30 cases, including the 12 source-unknown reversibility cases; no source values are imputed.
