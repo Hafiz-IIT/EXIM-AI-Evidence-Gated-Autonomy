@@ -127,6 +127,8 @@ class ExecuteDryRunTests(unittest.TestCase):
             self.assertEqual(sum(x["event"]=="raw_http_response" for x in rows),28)
             self.assertEqual(sum(x["event"]=="call_completed" for x in rows),28)
             self.assertEqual(sum(x["event"]=="provider_error" for x in rows),0)
+            self.assertEqual(sum(x["event"]=="run_started" for x in rows),1)
+            self.assertEqual(sum(x["event"]=="run_completed" for x in rows),1)
 
     def test_nonempty_ledger_prevents_duplicate_run(self):
         with tempfile.TemporaryDirectory() as tmp:
