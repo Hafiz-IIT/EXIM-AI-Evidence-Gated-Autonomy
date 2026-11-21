@@ -13,6 +13,12 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(plan["calls"],630)
         self.assertFalse(plan["execution_enabled"])
 
+    def test_prompt_pack_v2_routing_plan_is_28_calls(self):
+        plan=build_plan("routing-v3")
+        self.assertEqual(plan["calls"],28)
+        self.assertEqual(plan["manifest_id"],"E3-DRY-RUN-MANIFEST-v3-prompt-pack-v2")
+        self.assertFalse(plan["execution_enabled"])
+
     def test_execution_is_hard_blocked(self):
         with self.assertRaisesRegex(RuntimeError,"EXECUTION BLOCKED"):
             execute({"execution_enabled":False})
