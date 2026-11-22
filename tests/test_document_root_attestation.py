@@ -52,7 +52,6 @@ def verify(record, instances, normalized, keys=None, revoked=(), tenant="tenant-
     return verify_document_root_attestation(
         record,
         trusted_keys=keys or {"doc-root-k1": test_key("doc-root-k1").public_key()},
-        trusted_signers=signers or {key_id: "document-root-authority" for key_id in (keys or {"doc-root-k1": None})},
         revoked_key_ids=set(revoked),
         expected_tenant_id=tenant,
         expected_case_id=case,
