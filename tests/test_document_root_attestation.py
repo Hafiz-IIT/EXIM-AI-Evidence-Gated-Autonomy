@@ -48,10 +48,11 @@ def attest(instances, normalized, key=None, key_id="doc-root-k1", tenant="tenant
     )
 
 
-def verify(record, instances, normalized, keys=None, revoked=(), tenant="tenant-A", case="case-1", now=150, consumed=None):
+def verify(record, instances, normalized, keys=None, revoked=(), tenant="tenant-A", case="case-1", now=150, consumed=None, signers=None):
     return verify_document_root_attestation(
         record,
         trusted_keys=keys or {"doc-root-k1": test_key("doc-root-k1").public_key()},
+        trusted_signers=signers or {key_id: "document-root-authority" for key_id in (keys or {"doc-root-k1": None})},
         revoked_key_ids=set(revoked),
         expected_tenant_id=tenant,
         expected_case_id=case,
@@ -59,6 +60,7 @@ def verify(record, instances, normalized, keys=None, revoked=(), tenant="tenant-
         normalized_documents=normalized,
         now=now,
         consumed_nonces=consumed,
+        trusted_signers=signers or {key_id: "document-root-authority" for key_id in (keys or {"doc-root-k1": None})},
     )
 
 
@@ -160,6 +162,36 @@ class DocumentRootAttestationTests(unittest.TestCase):
         self.assertEqual(verify(forged_record, obs["document_instances"], obs["documents"]), (True, "valid"))
         # This is the expected failure mode under the combined compromise assumptions.
         self.assertEqual(evidence_gate_v1(case), "ACT")
+
+
+    def test_signer_identity_must_match_key_registry(self):
+        attacker_record = create_document_root_attestation(
+            signer_id="attacker-controlled-identity",
+            key_id="doc-root-k1",
+            tenant_id="tenant-A",
+            case_id="case-1",
+            document_instances=self.instances,
+            normalized_documents=self.normalized,
+            private_key=test_key("doc-root-k1"),
+            issued_at=100,
+            expires_at=200,
+            nonce="nonce-attacker",
+        )
+        self.assertEqual(
+            verify(attacker_record, self.instances, self.normalized),
+            (False, "signer_identity_mismatch"),
+        )
+
+    def test_key_without_signer_enrollment_is_rejected(self):
+        self.assertEqual(
+            verify(
+                self.record,
+                self.instances,
+                self.normalized,
+                signers={},
+            ),
+            (False, "untrusted_signer"),
+        )
 
     def test_invalid_signature_is_rejected(self):
         altered = copy.deepcopy(self.record)
