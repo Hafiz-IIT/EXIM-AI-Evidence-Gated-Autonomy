@@ -124,7 +124,9 @@ def evaluate_policy(cases, policy, params, draws):
     overall = defaultdict(int)
     by_family = defaultdict(lambda: defaultdict(int))
     for case in cases:
-        action = policy(case)
+        # Keep benchmark labels and identifiers outside the policy input.
+        policy_input = {"observable": case["observable"], "action": case["action"]}
+        action = policy(policy_input)
         final_act = final_consequential_action(
             action, case["safe_to_act"], params, draws[case["case_id"]]
         )
