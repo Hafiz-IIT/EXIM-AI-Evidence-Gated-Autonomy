@@ -24,7 +24,7 @@
 | ATT-2 | Under a deliberately coordinated compromise of the trusted document-root signer and upstream evidence channels, 300 of 700 HIGH-risk cases produced unsafe ACT (42.86% of all cases; 85.71% of ACT decisions). | experiments/document_root_attestation/RESULTS_REVIEW.md; document-root CI artifact | Reproduced synthetic adversarial result | A conditional attack outcome under explicit strong assumptions, not an incident probability or estimate of deployed-system risk. |
 | TRUST-1 | A valid signature binds a payload to a key; it does not prove that the source claim is true. | src/provenance.py; document-root compromise experiment and results review | Supported design limitation | Do not describe cryptographic provenance as a truth certificate. |
 | TRUST-2 | The document-root verifier checks a caller-supplied key-ID-to-signer-ID authorization mapping. | Current implementation and regression tests in src/provenance.py and tests/test_document_root_attestation.py | Implementation-level test claim | The mapping is not authenticated signer enrollment, PKI, KMS/HSM custody or an operational trust registry. |
-| RETR-1 | Retrieval availability, retrieval accuracy and escalation-unavailability fallback can materially affect the relative performance of Evidence Gate and Risk Gate. | experiments/retrieval_quality_sensitivity/PROTOCOL.md; scripts/run_retrieval_quality_sensitivity.py; results artifact when generated | Exploratory extension; pending execution | No numerical claim is permitted until the latest workflow run succeeds and its artifact is inspected. |
+| RETR-1 | Across 162 synthetic parameter conditions, Evidence Gate had a higher unsafe-ACT rate than Risk Gate in 145 conditions and a lower rate in 17; the paired 95% intervals were entirely positive in 141, entirely negative in 14 and crossed zero in 7. | scripts/run_retrieval_quality_sensitivity.py; experiments/retrieval_quality_sensitivity/PROTOCOL.md and RESULTS_REVIEW.md; CI artifact from workflow run 45085233806 | Reproduced exploratory synthetic sensitivity result | The result is conditional on the illustrative binary-error model, fixed 0.93 verifier accuracy and constructed v0.4 HIGH-risk cases. It is not a deployment-safety estimate. |
 | REAL-1 | Real customs data, production deployment, external frontier-model evaluation and human-subject validation have not been established by the current benchmark results. | Repository research-boundary statements and experiment protocols | Not evaluated | Do not imply operational or human validation. |
 
 ## Version and interpretation rules
@@ -43,7 +43,7 @@
 
 - Recover the historical Experiment 1A downstream-resolution runner or explicitly retire its original numerical comparison.
 - Complete independent literature and novelty review before making a novelty claim.
-- Inspect the retrieval-quality sensitivity outputs after the first successful full run; do not promote the protocol itself as a result.
+- Extend retrieval-quality sensitivity with correlated retrieval/verifier/human errors, empirically informed parameter ranges and intervention costs; retain its exploratory status.
 - Obtain independent review of scenario labels, cost assumptions, source-dependency assumptions and attack capabilities.
 - Complete real-provider evaluation separately from synthetic policy simulation.
 - Reconcile every manuscript table and abstract statement against this ledger before any public preprint submission.
