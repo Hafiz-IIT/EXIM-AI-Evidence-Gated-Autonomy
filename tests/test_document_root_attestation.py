@@ -196,6 +196,30 @@ class DocumentRootAttestationTests(unittest.TestCase):
             (False, "untrusted_signer"),
         )
 
+
+    def test_boolean_timestamps_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "integer later than issued_at"):
+            create_document_root_attestation(
+                signer_id="document-root-authority",
+                key_id="doc-root-k1",
+                tenant_id="tenant-A",
+                case_id="case-1",
+                document_instances=self.instances,
+                normalized_documents=self.normalized,
+                private_key=test_key("doc-root-k1"),
+                issued_at=True,
+                expires_at=200,
+                nonce="nonce-bool-time",
+            )
+        altered = copy.deepcopy(self.record)
+        altered["payload"]["issued_at"] = True
+        # The altered payload is also signature-invalid, but type validation
+        # must reject it before any comparison can treat bool as an integer.
+        self.assertEqual(
+            verify(altered, self.instances, self.normalized),
+            (False, "expired_or_not_yet_valid"),
+        )
+
     def test_invalid_signature_is_rejected(self):
         altered = copy.deepcopy(self.record)
         altered["signature_b64"] = "AAAA"
