@@ -49,9 +49,14 @@ def attest(instances, normalized, key=None, key_id="doc-root-k1", tenant="tenant
 
 
 def verify(record, instances, normalized, keys=None, revoked=(), tenant="tenant-A", case="case-1", now=150, consumed=None, signers=None):
+    effective_keys = keys if keys is not None else {"doc-root-k1": test_key("doc-root-k1").public_key()}
+    effective_signers = signers if signers is not None else {
+        key_id: "document-root-authority" for key_id in effective_keys
+    }
     return verify_document_root_attestation(
         record,
-        trusted_keys=keys or {"doc-root-k1": test_key("doc-root-k1").public_key()},
+        trusted_keys=effective_keys,
+        trusted_signers=effective_signers,
         revoked_key_ids=set(revoked),
         expected_tenant_id=tenant,
         expected_case_id=case,
@@ -59,7 +64,6 @@ def verify(record, instances, normalized, keys=None, revoked=(), tenant="tenant-
         normalized_documents=normalized,
         now=now,
         consumed_nonces=consumed,
-        trusted_signers=signers or {key_id: "document-root-authority" for key_id in (keys or {"doc-root-k1": None})},
     )
 
 
