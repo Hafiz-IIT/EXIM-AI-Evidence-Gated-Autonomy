@@ -7,14 +7,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class EximTier2DatasetTests(unittest.TestCase):
     def test_exact_scenario_count_and_unique_ids(self):
-        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        data = json.loads((ROOT / "data" / "exim_synthetic_25.json").read_text(encoding="utf-8"))
         rows = data["scenarios"]
         self.assertEqual(data["scenario_count"], 25)
         self.assertEqual(len(rows), 25)
         self.assertEqual(len({row["scenario_id"] for row in rows}), 25)
 
     def test_category_balance_and_five_clean_controls(self):
-        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        data = json.loads((ROOT / "data" / "exim_synthetic_25.json").read_text(encoding="utf-8"))
         counts = {}
         for row in data["scenarios"]:
             counts[row["category"]] = counts.get(row["category"], 0) + 1
@@ -40,7 +40,7 @@ class EximTier2DatasetTests(unittest.TestCase):
 
     def test_evidence_issue_dates_precede_expiry(self):
         from datetime import datetime
-        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        data = json.loads((ROOT / "data" / "exim_synthetic_25.json").read_text(encoding="utf-8"))
         for row in data["scenarios"]:
             for evidence in row["evidence"]:
                 issued = evidence.get("issued_at")
@@ -53,7 +53,7 @@ class EximTier2DatasetTests(unittest.TestCase):
     def test_expired_records_are_expired_before_shipment(self):
         from datetime import datetime
         shipment_date = datetime.fromisoformat("2026-11-20T00:00:00+00:00")
-        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        data = json.loads((ROOT / "data" / "exim_synthetic_25.json").read_text(encoding="utf-8"))
         expired = [row for row in data["scenarios"] if row["category"] == "expired_certificate"]
         self.assertEqual(len(expired), 4)
         for row in expired:
@@ -62,7 +62,7 @@ class EximTier2DatasetTests(unittest.TestCase):
             self.assertLess(expiry, shipment_date, msg=row["scenario_id"])
 
     def test_document_type_matches_mismatch_context(self):
-        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        data = json.loads((ROOT / "data" / "exim_synthetic_25.json").read_text(encoding="utf-8"))
         expected = {
             "EXIM-DOC-MISMATCH-1": ["Bill of Lading", "Commercial Invoice"],
             "EXIM-DOC-MISMATCH-2": ["Carrier Manifest", "Packing List"],
@@ -74,7 +74,7 @@ class EximTier2DatasetTests(unittest.TestCase):
                 self.assertEqual([e["document_type"] for e in row["evidence"]], expected[row["scenario_id"]])
 
     def test_every_case_has_evidence_and_gold_action(self):
-        data = json.loads((ROOT / "data" / "exim_real_25.json").read_text(encoding="utf-8"))
+        data = json.loads((ROOT / "data" / "exim_synthetic_25.json").read_text(encoding="utf-8"))
         for row in data["scenarios"]:
             self.assertIn(row["expected_action"], {"ACT", "ESCALATE"})
             self.assertTrue(row["evidence"])
