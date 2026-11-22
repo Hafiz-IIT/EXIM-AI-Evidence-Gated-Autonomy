@@ -62,6 +62,17 @@ jobs:
             echo "RUNNER_V2_ERROR=$(tail -n 1 /tmp/ega-v2-runner.log | cut -c1-100)" >> "$GITHUB_ENV"
             exit "$CODE"
           fi
+      - name: Run action-consequence metadata spoof experiment
+        id: action_consequence
+        run: python scripts/run_action_consequence_spoof.py
+      - name: Upload action-consequence binding outputs
+        if: always() && steps.action_consequence.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-action-consequence-binding-v1
+          path: results/action_consequence_binding/
+          if-no-files-found: error
+          retention-days: 90
       - name: Run document-root attestation threat experiments
         id: document_root
         run: python scripts/run_document_root_attestation.py
@@ -114,6 +125,7 @@ jobs:
           RUNNER_V2_OUTCOME: ${{ steps.runner_v2.outcome }}
           RUNNER_V2_ERROR: ${{ env.RUNNER_V2_ERROR }}
           DOCUMENT_ROOT_OUTCOME: ${{ steps.document_root.outcome }}
+          ACTION_CONSEQUENCE_OUTCOME: ${{ steps.action_consequence.outcome }}
         run: |
           if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
           V1_STATUS="$RUNNER_OUTCOME"
