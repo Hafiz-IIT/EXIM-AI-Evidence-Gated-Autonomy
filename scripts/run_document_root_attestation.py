@@ -68,6 +68,7 @@ def verify(record, case, keyring, revoked=(), tenant=None, consumed=None):
     return verify_document_root_attestation(
         record,
         trusted_keys=keyring,
+        trusted_signers={key_id: "synthetic-document-root" for key_id in keyring},
         revoked_key_ids=set(revoked),
         expected_tenant_id=tenant or "tenant-demo",
         expected_case_id=case["case_id"],
