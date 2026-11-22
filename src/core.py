@@ -121,6 +121,8 @@ def evidence_gate_v2(r, *, trusted_action_id, trusted_action_catalog):
     This function checks metadata binding; it does not itself authenticate the
     caller or enforce the eventual tool invocation.
     """
+    if not isinstance(r, Mapping):
+        return "ESCALATE"
     if not isinstance(trusted_action_id, str) or not trusted_action_id:
         return "ESCALATE"
     if not isinstance(trusted_action_catalog, Mapping):
