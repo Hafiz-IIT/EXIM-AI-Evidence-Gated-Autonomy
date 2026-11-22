@@ -54,7 +54,11 @@ def create_document_root_attestation(
     """
     if not all(isinstance(x, str) and x for x in (signer_id, key_id, tenant_id, case_id, nonce)):
         raise ValueError("signer_id, key_id, tenant_id, case_id and nonce must be non-empty strings")
-    if not isinstance(issued_at, int) or not isinstance(expires_at, int) or expires_at <= issued_at:
+    if (
+        isinstance(issued_at, bool) or not isinstance(issued_at, int)
+        or isinstance(expires_at, bool) or not isinstance(expires_at, int)
+        or expires_at <= issued_at
+    ):
         raise ValueError("expires_at must be an integer later than issued_at")
     payload = {
         "schema": "ega-document-root-attestation-v1",
@@ -115,7 +119,14 @@ def verify_document_root_attestation(
             return False, "tenant_mismatch"
         if payload.get("case_id") != expected_case_id:
             return False, "case_mismatch"
-        if not isinstance(now, int) or now < payload["issued_at"] or now >= payload["expires_at"]:
+        issued_at = payload.get("issued_at")
+        expires_at = payload.get("expires_at")
+        if (
+            isinstance(now, bool) or not isinstance(now, int)
+            or isinstance(issued_at, bool) or not isinstance(issued_at, int)
+            or isinstance(expires_at, bool) or not isinstance(expires_at, int)
+            or now < issued_at or now >= expires_at or expires_at <= issued_at
+        ):
             return False, "expired_or_not_yet_valid"
         if payload.get("document_instances_sha256") != canonical_sha256(document_instances):
             return False, "document_instances_mismatch"
