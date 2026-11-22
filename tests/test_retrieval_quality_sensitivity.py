@@ -64,6 +64,32 @@ class RetrievalQualitySensitivityTests(unittest.TestCase):
         self.assertEqual(len(rows), 162)
         self.assertEqual({row["unavailable_fallback"] for row in rows}, {"ACT", "DEFER"})
 
+    def test_policy_never_receives_gold_label_fields(self):
+        case = {
+            "case_id": "C0-HIGH",
+            "family": "C0_clean",
+            "safe_to_act": False,
+            "ground_truth": {"secret": "gold"},
+            "observable": {},
+            "action": {"risk_level": "HIGH"},
+        }
+        seen = {}
+        def policy(input_case):
+            seen.update(input_case)
+            return "DEFER"
+        params = {
+            "retrieval_availability": 0.9,
+            "retrieval_accuracy": 0.9,
+            "human_accuracy": 0.9,
+            "escalation_availability": 0.9,
+            "unavailable_fallback": "DEFER",
+            "verifier_accuracy": 0.93,
+        }
+        MODULE.evaluate_policy([case], policy, params, {"C0-HIGH": self.draws})
+        self.assertEqual(set(seen), {"observable", "action"})
+        self.assertNotIn("safe_to_act", seen)
+        self.assertNotIn("ground_truth", seen)
+
     def test_paired_difference_uses_seed_level_pairs(self):
         mean, sd, low, high = MODULE.paired_difference_ci([0.2, 0.4, 0.6], [0.1, 0.3, 0.5])
         self.assertAlmostEqual(mean, 0.1)
