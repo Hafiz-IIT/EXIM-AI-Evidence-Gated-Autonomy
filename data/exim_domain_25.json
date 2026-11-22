@@ -1,0 +1,726 @@
+{
+  "schema_version": "1.0",
+  "title": "EXIM Domain-Context Synthetic Evidence-Gating Scenarios",
+  "count": 25,
+  "source_note": "Domain-grounded, expert-authored synthetic cases. These are not real shipment records, customer documents, customs records, or observed production incidents. Every scenario includes an explicit evaluation_mechanism; domain datasets are contextual synthetic cases and do not claim execution of domain-specific policy logic.",
+  "scenarios": [
+    {
+      "id": "EXIM-001",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "independent_invoice_manifest_match",
+      "description": "Invoice and manifest quantities agree with independent ledger and scale evidence.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Invoice and manifest quantities agree with independent ledger and scale evidence.",
+      "evaluation_mechanism": "fresh_independent_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-002",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "verified_packing_list_weight",
+      "description": "Packing-list gross weight is corroborated by terminal scale record.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Packing-list gross weight is corroborated by terminal scale record.",
+      "evaluation_mechanism": "fresh_independent_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-003",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_identity",
+      "name": "container_number_crosscheck",
+      "description": "Container identifier matches carrier and gate systems.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Container identifier matches carrier and gate systems.",
+      "evaluation_mechanism": "fresh_independent_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-004",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "customs_authority",
+      "name": "current_authority_confirmation",
+      "description": "Current authorization is confirmed by two independent authority sources.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Current authorization is confirmed by two independent authority sources.",
+      "evaluation_mechanism": "fresh_independent_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-005",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "classification",
+      "name": "independent_hs_reference_match",
+      "description": "Two independent tariff references support the same HS classification.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Two independent tariff references support the same HS classification.",
+      "evaluation_mechanism": "fresh_independent_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-006",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_identity",
+      "name": "consignee_identity_match",
+      "description": "Consignee identity matches independent registry and booking records.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Consignee identity matches independent registry and booking records.",
+      "evaluation_mechanism": "fresh_independent_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-007",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_completeness",
+      "name": "complete_document_set",
+      "description": "Required invoice, packing list and declaration slots are independently confirmed.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Required invoice, packing list and declaration slots are independently confirmed.",
+      "evaluation_mechanism": "fresh_independent_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-008",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "release_status",
+      "name": "verified_release_status",
+      "description": "Release status is current and independently corroborated.",
+      "target_claim": "supported",
+      "risk_level": "LOW",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "source_a",
+          "confidence": 0.97,
+          "age_seconds": 20,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "source_b",
+          "confidence": 0.96,
+          "age_seconds": 35,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ACT",
+      "rationale": "Expected ACT: Release status is current and independently corroborated.",
+      "evaluation_mechanism": "fresh_independent_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-009",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "invoice_ocr_uncertainty",
+      "description": "OCR confidence on a material invoice field is low and needs source review.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "single_source",
+          "confidence": 0.99,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "single_lineage"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: OCR confidence on a material invoice field is low and needs source review.",
+      "evaluation_mechanism": "single_source_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-010",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_completeness",
+      "name": "missing_packing_list",
+      "description": "Packing list is absent; request evidence before action.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Packing list is absent; request evidence before action.",
+      "evaluation_mechanism": "missing_evidence",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-011",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "classification",
+      "name": "ambiguous_hs_subheading",
+      "description": "Two tariff candidates remain plausible without decisive source evidence.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "single_source",
+          "confidence": 0.99,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "single_lineage"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Two tariff candidates remain plausible without decisive source evidence.",
+      "evaluation_mechanism": "single_source_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-012",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_identity",
+      "name": "unit_normalization_pending",
+      "description": "Gross and net weight values may use incompatible units.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "single_source",
+          "confidence": 0.99,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "single_lineage"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Gross and net weight values may use incompatible units.",
+      "evaluation_mechanism": "single_source_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-013",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "customs_authority",
+      "name": "authorization_expiry_unknown",
+      "description": "Authorization is present but expiry cannot be verified.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "single_source",
+          "confidence": 0.99,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "single_lineage"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Authorization is present but expiry cannot be verified.",
+      "evaluation_mechanism": "single_source_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-014",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_timing",
+      "name": "stale_terminal_event",
+      "description": "Terminal event evidence is older than its configured TTL.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "stale_a",
+          "confidence": 0.99,
+          "age_seconds": 7200,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "supported",
+          "source": "stale_b",
+          "confidence": 0.98,
+          "age_seconds": 7300,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Terminal event evidence is older than its configured TTL.",
+      "evaluation_mechanism": "stale_evidence",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-015",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "single_source_invoice_value",
+      "description": "Invoice value is supported by one extractor only.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "single_source",
+          "confidence": 0.99,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "single_lineage"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Invoice value is supported by one extractor only.",
+      "evaluation_mechanism": "single_source_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-016",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_completeness",
+      "name": "partial_declaration_fields",
+      "description": "Some declaration fields lack source-backed values.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "single_source",
+          "confidence": 0.99,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "single_lineage"
+        }
+      ],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Some declaration fields lack source-backed values.",
+      "evaluation_mechanism": "single_source_support",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-017",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "financial_reconciliation",
+      "name": "duty_calculation_inputs_incomplete",
+      "description": "Duty calculation is missing a required classification or valuation input.",
+      "target_claim": "supported",
+      "risk_level": "MEDIUM",
+      "evidence": [],
+      "expected_action": "VERIFY",
+      "rationale": "Expected VERIFY: Duty calculation is missing a required classification or valuation input.",
+      "evaluation_mechanism": "missing_evidence",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-018",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "invoice_packing_quantity_conflict",
+      "description": "Invoice and packing list contain materially conflicting quantities.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "trusted_source_a",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "contradicted",
+          "source": "trusted_source_b",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Invoice and packing list contain materially conflicting quantities.",
+      "evaluation_mechanism": "fresh_conflicting_claims",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-019",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "tampered_document_digest",
+      "description": "Document instance does not match the attested digest.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "trusted_source_a",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "contradicted",
+          "source": "trusted_source_b",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Document instance does not match the attested digest.",
+      "evaluation_mechanism": "fresh_conflicting_claims",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-020",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "shipment_identity",
+      "name": "container_identity_conflict",
+      "description": "Carrier and gate records disagree on container identity.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "trusted_source_a",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "contradicted",
+          "source": "trusted_source_b",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Carrier and gate records disagree on container identity.",
+      "evaluation_mechanism": "fresh_conflicting_claims",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-021",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "customs_authority",
+      "name": "revoked_authorization_key",
+      "description": "Authorization attestation uses a revoked signing key.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "trusted_source_a",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "contradicted",
+          "source": "trusted_source_b",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Authorization attestation uses a revoked signing key.",
+      "evaluation_mechanism": "fresh_conflicting_claims",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-022",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "classification",
+      "name": "high_impact_hs_conflict",
+      "description": "Authoritative tariff sources materially conflict on classification.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "trusted_source_a",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "contradicted",
+          "source": "trusted_source_b",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Authoritative tariff sources materially conflict on classification.",
+      "evaluation_mechanism": "fresh_conflicting_claims",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-023",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "release_status",
+      "name": "unauthorized_release_request",
+      "description": "Release instruction lacks evidence of authorized approval.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "trusted_source_a",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "contradicted",
+          "source": "trusted_source_b",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Release instruction lacks evidence of authorized approval.",
+      "evaluation_mechanism": "fresh_conflicting_claims",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-024",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "document_integrity",
+      "name": "duplicate_document_slot",
+      "description": "Two distinct files claim the same required document slot.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "trusted_source_a",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "contradicted",
+          "source": "trusted_source_b",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Two distinct files claim the same required document slot.",
+      "evaluation_mechanism": "fresh_conflicting_claims",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    },
+    {
+      "id": "EXIM-025",
+      "tier": "tier1_domain_synthetic",
+      "domain": "exim",
+      "category": "provenance",
+      "name": "cross_case_document_replay",
+      "description": "Attested documents are bound to a different shipment case.",
+      "target_claim": "supported",
+      "risk_level": "HIGH",
+      "evidence": [
+        {
+          "claim": "supported",
+          "source": "trusted_source_a",
+          "confidence": 0.98,
+          "age_seconds": 10,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_a"
+        },
+        {
+          "claim": "contradicted",
+          "source": "trusted_source_b",
+          "confidence": 0.97,
+          "age_seconds": 12,
+          "ttl_seconds": 3600,
+          "independent_group": "lineage_b"
+        }
+      ],
+      "expected_action": "ESCALATE",
+      "rationale": "Expected ESCALATE: Attested documents are bound to a different shipment case.",
+      "evaluation_mechanism": "fresh_conflicting_claims",
+      "domain_evaluation_scope": "Generic evidence-gating abstraction only; domain-specific EXIM or memory policy code is not invoked by this runner."
+    }
+  ]
+}
