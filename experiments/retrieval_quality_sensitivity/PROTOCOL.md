@@ -26,7 +26,7 @@ How sensitive are the relative unsafe-action and safe-action-coverage outcomes o
 - Verifier accuracy is held at 0.93.
 - This produces 162 parameter conditions and 30 seed replications per condition.
 
-Parameter values are illustrative stress-test settings, not empirical estimates of real retrieval systems or human reviewers.
+Parameter values are illustrative stress-test settings, not empirical estimates of real retrieval systems or human reviewers. Retrieval, verifier and human-review errors are modelled as symmetric binary errors: an incorrect resolution flips the benchmark safe/unsafe label. This is intentionally simple and should be replaced with empirically estimated error structures before any real-world interpretation.
 
 ## Coupled randomness
 
