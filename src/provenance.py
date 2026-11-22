@@ -54,7 +54,11 @@ def create_document_root_attestation(
     """
     if not all(isinstance(x, str) and x for x in (signer_id, key_id, tenant_id, case_id, nonce)):
         raise ValueError("signer_id, key_id, tenant_id, case_id and nonce must be non-empty strings")
-    if not isinstance(issued_at, int) or not isinstance(expires_at, int) or expires_at <= issued_at:
+    if (
+        isinstance(issued_at, bool) or not isinstance(issued_at, int)
+        or isinstance(expires_at, bool) or not isinstance(expires_at, int)
+        or expires_at <= issued_at
+    ):
         raise ValueError("expires_at must be an integer later than issued_at")
     payload = {
         "schema": "ega-document-root-attestation-v1",
@@ -79,6 +83,7 @@ def verify_document_root_attestation(
     attestation: dict,
     *,
     trusted_keys: Mapping[str, Ed25519PublicKey],
+    trusted_signers: Mapping[str, str],
     revoked_key_ids: set[str] | frozenset[str] = frozenset(),
     expected_tenant_id: str,
     expected_case_id: str,
@@ -102,21 +107,38 @@ def verify_document_root_attestation(
         public_key = trusted_keys.get(key_id)
         if public_key is None:
             return False, "untrusted_key"
+        signer_id = payload.get("signer_id")
+        if not isinstance(signer_id, str) or not signer_id:
+            return False, "invalid_attestation"
+        authorized_signer = trusted_signers.get(key_id)
+        if authorized_signer is None:
+            return False, "untrusted_signer"
+        if signer_id != authorized_signer:
+            return False, "signer_identity_mismatch"
         if payload.get("tenant_id") != expected_tenant_id:
             return False, "tenant_mismatch"
         if payload.get("case_id") != expected_case_id:
             return False, "case_mismatch"
-        if not isinstance(now, int) or now < payload["issued_at"] or now >= payload["expires_at"]:
+        issued_at = payload.get("issued_at")
+        expires_at = payload.get("expires_at")
+        if (
+            isinstance(now, bool) or not isinstance(now, int)
+            or isinstance(issued_at, bool) or not isinstance(issued_at, int)
+            or isinstance(expires_at, bool) or not isinstance(expires_at, int)
+            or now < issued_at or now >= expires_at or expires_at <= issued_at
+        ):
             return False, "expired_or_not_yet_valid"
         if payload.get("document_instances_sha256") != canonical_sha256(document_instances):
             return False, "document_instances_mismatch"
         if payload.get("normalized_documents_sha256") != canonical_sha256(normalized_documents):
             return False, "normalized_documents_mismatch"
         nonce = payload["nonce"]
-        if consumed_nonces is not None and nonce in consumed_nonces:
-            return False, "replay"
+        if not isinstance(nonce, str) or not nonce:
+            return False, "invalid_attestation"
         signature = base64.b64decode(attestation["signature_b64"], validate=True)
         public_key.verify(signature, canonical_bytes(payload))
+        if consumed_nonces is not None and nonce in consumed_nonces:
+            return False, "replay"
         if consumed_nonces is not None:
             consumed_nonces.add(nonce)
         return True, "valid"

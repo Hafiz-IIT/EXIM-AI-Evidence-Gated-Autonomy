@@ -48,10 +48,15 @@ def attest(instances, normalized, key=None, key_id="doc-root-k1", tenant="tenant
     )
 
 
-def verify(record, instances, normalized, keys=None, revoked=(), tenant="tenant-A", case="case-1", now=150, consumed=None):
+def verify(record, instances, normalized, keys=None, revoked=(), tenant="tenant-A", case="case-1", now=150, consumed=None, signers=None):
+    effective_keys = keys if keys is not None else {"doc-root-k1": test_key("doc-root-k1").public_key()}
+    effective_signers = signers if signers is not None else {
+        key_id: "document-root-authority" for key_id in effective_keys
+    }
     return verify_document_root_attestation(
         record,
-        trusted_keys=keys or {"doc-root-k1": test_key("doc-root-k1").public_key()},
+        trusted_keys=effective_keys,
+        trusted_signers=effective_signers,
         revoked_key_ids=set(revoked),
         expected_tenant_id=tenant,
         expected_case_id=case,
@@ -160,6 +165,60 @@ class DocumentRootAttestationTests(unittest.TestCase):
         self.assertEqual(verify(forged_record, obs["document_instances"], obs["documents"]), (True, "valid"))
         # This is the expected failure mode under the combined compromise assumptions.
         self.assertEqual(evidence_gate_v1(case), "ACT")
+
+
+    def test_signer_identity_must_match_key_registry(self):
+        attacker_record = create_document_root_attestation(
+            signer_id="attacker-controlled-identity",
+            key_id="doc-root-k1",
+            tenant_id="tenant-A",
+            case_id="case-1",
+            document_instances=self.instances,
+            normalized_documents=self.normalized,
+            private_key=test_key("doc-root-k1"),
+            issued_at=100,
+            expires_at=200,
+            nonce="nonce-attacker",
+        )
+        self.assertEqual(
+            verify(attacker_record, self.instances, self.normalized),
+            (False, "signer_identity_mismatch"),
+        )
+
+    def test_key_without_signer_enrollment_is_rejected(self):
+        self.assertEqual(
+            verify(
+                self.record,
+                self.instances,
+                self.normalized,
+                signers={},
+            ),
+            (False, "untrusted_signer"),
+        )
+
+
+    def test_boolean_timestamps_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "integer later than issued_at"):
+            create_document_root_attestation(
+                signer_id="document-root-authority",
+                key_id="doc-root-k1",
+                tenant_id="tenant-A",
+                case_id="case-1",
+                document_instances=self.instances,
+                normalized_documents=self.normalized,
+                private_key=test_key("doc-root-k1"),
+                issued_at=True,
+                expires_at=200,
+                nonce="nonce-bool-time",
+            )
+        altered = copy.deepcopy(self.record)
+        altered["payload"]["issued_at"] = True
+        # The altered payload is also signature-invalid, but type validation
+        # must reject it before any comparison can treat bool as an integer.
+        self.assertEqual(
+            verify(altered, self.instances, self.normalized),
+            (False, "expired_or_not_yet_valid"),
+        )
 
     def test_invalid_signature_is_rejected(self):
         altered = copy.deepcopy(self.record)

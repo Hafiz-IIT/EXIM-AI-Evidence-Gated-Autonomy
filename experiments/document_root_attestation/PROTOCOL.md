@@ -10,14 +10,14 @@ Can a trusted document-root authority cryptographically bind both (a) the raw do
 
 The Ed25519-signed payload binds:
 - schema/version;
-- signer identity and key identifier;
+- signer identity and key identifier, checked against an explicit key-ID-to-signer-ID authorization registry;
 - tenant identifier and case identifier;
 - SHA-256 of canonicalized raw document instances;
 - SHA-256 of canonicalized normalized document slots;
 - issuance and expiry timestamps;
 - a unique nonce.
 
-Verification checks the trusted key registry, revocation set, tenant/case scope, validity window, both document digests, replay state and Ed25519 signature. The nonce is consumed only after all checks succeed.
+Verification checks the trusted public-key registry, the key-ID-to-signer-ID authorization mapping, revocation set, tenant/case scope, validity window, both document digests, replay state and Ed25519 signature. The signer mapping is a caller-supplied trust configuration; this experiment does not implement authenticated enrollment or key-administration controls. The nonce is consumed only after all checks succeed.
 
 ## Threat experiments
 
@@ -61,7 +61,7 @@ The runner uses deterministic test-only keys derived from fixed labels. This mak
 
 This experiment tests cryptographic binding and selected lifecycle controls. It does not implement:
 - KMS/HSM-backed private-key custody;
-- authenticated signer enrollment or independent identity proof;
+- authenticated signer enrollment or independent identity proof (the local key-to-signer mapping is a test-time authorization registry only);
 - durable, atomic, distributed replay-state storage;
 - certificate issuance, trust-chain validation or operational key rotation;
 - revocation distribution/latency guarantees;
