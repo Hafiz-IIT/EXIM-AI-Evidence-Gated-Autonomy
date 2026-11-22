@@ -79,6 +79,7 @@ def verify_document_root_attestation(
     attestation: dict,
     *,
     trusted_keys: Mapping[str, Ed25519PublicKey],
+    trusted_signers: Mapping[str, str],
     revoked_key_ids: set[str] | frozenset[str] = frozenset(),
     expected_tenant_id: str,
     expected_case_id: str,
@@ -102,6 +103,14 @@ def verify_document_root_attestation(
         public_key = trusted_keys.get(key_id)
         if public_key is None:
             return False, "untrusted_key"
+        signer_id = payload.get("signer_id")
+        if not isinstance(signer_id, str) or not signer_id:
+            return False, "invalid_attestation"
+        authorized_signer = trusted_signers.get(key_id)
+        if authorized_signer is None:
+            return False, "untrusted_signer"
+        if signer_id != authorized_signer:
+            return False, "signer_identity_mismatch"
         if payload.get("tenant_id") != expected_tenant_id:
             return False, "tenant_mismatch"
         if payload.get("case_id") != expected_case_id:
@@ -113,10 +122,12 @@ def verify_document_root_attestation(
         if payload.get("normalized_documents_sha256") != canonical_sha256(normalized_documents):
             return False, "normalized_documents_mismatch"
         nonce = payload["nonce"]
-        if consumed_nonces is not None and nonce in consumed_nonces:
-            return False, "replay"
+        if not isinstance(nonce, str) or not nonce:
+            return False, "invalid_attestation"
         signature = base64.b64decode(attestation["signature_b64"], validate=True)
         public_key.verify(signature, canonical_bytes(payload))
+        if consumed_nonces is not None and nonce in consumed_nonces:
+            return False, "replay"
         if consumed_nonces is not None:
             consumed_nonces.add(nonce)
         return True, "valid"
