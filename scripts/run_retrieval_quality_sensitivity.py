@@ -120,13 +120,22 @@ def case_metrics(counters):
     }
 
 
-def evaluate_policy(cases, policy, params, draws):
+def precompute_policy_actions(cases, policies=POLICIES):
+    """Run deterministic policy functions once, using only observable case fields."""
+    cached = {}
+    for policy_name, policy in policies.items():
+        cached[policy_name] = {}
+        for case in cases:
+            policy_input = {"observable": case["observable"], "action": case["action"]}
+            cached[policy_name][case["case_id"]] = policy(policy_input)
+    return cached
+
+
+def evaluate_policy(cases, policy_actions, params, draws):
     overall = defaultdict(int)
     by_family = defaultdict(lambda: defaultdict(int))
     for case in cases:
-        # Keep benchmark labels and identifiers outside the policy input.
-        policy_input = {"observable": case["observable"], "action": case["action"]}
-        action = policy(policy_input)
+        action = policy_actions[case["case_id"]]
         final_act = final_consequential_action(
             action, case["safe_to_act"], params, draws[case["case_id"]]
         )
@@ -183,6 +192,7 @@ def main():
     dataset_sha256 = hashlib.sha256(BENCH.read_bytes()).hexdigest()
     seeds = range(N_SEEDS)
     draw_cache = {seed: make_common_random_draws(cases, seed) for seed in seeds}
+    policy_action_cache = precompute_policy_actions(cases)
     overall_rows = []
     family_rows = []
 
@@ -192,7 +202,7 @@ def main():
         run_params = {**params, "verifier_accuracy": 0.93}
         for seed in seeds:
             for policy_name, policy in POLICIES.items():
-                overall, families = evaluate_policy(cases, policy, run_params, draw_cache[seed])
+                overall, families = evaluate_policy(cases, policy_action_cache[policy_name], run_params, draw_cache[seed])
                 per_policy[policy_name].append(overall)
                 for family, metrics in families.items():
                     per_family[policy_name][family].append(metrics)
