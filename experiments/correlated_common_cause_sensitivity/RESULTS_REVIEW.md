@@ -1,9 +1,9 @@
 # Correlated Common-Cause Sensitivity — Results Review v2
 
-**Workflow run:** [45150840549](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/45150840549)  
-**PR head commit used for the artifact:** `93c1ba6dbdf7732c92b6662a5e5e3778e208a2d1`  
-**Workflow checkout commit recorded in manifest:** `627bd3011badb2f70771f7a053595801e9b3e82d`  
-**Artifact:** [ega-correlated-common-cause-sensitivity-v2](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/45150840549/artifacts/14805509932)  
+**Workflow run:** [45151733036](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/45151733036)  
+**PR head commit used for the artifact:** `23cc5f287d349032daf96b1ed9bb670402dafd1e`  
+**Workflow checkout commit recorded in manifest:** `14238c6a44a2e360142f012d6094df5759631a37`  
+**Artifact:** [ega-correlated-common-cause-sensitivity-v2](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/45151733036/artifacts/14807765067)  
 **Benchmark:** v0.4 HIGH-risk subset (700 cases)  
 **Design:** 81 parameter conditions × 20 seeds; three policy structures  
 **Study type:** exploratory synthetic sensitivity analysis
