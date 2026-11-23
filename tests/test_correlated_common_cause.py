@@ -16,7 +16,7 @@ class CorrelatedCommonCauseTests(unittest.TestCase):
         self.assertEqual(len(list(MODULE.conditions())), 81)
 
     def test_zero_shock_reduces_to_independent_marginals(self):
-        self.assertEqual(MODULE.residual_error_probability(0.93, 0.0), 0.07)
+        self.assertAlmostEqual(MODULE.residual_error_probability(0.93, 0.0), 0.07)
         self.assertEqual(MODULE.residual_error_probability(0.75, 0.0), 0.25)
 
     def test_common_shock_preserves_each_marginal_error_rate(self):
