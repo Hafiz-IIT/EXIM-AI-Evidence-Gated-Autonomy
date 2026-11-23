@@ -14,6 +14,13 @@ FIELDS = (
     "cross_document_consistency",
     "recommended_disposition",
 )
+ALLOWED = {
+    "evidence_sufficiency": {"SUFFICIENT", "INSUFFICIENT", "AMBIGUOUS"},
+    "source_integrity": {"VALID", "INVALID", "UNCERTAIN"},
+    "document_freshness": {"CURRENT", "STALE", "UNKNOWN"},
+    "cross_document_consistency": {"CONSISTENT", "CONFLICT", "NOT_ASSESSABLE"},
+    "recommended_disposition": {"ACT", "DEFER", "ESCALATE"},
+}
 
 
 def load_annotations(path):
@@ -35,6 +42,13 @@ def load_annotations(path):
         if key in seen:
             raise ValueError(f"Duplicate annotation from same annotator: {key}")
         seen.add(key)
+        for field in FIELDS:
+            value = row[field].strip()
+            if value and value not in ALLOWED[field]:
+                raise ValueError(f"Invalid {field} value {value!r} for {key}")
+        confidence = row.get("confidence_1_5", "").strip()
+        if confidence and confidence not in {"1", "2", "3", "4", "5"}:
+            raise ValueError(f"confidence_1_5 must be 1-5 for {key}")
     return rows
 
 
