@@ -89,22 +89,22 @@ class CorrelatedCommonCauseTests(unittest.TestCase):
             "unsafe_act_rate", "unsafe_act_conditional_rate", "safe_act_coverage",
             "false_block_rate", "act_rate",
         )
+        policies = ("EvidenceGate", "RiskGate", "SerialEvidenceGate")
         for retrieval in (0.50, 0.75, 0.95):
             for human in (0.75, 0.90, 0.98):
                 for verifier in (0.85, 0.93, 0.98):
-                    for policy in ("EvidenceGate", "RiskGate", "SerialEvidenceGate"):
-                        for seed in range(MODULE.N_SEEDS):
-                            for fraction in (0.0, 0.5, 1.0):
-                                row = {
-                                    "retrieval_accuracy": retrieval,
-                                    "human_accuracy": human,
-                                    "verifier_accuracy": verifier,
-                                    "policy": policy, "seed": seed,
-                                    "common_shock_fraction": fraction,
-                                }
+                    for seed in range(MODULE.N_SEEDS):
+                        for fraction in (0.0, 0.5, 1.0):
+                            row = {
+                                "retrieval_accuracy": retrieval,
+                                "human_accuracy": human,
+                                "verifier_accuracy": verifier,
+                                "seed": seed, "common_shock_fraction": fraction,
+                            }
+                            for policy in policies:
                                 for metric in metrics:
                                     row[f"{policy}_{metric}"] = seed / 100 + fraction / 10
-                                rows.append(row)
+                            rows.append(row)
         effects = MODULE.paired_shock_effects(rows)
         self.assertEqual(len(effects), 810)
         selected = next(
