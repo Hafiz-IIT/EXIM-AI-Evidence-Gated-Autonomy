@@ -71,8 +71,10 @@ def build_packet(cases, per_family=10, seed=SEED):
             raise ValueError(f"Family {family} has only {len(pair_ids)} pairs")
         for pair_id in rng.sample(pair_ids, per_family):
             pair = groups[family][pair_id]
-            if len(pair) != 2:
-                raise ValueError(f"Pair {pair_id} does not contain exactly two risk variants")
+            if len(pair) != 2 or {row["action"]["risk_level"] for row in pair} != {"LOW", "HIGH"}:
+                raise ValueError(f"Pair {pair_id} does not contain one LOW and one HIGH variant")
+            if pair[0]["observable"] != pair[1]["observable"]:
+                raise ValueError(f"Pair {pair_id} has mismatched observable evidence")
             for case in pair:
                 ann_id = annotation_id(case["case_id"], seed)
                 action = case["action"]
