@@ -77,6 +77,8 @@ class RetrievalQualitySensitivityTests(unittest.TestCase):
         def policy(input_case):
             seen.update(input_case)
             return "DEFER"
+        cache = MODULE.precompute_policy_actions([case], {"spy": policy})
+        self.assertEqual(cache["spy"]["C0-HIGH"], "DEFER")
         params = {
             "retrieval_availability": 0.9,
             "retrieval_accuracy": 0.9,
@@ -85,7 +87,7 @@ class RetrievalQualitySensitivityTests(unittest.TestCase):
             "unavailable_fallback": "DEFER",
             "verifier_accuracy": 0.93,
         }
-        MODULE.evaluate_policy([case], policy, params, {"C0-HIGH": self.draws})
+        MODULE.evaluate_policy([case], cache["spy"], params, {"C0-HIGH": self.draws})
         self.assertEqual(set(seen), {"observable", "action"})
         self.assertNotIn("safe_to_act", seen)
         self.assertNotIn("ground_truth", seen)
