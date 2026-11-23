@@ -51,6 +51,38 @@ class CorrelatedCommonCauseTests(unittest.TestCase):
         self.assertEqual(MODULE.make_correlated_draws(cases, 7), MODULE.make_correlated_draws(cases, 7))
         self.assertNotEqual(MODULE.make_correlated_draws(cases, 7), MODULE.make_correlated_draws(cases, 8))
 
+    def test_serial_gate_shared_shock_can_bypass_human_review(self):
+        case = {"case_id": "U1", "family": "test", "safe_to_act": False}
+        params = {
+            "retrieval_accuracy": 0.98, "human_accuracy": 0.98,
+            "verifier_accuracy": 0.98, "common_shock_fraction": 1.0,
+            "retrieval_availability": 1.0, "escalation_availability": 1.0,
+            "unavailable_fallback": "DEFER",
+        }
+        draws = {"U1": {
+            "common_shock": 0.001, "retrieval_noise": 0.99,
+            "verifier_noise": 0.99, "human_noise": 0.99,
+            "retrieval_available": 0.0, "escalation_available": 0.0,
+        }}
+        overall, _ = MODULE.evaluate_serial_evidence_gate([case], params, draws)
+        self.assertEqual(overall["unsafe_acts"], 1)
+
+    def test_serial_gate_escalates_when_retrieval_and_verifier_disagree(self):
+        case = {"case_id": "S1", "family": "test", "safe_to_act": True}
+        params = {
+            "retrieval_accuracy": 0.75, "human_accuracy": 0.75,
+            "verifier_accuracy": 0.75, "common_shock_fraction": 0.0,
+            "retrieval_availability": 1.0, "escalation_availability": 1.0,
+            "unavailable_fallback": "DEFER",
+        }
+        draws = {"S1": {
+            "common_shock": 0.5, "retrieval_noise": 0.0,
+            "verifier_noise": 0.99, "human_noise": 0.99,
+            "retrieval_available": 0.0, "escalation_available": 0.0,
+        }}
+        overall, _ = MODULE.evaluate_serial_evidence_gate([case], params, draws)
+        self.assertEqual(overall["safe_acts"], 1)
+
     def test_paired_difference_uses_seed_level_pairs(self):
         mean, sd, low, high = MODULE.paired_difference_ci([0.2, 0.4, 0.6], [0.1, 0.3, 0.5])
         self.assertAlmostEqual(mean, 0.1)
