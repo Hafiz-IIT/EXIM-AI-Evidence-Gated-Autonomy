@@ -1,0 +1,18 @@
+{
+  "protocol": "blinded-stratified-human-annotation-v1",
+  "fields": {
+    "evidence_sufficiency": ["SUFFICIENT", "INSUFFICIENT", "AMBIGUOUS"],
+    "source_integrity": ["VALID", "INVALID", "UNCERTAIN"],
+    "document_freshness": ["CURRENT", "STALE", "UNKNOWN"],
+    "cross_document_consistency": ["CONSISTENT", "CONFLICT", "NOT_ASSESSABLE"],
+    "recommended_disposition": ["ACT", "DEFER", "ESCALATE"],
+    "confidence_1_5": [1, 2, 3, 4, 5],
+    "rationale": "short evidence-based explanation"
+  },
+  "required_identity": ["annotation_id", "annotator_id"],
+  "blinding_excludes": [
+    "case_id", "pair_id", "family", "severity", "fault",
+    "ground_truth", "safe_to_act", "fingerprint"
+  ],
+  "minimum_independent_annotators_per_item": 2
+}

@@ -51,6 +51,17 @@ jobs:
           path: data/benchmark_v0.4/
           if-no-files-found: error
           retention-days: 90
+      - name: Build blinded human annotation packet
+        id: annotation_packet
+        run: python scripts/build_annotation_packet.py --per-family 10 --seed 20261123
+      - name: Upload blinded annotation packet (shareable files only)
+        if: always() && steps.annotation_packet.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-independent-annotation-packet-v1
+          path: results/annotation_validation/shareable/
+          if-no-files-found: error
+          retention-days: 90
       - name: Run v0.4 reconstruction and sensitivity analysis
         id: runner_v2
         run: |
@@ -156,6 +167,7 @@ jobs:
           RUNNER_ERROR: ${{ env.RUNNER_ERROR }}
           V04_GENERATE_OUTCOME: ${{ steps.v04_generate.outcome }}
           V04_VERIFY_OUTCOME: ${{ steps.v04_verify.outcome }}
+          ANNOTATION_PACKET_OUTCOME: ${{ steps.annotation_packet.outcome }}
           RUNNER_V2_OUTCOME: ${{ steps.runner_v2.outcome }}
           RUNNER_V2_ERROR: ${{ env.RUNNER_V2_ERROR }}
           DOCUMENT_ROOT_OUTCOME: ${{ steps.document_root.outcome }}
@@ -164,14 +176,14 @@ jobs:
           RETRIEVAL_OUTCOME: ${{ steps.retrieval_sensitivity.outcome }}
           CORRELATED_SENSITIVITY_OUTCOME: ${{ steps.correlated_sensitivity.outcome }}
         run: |
-          if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$SIGNED_CATALOG_OUTCOME" = "success" ] && [ "$ACTION_CONSEQUENCE_OUTCOME" = "success" ] && [ "$RETRIEVAL_OUTCOME" = "success" ] && [ "$CORRELATED_SENSITIVITY_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
+          if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$ANNOTATION_PACKET_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$SIGNED_CATALOG_OUTCOME" = "success" ] && [ "$ACTION_CONSEQUENCE_OUTCOME" = "success" ] && [ "$RETRIEVAL_OUTCOME" = "success" ] && [ "$CORRELATED_SENSITIVITY_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
           V1_STATUS="$RUNNER_OUTCOME"
           V2_STATUS="$RUNNER_V2_OUTCOME"
           case "$V1_STATUS" in success|failure|error) ;; *) V1_STATUS=failure ;; esac
           case "$V2_STATUS" in success|failure|error) ;; *) V2_STATUS=failure ;; esac
-          curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$STATE\",\"context\":\"portfolio/benchmark-integrity-and-manuscript-build\",\"description\":\"Tests, benchmarks, retrieval/action spoof studies, signed catalog and correlated-failure studies, provenance threats, tables and manuscript build\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
+          curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$STATE\",\"context\":\"portfolio/benchmark-integrity-and-manuscript-build\",\"description\":\"Tests, benchmarks, retrieval/action spoof studies, signed catalog and correlated-failure studies, blinded annotation packet, provenance threats, tables and manuscript build\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
           curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$V1_STATUS\",\"context\":\"portfolio/reconstruction-v1-diagnostic\",\"description\":\"${RUNNER_ERROR:-runner-passed}\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
           curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$V2_STATUS\",\"context\":\"portfolio/reconstruction-v2-sensitivity\",\"description\":\"${RUNNER_V2_ERROR:-v04-runner-passed}\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
       - name: Fail workflow when verification fails
-        if: steps.tests.outcome != 'success' || steps.generate.outcome != 'success' || steps.verify.outcome != 'success' || steps.runner.outcome != 'success' || steps.v04_generate.outcome != 'success' || steps.v04_verify.outcome != 'success' || steps.runner_v2.outcome != 'success' || steps.document_root.outcome != 'success' || steps.signed_catalog.outcome != 'success' || steps.action_consequence.outcome != 'success' || steps.retrieval_sensitivity.outcome != 'success' || steps.correlated_sensitivity.outcome != 'success' || steps.tables.outcome != 'success' || steps.latex.outcome != 'success'
+        if: steps.tests.outcome != 'success' || steps.generate.outcome != 'success' || steps.verify.outcome != 'success' || steps.runner.outcome != 'success' || steps.v04_generate.outcome != 'success' || steps.v04_verify.outcome != 'success' || steps.annotation_packet.outcome != 'success' || steps.runner_v2.outcome != 'success' || steps.document_root.outcome != 'success' || steps.signed_catalog.outcome != 'success' || steps.action_consequence.outcome != 'success' || steps.retrieval_sensitivity.outcome != 'success' || steps.correlated_sensitivity.outcome != 'success' || steps.tables.outcome != 'success' || steps.latex.outcome != 'success'
         run: exit 1
