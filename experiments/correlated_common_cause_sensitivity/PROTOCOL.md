@@ -56,10 +56,11 @@ The serial comparator makes the cross-channel dependence observable. Results for
 - Safe ACT coverage.
 - False-block rate among safe cases.
 - Final ACT rate.
-- Paired Evidence Gate minus Risk Gate differences across 20 seed-level replications, with t-based 95% intervals.
+- Paired Evidence Gate minus Risk Gate and SerialEvidenceGate minus Risk Gate differences across 20 seed-level replications, with t-based 95% intervals.
+- Paired shock effects (rho=0.5 minus rho=0; rho=max minus rho=0) for every policy and metric, computed within the same seed and reported with t-based 95% intervals in `paired_shock_effects.csv`.
 - Per-family summaries across all 14 benchmark families.
 
-The same case-indexed random draws are reused across all three policy structures. Report both marginal accuracies and the actual common-shock mass for every condition. Report the existing branching policies separately from the stylized SerialEvidenceGate.
+The same case-indexed random draws are reused across all three policy structures. Seed-level policy metrics are retained in `seed_level_results.csv` so shock effects can be compared within seed rather than inferred from independent aggregate intervals. Report both marginal accuracies and the actual common-shock mass for every condition. Report the existing branching policies separately from the stylized SerialEvidenceGate.
 
 ## Limitations
 
