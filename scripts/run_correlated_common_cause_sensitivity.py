@@ -247,17 +247,18 @@ def paired_shock_effects(seed_rows):
     )
     base_keys = ("retrieval_accuracy", "human_accuracy", "verifier_accuracy")
     lookup = {}
+    policies = ("EvidenceGate", "RiskGate", "SerialEvidenceGate")
     for row in seed_rows:
-        key = (
-            tuple(float(row[name]) for name in base_keys),
-            int(row["seed"]), row["policy"], float(row["common_shock_fraction"]),
-        )
-        lookup[key] = row
+        base = tuple(float(row[name]) for name in base_keys)
+        seed = int(row["seed"])
+        shock_fraction = float(row["common_shock_fraction"])
+        for policy in policies:
+            lookup[(base, seed, policy, shock_fraction)] = row
     output = []
     base_conditions = list(itertools.product(*(GRID[key] for key in base_keys)))
     for base in base_conditions:
         base_tuple = tuple(float(value) for value in base)
-        for policy in ("EvidenceGate", "RiskGate", "SerialEvidenceGate"):
+        for policy in policies:
             for target_fraction in (0.5, 1.0):
                 for metric in metrics_to_compare:
                     left = [
