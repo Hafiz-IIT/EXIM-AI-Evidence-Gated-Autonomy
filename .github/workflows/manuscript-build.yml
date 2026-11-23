@@ -80,7 +80,7 @@ jobs:
         if: always() && steps.correlated_sensitivity.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: ega-correlated-common-cause-sensitivity-v1
+          name: ega-correlated-common-cause-sensitivity-v2
           path: results/correlated_common_cause_sensitivity/
           if-no-files-found: error
           retention-days: 90
