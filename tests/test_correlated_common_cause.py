@@ -81,7 +81,7 @@ class CorrelatedCommonCauseTests(unittest.TestCase):
             "retrieval_available": 0.0, "escalation_available": 0.0,
         }}
         overall, _ = MODULE.evaluate_serial_evidence_gate([case], params, draws)
-        self.assertEqual(overall["safe_acts"], 1)
+        self.assertEqual(overall["safe_act_coverage"], 1.0)
 
     def test_paired_difference_uses_seed_level_pairs(self):
         mean, sd, low, high = MODULE.paired_difference_ci([0.2, 0.4, 0.6], [0.1, 0.3, 0.5])
