@@ -83,6 +83,43 @@ class CorrelatedCommonCauseTests(unittest.TestCase):
         overall, _ = MODULE.evaluate_serial_evidence_gate([case], params, draws)
         self.assertEqual(overall["safe_act_coverage"], 1.0)
 
+    def test_paired_shock_effects_use_same_seed_across_correlation_levels(self):
+        rows = []
+        metrics = (
+            "unsafe_act_rate", "unsafe_act_conditional_rate", "safe_act_coverage",
+            "false_block_rate", "act_rate",
+        )
+        for retrieval in (0.50, 0.75, 0.95):
+            for human in (0.75, 0.90, 0.98):
+                for verifier in (0.85, 0.93, 0.98):
+                    for policy in ("EvidenceGate", "RiskGate", "SerialEvidenceGate"):
+                        for seed in range(MODULE.N_SEEDS):
+                            for fraction in (0.0, 0.5, 1.0):
+                                row = {
+                                    "retrieval_accuracy": retrieval,
+                                    "human_accuracy": human,
+                                    "verifier_accuracy": verifier,
+                                    "policy": policy, "seed": seed,
+                                    "common_shock_fraction": fraction,
+                                }
+                                for metric in metrics:
+                                    row[f"{policy}_{metric}"] = seed / 100 + fraction / 10
+                                rows.append(row)
+        effects = MODULE.paired_shock_effects(rows)
+        self.assertEqual(len(effects), 810)
+        selected = next(
+            row for row in effects
+            if row["retrieval_accuracy"] == 0.5
+            and row["human_accuracy"] == 0.75
+            and row["verifier_accuracy"] == 0.85
+            and row["policy"] == "SerialEvidenceGate"
+            and row["comparison"] == "shock_0.5_minus_independent"
+            and row["metric"] == "unsafe_act_rate"
+        )
+        self.assertAlmostEqual(selected["paired_mean_difference"], 0.05)
+        self.assertAlmostEqual(selected["paired_95ci_low"], 0.05)
+        self.assertAlmostEqual(selected["paired_95ci_high"], 0.05)
+
     def test_paired_difference_uses_seed_level_pairs(self):
         mean, sd, low, high = MODULE.paired_difference_ci([0.2, 0.4, 0.6], [0.1, 0.3, 0.5])
         self.assertAlmostEqual(mean, 0.1)
