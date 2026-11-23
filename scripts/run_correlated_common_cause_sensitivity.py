@@ -239,12 +239,59 @@ def write_csv(path, rows):
         writer.writerows(rows)
 
 
+def paired_shock_effects(seed_rows):
+    """Paired within-seed changes from rho=0 to rho=0.5 and rho=max."""
+    metrics_to_compare = (
+        "unsafe_act_rate", "unsafe_act_conditional_rate", "safe_act_coverage",
+        "false_block_rate", "act_rate",
+    )
+    base_keys = ("retrieval_accuracy", "human_accuracy", "verifier_accuracy")
+    lookup = {}
+    for row in seed_rows:
+        key = (
+            tuple(float(row[name]) for name in base_keys),
+            int(row["seed"]), row["policy"], float(row["common_shock_fraction"]),
+        )
+        lookup[key] = row
+    output = []
+    base_conditions = list(itertools.product(*(GRID[key] for key in base_keys)))
+    for base in base_conditions:
+        base_tuple = tuple(float(value) for value in base)
+        for policy in ("EvidenceGate", "RiskGate", "SerialEvidenceGate"):
+            for target_fraction in (0.5, 1.0):
+                for metric in metrics_to_compare:
+                    left = [
+                        lookup[(base_tuple, seed, policy, target_fraction)][f"{policy}_{metric}"]
+                        for seed in range(N_SEEDS)
+                    ]
+                    right = [
+                        lookup[(base_tuple, seed, policy, 0.0)][f"{policy}_{metric}"]
+                        for seed in range(N_SEEDS)
+                    ]
+                    mean, sd, low, high = paired_difference_ci(left, right)
+                    output.append({
+                        "retrieval_accuracy": base_tuple[0],
+                        "human_accuracy": base_tuple[1],
+                        "verifier_accuracy": base_tuple[2],
+                        "policy": policy,
+                        "comparison": f"shock_{target_fraction}_minus_independent",
+                        "metric": metric,
+                        "paired_mean_difference": mean,
+                        "paired_sd": sd,
+                        "paired_95ci_low": low,
+                        "paired_95ci_high": high,
+                        "seeds": N_SEEDS,
+                    })
+    return output
+
+
 def main():
     cases = load_high_risk_cases()
     policy_cache = precompute_policy_actions(cases)
     draws_by_seed = {seed: make_correlated_draws(cases, seed) for seed in range(N_SEEDS)}
     overall_rows = []
     family_rows = []
+    seed_rows = []
     metric_names = (
         "unsafe_act_rate", "unsafe_act_conditional_rate", "safe_act_coverage",
         "false_block_rate", "act_rate",
@@ -267,6 +314,14 @@ def main():
             per_policy["SerialEvidenceGate"].append(serial_overall)
             for family, result in serial_families.items():
                 per_family["SerialEvidenceGate"][family].append(result)
+            seed_row = {
+                "condition_id": condition_id, "seed": seed,
+                **params, "common_shock_mass": shock,
+            }
+            for name in policy_names:
+                for metric in metric_names:
+                    seed_row[f"{name}_{metric}"] = per_policy[name][-1][metric]
+            seed_rows.append(seed_row)
 
         row = {
             "condition_id": condition_id, **params,
@@ -310,8 +365,11 @@ def main():
                 family_rows.append(frow)
 
     OUT.mkdir(parents=True, exist_ok=True)
+    shock_effect_rows = paired_shock_effects(seed_rows)
     write_csv(OUT / "overall_summary.csv", overall_rows)
     write_csv(OUT / "scenario_family_summary.csv", family_rows)
+    write_csv(OUT / "seed_level_results.csv", seed_rows)
+    write_csv(OUT / "paired_shock_effects.csv", shock_effect_rows)
     manifest = {
         "experiment": "correlated-common-cause-retrieval-verifier-human-sensitivity-v2",
         "status": "exploratory synthetic sensitivity analysis",
