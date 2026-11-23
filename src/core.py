@@ -1,6 +1,7 @@
 import hashlib
 import json
 import math
+from collections.abc import Mapping
 
 
 def _canonical_hash(value):
@@ -110,3 +111,39 @@ def weak_strong(r, hi=0.94, lo=0.75):
 def risk_gate(r, threshold=0.90):
     f = visible_features(r)
     return "VERIFY" if f["risk"] == "HIGH" else ("ACT" if f["confidence"] >= threshold else "DEFER")
+
+
+def evidence_gate_v2(r, *, trusted_action_id, trusted_action_catalog):
+    """Authorize only an action whose consequence metadata matches trusted context.
+
+    trusted_action_id must come from an authorization context independent of the
+    agent-proposed action. The catalog must be maintained outside the model.
+    This function checks metadata binding; it does not itself authenticate the
+    caller or enforce the eventual tool invocation.
+    """
+    if not isinstance(r, Mapping):
+        return "ESCALATE"
+    if not isinstance(trusted_action_id, str) or not trusted_action_id:
+        return "ESCALATE"
+    if not isinstance(trusted_action_catalog, Mapping):
+        return "ESCALATE"
+    action = r.get("action")
+    if not isinstance(action, Mapping):
+        return "ESCALATE"
+    if action.get("name") != trusted_action_id:
+        return "ESCALATE"
+    trusted = trusted_action_catalog.get(trusted_action_id)
+    if not isinstance(trusted, Mapping):
+        return "ESCALATE"
+    required = ("risk_level", "reversibility", "external_effect")
+    if any(not isinstance(trusted.get(key), str) or not trusted.get(key) for key in required):
+        return "ESCALATE"
+    if any(action.get(key) != trusted[key] for key in required):
+        return "ESCALATE"
+    if trusted["risk_level"] not in {"LOW", "HIGH"}:
+        return "ESCALATE"
+
+    normalized = dict(r)
+    normalized["action"] = dict(action)
+    normalized["action"]["risk_level"] = trusted["risk_level"]
+    return evidence_gate_v1(normalized)
