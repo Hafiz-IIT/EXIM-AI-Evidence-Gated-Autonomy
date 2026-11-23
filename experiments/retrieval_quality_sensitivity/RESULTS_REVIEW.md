@@ -1,8 +1,8 @@
 # Retrieval Quality and Escalation Fallback — Results Review v1
 
-**Workflow run:** 45085233806  
-**Source commit:** 1db4b147149a3786143a332db7b9e9ce2dba261c  
-**Artifact:** ega-retrieval-quality-sensitivity-v1  
+**Workflow run:** 45086610287  
+**Source commit:** 07365614e4750d81b7530e58fa33d09e79108811  
+**Artifact:** [ega-retrieval-quality-sensitivity-v1](https://github.com/Hafiz-IIT/EXIM-AI-Evidence-Gated-Autonomy/actions/runs/45086610287/artifacts/14779661317)  
 **Benchmark:** v0.4 HIGH-risk subset  
 **Cases:** 700 (600 unsafe-to-act, 100 safe-to-act)  
 **Replications:** 30 seeds per condition  
