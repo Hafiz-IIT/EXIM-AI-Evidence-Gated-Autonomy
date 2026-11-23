@@ -1,6 +1,6 @@
 # Correlated Common-Cause Retrieval, Verifier and Human-Review Sensitivity v1
 
-**Status:** Exploratory synthetic sensitivity experiment. This extends the independent-error model without replacing prior results.
+**Status:** Exploratory synthetic sensitivity experiment. Version 2 adds an explicit serial-gate comparator after the first run exposed a limitation in the existing branching policy simulator.
 
 ## Research question
 
@@ -42,6 +42,13 @@ The model preserves each channel's marginal error rate while inducing positive d
 
 This is a deliberately simple common-cause model. It does not represent source graphs, multiple correlated clusters, adaptive adversaries, or empirically estimated dependencies.
 
+## Two policy structures are evaluated
+
+1. **Existing policy branches.** The repository's current Evidence Gate and Risk Gate choose one terminal correctness channel per case (retrieval, verifier, or human escalation). The shared shock is present in the draw cache, but a single path usually invokes only one correctness channel. With marginals preserved, this branch-only model is expected to be largely insensitive to cross-channel dependence. That is a diagnostic limitation, not evidence that correlated failures are harmless.
+2. **SerialEvidenceGate (stylized comparator).** Retrieval and verifier each produce a binary safe/unsafe assessment. If they agree, the gate follows the shared assessment. If they disagree, or retrieval is unavailable, it escalates to human review. A common shock can make retrieval and verifier jointly wrong on an unsafe case, causing agreement on a false-safe assessment and bypassing the human escalation. This is a deliberately simplified composition model, not a claim about the current Evidence Gate implementation.
+
+The serial comparator makes the cross-channel dependence observable. Results for it must be reported separately from the existing policies and must not be described as measured performance of the current EGA implementation.
+
 ## Metrics and statistical design
 
 - Unsafe ACT / all HIGH-risk cases.
@@ -52,7 +59,7 @@ This is a deliberately simple common-cause model. It does not represent source g
 - Paired Evidence Gate minus Risk Gate differences across 20 seed-level replications, with t-based 95% intervals.
 - Per-family summaries across all 14 benchmark families.
 
-The same case-indexed random draws are reused across both policies. Report both marginal accuracies and the actual common-shock mass for every condition.
+The same case-indexed random draws are reused across all three policy structures. Report both marginal accuracies and the actual common-shock mass for every condition. Report the existing branching policies separately from the stylized SerialEvidenceGate.
 
 ## Limitations
 
