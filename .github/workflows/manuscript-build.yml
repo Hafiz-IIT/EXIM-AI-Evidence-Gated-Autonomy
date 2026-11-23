@@ -84,6 +84,17 @@ jobs:
           path: results/action_consequence_binding/
           if-no-files-found: error
           retention-days: 90
+      - name: Run signed action-catalog and executor-binding threat experiment
+        id: signed_catalog
+        run: python scripts/run_signed_action_catalog_threats.py
+      - name: Upload signed action-catalog threat outputs
+        if: always() && steps.signed_catalog.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ega-signed-action-catalog-threats-v1
+          path: results/signed_action_catalog_threats/
+          if-no-files-found: error
+          retention-days: 90
       - name: Run document-root attestation threat experiments
         id: document_root
         run: python scripts/run_document_root_attestation.py
@@ -137,17 +148,18 @@ jobs:
           RUNNER_V2_OUTCOME: ${{ steps.runner_v2.outcome }}
           RUNNER_V2_ERROR: ${{ env.RUNNER_V2_ERROR }}
           DOCUMENT_ROOT_OUTCOME: ${{ steps.document_root.outcome }}
+          SIGNED_CATALOG_OUTCOME: ${{ steps.signed_catalog.outcome }}
           ACTION_CONSEQUENCE_OUTCOME: ${{ steps.action_consequence.outcome }}
           RETRIEVAL_OUTCOME: ${{ steps.retrieval_sensitivity.outcome }}
         run: |
-          if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$ACTION_CONSEQUENCE_OUTCOME" = "success" ] && [ "$RETRIEVAL_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
+          if [ "$TEST_OUTCOME" = "success" ] && [ "$GENERATE_OUTCOME" = "success" ] && [ "$VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_OUTCOME" = "success" ] && [ "$V04_GENERATE_OUTCOME" = "success" ] && [ "$V04_VERIFY_OUTCOME" = "success" ] && [ "$RUNNER_V2_OUTCOME" = "success" ] && [ "$DOCUMENT_ROOT_OUTCOME" = "success" ] && [ "$SIGNED_CATALOG_OUTCOME" = "success" ] && [ "$ACTION_CONSEQUENCE_OUTCOME" = "success" ] && [ "$RETRIEVAL_OUTCOME" = "success" ] && [ "$TABLES_OUTCOME" = "success" ] && [ "$LATEX_OUTCOME" = "success" ]; then STATE=success; else STATE=failure; fi
           V1_STATUS="$RUNNER_OUTCOME"
           V2_STATUS="$RUNNER_V2_OUTCOME"
           case "$V1_STATUS" in success|failure|error) ;; *) V1_STATUS=failure ;; esac
           case "$V2_STATUS" in success|failure|error) ;; *) V2_STATUS=failure ;; esac
-          curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$STATE\",\"context\":\"portfolio/benchmark-integrity-and-manuscript-build\",\"description\":\"Tests, benchmarks, retrieval/action spoof studies, provenance threats, tables and manuscript build\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
+          curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$STATE\",\"context\":\"portfolio/benchmark-integrity-and-manuscript-build\",\"description\":\"Tests, benchmarks, retrieval/action spoof studies, signed catalog threats, provenance threats, tables and manuscript build\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
           curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$V1_STATUS\",\"context\":\"portfolio/reconstruction-v1-diagnostic\",\"description\":\"${RUNNER_ERROR:-runner-passed}\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
           curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" -d "{\"state\":\"$V2_STATUS\",\"context\":\"portfolio/reconstruction-v2-sensitivity\",\"description\":\"${RUNNER_V2_ERROR:-v04-runner-passed}\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}"
       - name: Fail workflow when verification fails
-        if: steps.tests.outcome != 'success' || steps.generate.outcome != 'success' || steps.verify.outcome != 'success' || steps.runner.outcome != 'success' || steps.v04_generate.outcome != 'success' || steps.v04_verify.outcome != 'success' || steps.runner_v2.outcome != 'success' || steps.document_root.outcome != 'success' || steps.action_consequence.outcome != 'success' || steps.retrieval_sensitivity.outcome != 'success' || steps.tables.outcome != 'success' || steps.latex.outcome != 'success'
+        if: steps.tests.outcome != 'success' || steps.generate.outcome != 'success' || steps.verify.outcome != 'success' || steps.runner.outcome != 'success' || steps.v04_generate.outcome != 'success' || steps.v04_verify.outcome != 'success' || steps.runner_v2.outcome != 'success' || steps.document_root.outcome != 'success' || steps.signed_catalog.outcome != 'success' || steps.action_consequence.outcome != 'success' || steps.retrieval_sensitivity.outcome != 'success' || steps.tables.outcome != 'success' || steps.latex.outcome != 'success'
         run: exit 1
