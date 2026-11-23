@@ -324,7 +324,7 @@ def main():
         "seeds": N_SEEDS,
         "condition_count": len(overall_rows),
         "policy_comparison": [*POLICIES, "SerialEvidenceGate"],
-        "serial_gate_definition": "Stylized two-source serial gate: retrieved evidence and verifier assessments must agree to decide; disagreement or retrieval unavailability escalates to human review. This is an analytical comparator, not the current EvidenceGate implementation."
+        "serial_gate_definition": "Stylized two-source serial gate: retrieved evidence and verifier assessments must agree to decide; disagreement or retrieval unavailability escalates to human review. This is an analytical comparator, not the current EvidenceGate implementation.",
         "fixed_assumptions": FIXED,
         "parameter_grid": {key: list(values) for key, values in GRID.items()},
         "correlation_model": (
