@@ -172,6 +172,37 @@ def evaluate_policy(cases, policy_actions, params, draws):
     return metrics(counters), {name: metrics(row) for name, row in by_family.items()}
 
 
+def evaluate_serial_evidence_gate(cases, params, draws):
+    """Stylized serial gate: retrieval and verifier must agree; disagreement escalates."""
+    counters = defaultdict(int)
+    by_family = defaultdict(lambda: defaultdict(int))
+    shock_mass = common_shock_mass(params)
+    for case in cases:
+        safe = bool(case["safe_to_act"])
+        case_draws = draws[case["case_id"]]
+        retrieval_available = case_draws["retrieval_available"] < params["retrieval_availability"]
+        if not retrieval_available:
+            decision = escalation_outcome(safe, params, case_draws, shock_mass)
+        else:
+            retrieval_says_safe = safe if channel_correct(
+                case_draws, "retrieval", params["retrieval_accuracy"], shock_mass
+            ) else not safe
+            verifier_says_safe = safe if channel_correct(
+                case_draws, "verifier", params["verifier_accuracy"], shock_mass
+            ) else not safe
+            if retrieval_says_safe == verifier_says_safe:
+                decision = retrieval_says_safe
+            else:
+                decision = escalation_outcome(safe, params, case_draws, shock_mass)
+        for bucket in (counters, by_family[case["family"]]):
+            bucket["n"] += 1
+            bucket["safe_n"] += int(safe)
+            bucket["acts"] += int(decision)
+            bucket["unsafe_acts"] += int(decision and not safe)
+            bucket["safe_acts"] += int(decision and safe)
+    return metrics(counters), {name: metrics(row) for name, row in by_family.items()}
+
+
 def mean_ci(values):
     clean = [float(value) for value in values if value is not None]
     if not clean:
@@ -222,8 +253,9 @@ def main():
     for condition_id, condition in enumerate(conditions(), start=1):
         params = {**FIXED, **condition}
         shock = common_shock_mass(params)
-        per_policy = {name: [] for name in POLICIES}
-        per_family = {name: defaultdict(list) for name in POLICIES}
+        policy_names = [*POLICIES, "SerialEvidenceGate"]
+        per_policy = {name: [] for name in policy_names}
+        per_family = {name: defaultdict(list) for name in policy_names}
         for seed in range(N_SEEDS):
             draws = draws_by_seed[seed]
             for name in POLICIES:
@@ -231,13 +263,17 @@ def main():
                 per_policy[name].append(overall)
                 for family, result in families.items():
                     per_family[name][family].append(result)
+            serial_overall, serial_families = evaluate_serial_evidence_gate(cases, params, draws)
+            per_policy["SerialEvidenceGate"].append(serial_overall)
+            for family, result in serial_families.items():
+                per_family["SerialEvidenceGate"][family].append(result)
 
         row = {
             "condition_id": condition_id, **params,
             "common_shock_mass": shock,
             "seeds": N_SEEDS, "high_risk_cases": len(cases),
         }
-        for name in POLICIES:
+        for name in policy_names:
             for metric in metric_names:
                 mean, sd, low, high = mean_ci([item[metric] for item in per_policy[name]])
                 prefix = f"{name}_{metric}"
@@ -245,19 +281,20 @@ def main():
                 row[prefix + "_sd"] = sd
                 row[prefix + "_95ci_low"] = low
                 row[prefix + "_95ci_high"] = high
-        for metric in metric_names:
-            mean, sd, low, high = paired_difference_ci(
-                [item[metric] for item in per_policy["EvidenceGate"]],
-                [item[metric] for item in per_policy["RiskGate"]],
-            )
-            prefix = f"paired_EvidenceGate_minus_RiskGate_{metric}"
-            row[prefix + "_mean"] = mean
-            row[prefix + "_sd"] = sd
-            row[prefix + "_95ci_low"] = low
-            row[prefix + "_95ci_high"] = high
+        for left_name, right_name in (("EvidenceGate", "RiskGate"), ("SerialEvidenceGate", "RiskGate")):
+            for metric in metric_names:
+                mean, sd, low, high = paired_difference_ci(
+                    [item[metric] for item in per_policy[left_name]],
+                    [item[metric] for item in per_policy[right_name]],
+                )
+                prefix = f"paired_{left_name}_minus_{right_name}_{metric}"
+                row[prefix + "_mean"] = mean
+                row[prefix + "_sd"] = sd
+                row[prefix + "_95ci_low"] = low
+                row[prefix + "_95ci_high"] = high
         overall_rows.append(row)
 
-        for name in POLICIES:
+        for name in policy_names:
             for family, seed_metrics in per_family[name].items():
                 frow = {
                     "condition_id": condition_id, "policy": name,
@@ -276,7 +313,7 @@ def main():
     write_csv(OUT / "overall_summary.csv", overall_rows)
     write_csv(OUT / "scenario_family_summary.csv", family_rows)
     manifest = {
-        "experiment": "correlated-common-cause-retrieval-verifier-human-sensitivity-v1",
+        "experiment": "correlated-common-cause-retrieval-verifier-human-sensitivity-v2",
         "status": "exploratory synthetic sensitivity analysis",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "source_commit": os.environ.get("GITHUB_SHA"),
@@ -286,7 +323,8 @@ def main():
         "high_risk_cases": len(cases),
         "seeds": N_SEEDS,
         "condition_count": len(overall_rows),
-        "policy_comparison": list(POLICIES),
+        "policy_comparison": [*POLICIES, "SerialEvidenceGate"],
+        "serial_gate_definition": "Stylized two-source serial gate: retrieved evidence and verifier assessments must agree to decide; disagreement or retrieval unavailability escalates to human review. This is an analytical comparator, not the current EvidenceGate implementation."
         "fixed_assumptions": FIXED,
         "parameter_grid": {key: list(values) for key, values in GRID.items()},
         "correlation_model": (
